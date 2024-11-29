@@ -55,11 +55,19 @@ const Addcolor = () => {
     validationSchema: schema,
     onSubmit: (values) => {
       if (getColorId !== undefined) {
-        const data = { id: getColorId, colorData: values };
-        dispatch(updateAColor(data));
+        dispatch(
+          updateAColor({
+            _id: getColorId,
+            color: values.title,
+          })
+        );
         dispatch(resetState());
       } else {
-        dispatch(createColor(values));
+        dispatch(
+          createColor({
+            color: values.title,
+          })
+        );
         formik.resetForm();
         setTimeout(() => {
           dispatch(resetState());

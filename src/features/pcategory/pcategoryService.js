@@ -1,42 +1,29 @@
-import axios from "axios";
-import { base_url } from "../../utils/baseUrl";
-import { config } from "../../utils/axiosconfig";
+import instance from "../../utils/axios-customize";
 
-const getProductCategories = async () => {
-  const response = await axios.get(`${base_url}category/`, {
-    headers: {
-      "ngrok-skip-browser-warning": "69420"
-    }
-  });
-
-  return response.data;
+const getProductCategories = async (query = "") => {
+  const response = await instance.get(`categories?${query}`);
+  return response;
 };
 const createCategory = async (category) => {
-  const response = await axios.post(`${base_url}category/`, category, config);
+  const response = await instance.post(`categories`, category);
 
-  return response.data;
+  return response;
 };
 
 const getProductCategory = async (id) => {
-  const response = await axios.get(`${base_url}category/${id}`, config);
+  const response = await instance.get(`categories/${id}`);
 
-  return response.data;
+  return response;
 };
 
 const deleteProductCategory = async (id) => {
-  const response = await axios.delete(`${base_url}category/${id}`, config);
+  const response = await instance.delete(`categories/${id}`);
 
-  return response.data;
+  return response;
 };
 const updateProductCategory = async (category) => {
-  console.log(category);
-  const response = await axios.put(
-    `${base_url}category/${category.id}`,
-    { title: category.pCatData.title },
-    config
-  );
-
-  return response.data;
+  const response = await instance.patch(`categories`, category);
+  return response;
 };
 const pCategoryService = {
   getProductCategories,

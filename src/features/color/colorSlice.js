@@ -4,20 +4,22 @@ import colorService from "./colorService";
 export const getColors = createAsyncThunk(
   "color/get-colors",
   async (thunkAPI) => {
-    try {
-      return await colorService.getColors();
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await colorService.getColors();
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
 export const createColor = createAsyncThunk(
   "color/create-color",
   async (colorData, thunkAPI) => {
-    try {
-      return await colorService.createColor(colorData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await colorService.createColor(colorData);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -25,20 +27,22 @@ export const createColor = createAsyncThunk(
 export const getAColor = createAsyncThunk(
   "color/get-color",
   async (id, thunkAPI) => {
-    try {
-      return await colorService.getColor(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await colorService.getColor(id);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
 export const updateAColor = createAsyncThunk(
   "color/update-color",
   async (color, thunkAPI) => {
-    try {
-      return await colorService.updateColor(color);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await colorService.updateColor(color);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -46,10 +50,11 @@ export const updateAColor = createAsyncThunk(
 export const deleteAColor = createAsyncThunk(
   "color/delete-color",
   async (id, thunkAPI) => {
-    try {
-      return await colorService.deleteColor(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await colorService.deleteColor(id);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -76,7 +81,7 @@ export const colorSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.colors = action.payload;
+        state.colors = action.payload.data.result;
       })
       .addCase(getColors.rejected, (state, action) => {
         state.isLoading = false;
@@ -121,7 +126,7 @@ export const colorSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.colorName = action.payload.title;
+        state.colorName = action.payload.data.color;
       })
       .addCase(getAColor.rejected, (state, action) => {
         state.isLoading = false;
@@ -136,7 +141,7 @@ export const colorSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.deletedColor = action.payload.title;
+        state.deletedColor = action.payload;
       })
       .addCase(deleteAColor.rejected, (state, action) => {
         state.isLoading = false;

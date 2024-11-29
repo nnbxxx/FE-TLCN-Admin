@@ -58,11 +58,19 @@ const Addbrand = () => {
     validationSchema: schema,
     onSubmit: (values) => {
       if (getBrandId !== undefined) {
-        const data = { id: getBrandId, brandData: values };
-        dispatch(updateABrand(data));
+        dispatch(
+          updateABrand({
+            _id: getBrandId,
+            brand: values.title,
+          })
+        );
         dispatch(resetState());
       } else {
-        dispatch(createBrand(values));
+        dispatch(
+          createBrand({
+            brand: values.title,
+          })
+        );
         formik.resetForm();
         setTimeout(() => {
           dispatch(resetState());

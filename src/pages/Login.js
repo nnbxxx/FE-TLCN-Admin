@@ -24,7 +24,12 @@ const Login = () => {
     },
     validationSchema: schema,
     onSubmit: (values) => {
-      dispatch(login(values));
+      dispatch(
+        login({
+          username: values.email,
+          password: values.password,
+        })
+      );
     },
   });
   const authState = useSelector((state) => state);
@@ -40,7 +45,7 @@ const Login = () => {
   return (
     <>
       <ToastContainer
-        position='top-right'
+        position="top-right"
         autoClose={1000}
         hideProgressBar={false}
         newestOnTop={false}
@@ -48,15 +53,14 @@ const Login = () => {
         rtl={false}
         pauseOnFocusLoss
         draggable
-        theme='light' />
+        theme="light"
+      />
       <div style={styles.container}>
-        
         <div style={styles.rightPanel}>
           <div style={styles.loginFormContainer}>
             <img src={logo} alt="Sac Logo" style={styles.logo} />
             <h3 style={styles.loginTitle}>Chào mừng bạn đến với Sắc</h3>
             <form onSubmit={formik.handleSubmit}>
-            
               <CustomInput
                 type="text"
                 label="email"
@@ -97,7 +101,6 @@ const Login = () => {
 };
 
 const styles = {
-  
   container: {
     display: "flex",
     minHeight: "100vh",
@@ -168,7 +171,7 @@ const styles = {
     fontWeight: "bold",
     marginBottom: "-11px",
   },
-  
+
   required: {
     color: "red",
     fontSize: "14px",

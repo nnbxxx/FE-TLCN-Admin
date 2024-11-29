@@ -4,30 +4,33 @@ import pCategoryService from "./pcategoryService";
 export const getCategories = createAsyncThunk(
   "productCategory/get-categories",
   async (thunkAPI) => {
-    try {
-      return await pCategoryService.getProductCategories();
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await pCategoryService.getProductCategories("");
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
 export const createCategory = createAsyncThunk(
   "productCategory/create-category",
   async (categoryData, thunkAPI) => {
-    try {
-      return await pCategoryService.createCategory(categoryData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await pCategoryService.createCategory(categoryData);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
 export const updateAProductCategory = createAsyncThunk(
   "productCategory/update-category",
   async (category, thunkAPI) => {
-    try {
-      return await pCategoryService.updateProductCategory(category);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await pCategoryService.updateProductCategory(category);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -35,20 +38,22 @@ export const updateAProductCategory = createAsyncThunk(
 export const deleteAProductCategory = createAsyncThunk(
   "productCategory/delete-category",
   async (id, thunkAPI) => {
-    try {
-      return await pCategoryService.deleteProductCategory(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await pCategoryService.deleteProductCategory(id);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
 export const getAProductCategory = createAsyncThunk(
   "productCategory/get-product-category",
   async (id, thunkAPI) => {
-    try {
-      return await pCategoryService.getProductCategory(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await pCategoryService.getProductCategory(id);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -74,7 +79,7 @@ export const pCategorySlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.pCategories = action.payload;
+        state.pCategories = action.payload.data.result;
       })
       .addCase(getCategories.rejected, (state, action) => {
         state.isLoading = false;
@@ -134,7 +139,7 @@ export const pCategorySlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.categoryName = action.payload.title;
+        state.categoryName = action.payload.data.name;
       })
       .addCase(getAProductCategory.rejected, (state, action) => {
         state.isLoading = false;

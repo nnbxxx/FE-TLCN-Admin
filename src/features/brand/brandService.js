@@ -1,40 +1,29 @@
-import axios from "axios";
-import { config } from "../../utils/axiosconfig";
-import { base_url } from "../../utils/baseUrl";
-const getBrands = async () => {
-  const response = await axios.get(`${base_url}brand/`, {
-    headers: {
-      "ngrok-skip-browser-warning": "69420"
-    }
-  });
+import instance from "../../utils/axios-customize";
+const getBrands = async (query = "") => {
+  const response = await instance.get(`brand?${query}`);
 
-  return response.data;
+  return response;
 };
 
 const createBrand = async (brand) => {
-  const response = await axios.post(`${base_url}brand/`, brand, config);
+  const response = await instance.post(`brand`, brand);
 
-  return response.data;
+  return response;
 };
 const updateBrand = async (brand) => {
-  const response = await axios.put(
-    `${base_url}brand/${brand.id}`,
-    { title: brand.brandData.title },
-    config
-  );
-
-  return response.data;
+  const response = await instance.patch(`brand`, brand);
+  return response;
 };
 const getBrand = async (id) => {
-  const response = await axios.get(`${base_url}brand/${id}`, config);
+  const response = await instance.get(`brand/${id}`);
 
-  return response.data;
+  return response;
 };
 
 const deleteBrand = async (id) => {
-  const response = await axios.delete(`${base_url}brand/${id}`, config);
+  const response = await instance.delete(`brand/${id}`);
 
-  return response.data;
+  return response;
 };
 
 const brandService = {

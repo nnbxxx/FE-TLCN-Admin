@@ -1,21 +1,14 @@
 import axios from "axios";
 import { config } from "../../utils/axiosconfig";
 import { base_url } from "../../utils/baseUrl";
+import instance from "../../utils/axios-customize";
 
 // const getTokenFromLocalStorage = localStorage.get("user")
 //   ? JSON.parse(localStorage.getItem("user"))
 //   : null;
 
 const login = async (user) => {
-  const response = await axios.post(`${base_url}user/admin-login`, user, {
-    headers: {
-      "ngrok-skip-browser-warning": "69420"
-    }
-  });
-  if (response.data) {
-    localStorage.setItem("user", JSON.stringify(response.data));
-  }
-  return response.data;
+  return await instance.post(`auth/login`, user);
 };
 const getOrders = async (data) => {
   const response = await axios.get(`${base_url}user/getallorders`, data);
@@ -38,7 +31,6 @@ const updateOrder = async (data) => {
     { status: data.status },
     config
   );
-  
 
   return response.data;
 };
@@ -47,10 +39,11 @@ const getMonthlyOrders = async (data) => {
   const response = await axios.get(
     `${base_url}user/getMonthWiseOrderIncome`,
 
-    data,{
+    data,
+    {
       headers: {
-        "ngrok-skip-browser-warning": "69420"
-      }
+        "ngrok-skip-browser-warning": "69420",
+      },
     }
   );
 
@@ -61,10 +54,11 @@ const getYearlyStats = async (data) => {
   const response = await axios.get(
     `${base_url}user/getyearlyorders`,
 
-    data,{
+    data,
+    {
       headers: {
-        "ngrok-skip-browser-warning": "69420"
-      }
+        "ngrok-skip-browser-warning": "69420",
+      },
     }
   );
 
@@ -78,7 +72,6 @@ const authService = {
   getMonthlyOrders,
   getYearlyStats,
   updateOrder,
-  
 };
 
 export default authService;

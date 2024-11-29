@@ -5,9 +5,11 @@ const getTokenFromLocalStorage = localStorage.getItem("user")
 export const config = {
   headers: {
     Authorization: `Bearer ${
-      getTokenFromLocalStorage !== null ? getTokenFromLocalStorage.token : ""
+      getTokenFromLocalStorage !== null
+        ? getTokenFromLocalStorage.access_token
+        : ""
     }`,
     Accept: "application/json",
-    "ngrok-skip-browser-warning": "69420"
+    "ngrok-skip-browser-warning": "69420",
   },
 };

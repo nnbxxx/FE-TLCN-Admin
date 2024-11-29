@@ -6,21 +6,7 @@ import { BiEdit } from "react-icons/bi";
 import { AiFillDelete } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import CustomModal from "../components/CustomModal";
-
-const columns = [
-  {
-    title: "SNo",
-    dataIndex: "key",
-  },
-  {
-    title: "Color",
-    dataIndex: "Color",
-  },
-  {
-    title: "Action",
-    dataIndex: "action",
-  },
-];
+import { render } from "@testing-library/react";
 
 const Colorlist = () => {
   const [open, setOpen] = useState(false);
@@ -38,43 +24,54 @@ const Colorlist = () => {
     dispatch(getColors());
   }, []);
   const colorState = useSelector((state) => state.color.colors);
-  const data1 = [];
-  for (let i = 0; i < colorState.length; i++) {
-    data1.push({
-      key: i + 1,
-      Color: (
-        <div className="col-3">
-          <ul
-            className="colors ps-0"
-            style={{
-              width: "30px",
-              height: "30px",
-              borderRadius: "50%",
-              marginBottom: "10px",
+  const columns = [
+    {
+      title: "Id",
+      dataIndex: "_id",
+      width: 100,
+    },
+    {
+      title: "Color",
+      dataIndex: "Color",
+      render: (index, item) => {
+        return (
+          <div className="col-3">
+            <ul
+              className="colors ps-0"
+              style={{
+                width: "30px",
+                height: "30px",
+                borderRadius: "50%",
+                marginBottom: "10px",
 
-              backgroundColor: colorState[i].title,
-            }}
-          ></ul>
-        </div>
-      ),
-      action: (
-        <>
-          <Link
-            to={`/admin/color/${colorState[i]._id}`}
-            className=" fs-3 text-danger"
-          >
-            <BiEdit />
-          </Link>
-          <button
-            className="ms-3 fs-3 text-danger bg-transparent border-0"
-            onClick={() => showModal(colorState[i]._id)}
-          >
-            <AiFillDelete />
-          </button>
-        </>
-      ),
-    });
-  }
+                backgroundColor: item.color,
+              }}
+            ></ul>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      render: (index, item) => {
+        return (
+          <>
+            <Link to={`/admin/color/${item._id}`} className=" fs-3 text-danger">
+              <BiEdit />
+            </Link>
+            <button
+              className="ms-3 fs-3 text-danger bg-transparent border-0"
+              onClick={() => showModal(item._id)}
+            >
+              <AiFillDelete />
+            </button>
+          </>
+        );
+      },
+    },
+  ];
+
   const deleteColor = (e) => {
     dispatch(deleteAColor(e));
 
@@ -87,7 +84,7 @@ const Colorlist = () => {
     <div>
       <h3 className="mb-4 title">Danh sách màu sắc</h3>
       <div>
-        <Table columns={columns} dataSource={data1} />
+        <Table columns={columns} dataSource={colorState} />
       </div>
       <CustomModal
         hideModal={hideModal}

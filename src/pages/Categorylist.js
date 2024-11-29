@@ -10,27 +10,46 @@ import {
   resetState,
 } from "../features/pcategory/pcategorySlice";
 import CustomModal from "../components/CustomModal";
-
-const columns = [
-  {
-    title: "SNo",
-    dataIndex: "key",
-  },
-  {
-    title: "Name",
-    dataIndex: "name",
-    sorter: (a, b) => a.name.length - b.name.length,
-  },
-
-  {
-    title: "Action",
-    dataIndex: "action",
-  },
-];
+import { render } from "@testing-library/react";
 
 const Categorylist = () => {
   const [open, setOpen] = useState(false);
   const [pCatId, setpCatId] = useState("");
+  const columns = [
+    {
+      title: "Id",
+      dataIndex: "_id",
+      width: 100,
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      sorter: (a, b) => a.name.length - b.name.length,
+    },
+
+    {
+      title: "Action",
+      dataIndex: "action",
+      render: (index, item) => {
+        return (
+          <>
+            <Link
+              to={`/admin/category/${item._id}`}
+              className=" fs-3 text-danger"
+            >
+              <BiEdit />
+            </Link>
+            <button
+              className="ms-3 fs-3 text-danger bg-transparent border-0"
+              onClick={() => showModal(item._id)}
+            >
+              <AiFillDelete />
+            </button>
+          </>
+        );
+      },
+    },
+  ];
   const showModal = (e) => {
     setOpen(true);
     setpCatId(e);
@@ -45,29 +64,7 @@ const Categorylist = () => {
     dispatch(getCategories());
   }, []);
   const pCatStat = useSelector((state) => state.pCategory.pCategories);
-  const data1 = [];
-  for (let i = 0; i < pCatStat.length; i++) {
-    data1.push({
-      key: i + 1,
-      name: pCatStat[i].title,
-      action: (
-        <>
-          <Link
-            to={`/admin/category/${pCatStat[i]._id}`}
-            className=" fs-3 text-danger"
-          >
-            <BiEdit />
-          </Link>
-          <button
-            className="ms-3 fs-3 text-danger bg-transparent border-0"
-            onClick={() => showModal(pCatStat[i]._id)}
-          >
-            <AiFillDelete />
-          </button>
-        </>
-      ),
-    });
-  }
+
   const deleteCategory = (e) => {
     dispatch(deleteAProductCategory(e));
     setOpen(false);
@@ -79,7 +76,7 @@ const Categorylist = () => {
     <div>
       <h3 className="mb-4 title">Danh sách danh mục sản phẩm</h3>
       <div>
-        <Table columns={columns} dataSource={data1} />
+        <Table columns={columns} dataSource={pCatStat} />
       </div>
       <CustomModal
         hideModal={hideModal}

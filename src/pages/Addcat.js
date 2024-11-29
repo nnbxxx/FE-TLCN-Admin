@@ -55,11 +55,21 @@ const Addcat = () => {
     validationSchema: schema,
     onSubmit: (values) => {
       if (getPCatId !== undefined) {
-        const data = { id: getPCatId, pCatData: values };
-        dispatch(updateAProductCategory(data));
+        dispatch(
+          updateAProductCategory({
+            _id: getPCatId,
+            name: values.title,
+            url: "https://t4.ftcdn.net/jpg/03/85/95/63/360_F_385956366_Zih7xDcSLqDxiJRYUfG5ZHNoFCSLMRjm.jpg",
+          })
+        );
         dispatch(resetState());
       } else {
-        dispatch(createCategory(values));
+        dispatch(
+          createCategory({
+            name: values.title,
+            url: "https://t4.ftcdn.net/jpg/03/85/95/63/360_F_385956366_Zih7xDcSLqDxiJRYUfG5ZHNoFCSLMRjm.jpg",
+          })
+        );
         formik.resetForm();
         setTimeout(() => {
           dispatch(resetState());

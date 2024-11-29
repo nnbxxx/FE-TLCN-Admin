@@ -16,10 +16,15 @@ const initialState = {
 export const login = createAsyncThunk(
   "auth/login",
   async (userData, thunkAPI) => {
-    try {
-      return await authService.login(userData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await authService.login(userData);
+    if (re && re.data) {
+      const { data } = re;
+      if (data) {
+        localStorage.setItem("user", JSON.stringify(re.data));
+      }
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -94,18 +99,17 @@ export const authSlice = createSlice({
         state.user = action.payload;
         state.message = "success";
         if (state.isSuccess === true) {
-          localStorage.setItem("token", action.payload.token)
+          localStorage.setItem("access_token", action.payload.access_token);
           toast.success("Login Successfully !");
         }
       })
       .addCase(login.rejected, (state, action) => {
         state.isError = true;
         state.isSuccess = false;
-        state.message = action.error;
+        state.message = action.payload.message;
         state.isLoading = false;
         if (state.isError === true) {
-          console.log(action.payload.response.data.message);
-          toast.error(action.payload.response.data.message)
+          toast.error(action.payload.message);
         }
       })
       .addCase(getOrders.pending, (state) => {

@@ -11,22 +11,6 @@ import {
 } from "../features/brand/brandSlice";
 import CustomModal from "../components/CustomModal";
 
-const columns = [
-  {
-    title: "SNo",
-    dataIndex: "key",
-  },
-  {
-    title: "Name",
-    dataIndex: "name",
-    sorter: (a, b) => a.name.length - b.name.length,
-  },
-  {
-    title: "Action",
-    dataIndex: "action",
-  },
-];
-
 const Brandlist = () => {
   const [open, setOpen] = useState(false);
   const [brandId, setbrandId] = useState("");
@@ -44,29 +28,39 @@ const Brandlist = () => {
     dispatch(getBrands());
   }, []);
   const brandState = useSelector((state) => state.brand.brands);
-  const data1 = [];
-  for (let i = 0; i < brandState.length; i++) {
-    data1.push({
-      key: i + 1,
-      name: brandState[i].title,
-      action: (
-        <>
-          <Link
-            to={`/admin/brand/${brandState[i]._id}`}
-            className=" fs-3 text-danger"
-          >
-            <BiEdit />
-          </Link>
-          <button
-            className="ms-3 fs-3 text-danger bg-transparent border-0"
-            onClick={() => showModal(brandState[i]._id)}
-          >
-            <AiFillDelete />
-          </button>
-        </>
-      ),
-    });
-  }
+  const columns = [
+    {
+      title: "Id",
+      dataIndex: "_id",
+      width: 100,
+    },
+    {
+      title: "Brand",
+      dataIndex: "brand",
+      sorter: (a, b) => a.brand.length - b.brand.length,
+    },
+
+    {
+      title: "Action",
+      dataIndex: "action",
+      render: (index, item) => {
+        return (
+          <>
+            <Link to={`/admin/brand/${item._id}`} className=" fs-3 text-danger">
+              <BiEdit />
+            </Link>
+            <button
+              className="ms-3 fs-3 text-danger bg-transparent border-0"
+              onClick={() => showModal(item._id)}
+            >
+              <AiFillDelete />
+            </button>
+          </>
+        );
+      },
+    },
+  ];
+
   const deleteBrand = (e) => {
     dispatch(deleteABrand(e));
 
@@ -79,7 +73,7 @@ const Brandlist = () => {
     <div>
       <h3 className="mb-4 title">Danh sách thương hiệu</h3>
       <div>
-        <Table columns={columns} dataSource={data1} />
+        <Table columns={columns} dataSource={brandState} />
       </div>
       <CustomModal
         hideModal={hideModal}

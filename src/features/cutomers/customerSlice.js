@@ -7,7 +7,6 @@ export const getUsers = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await customerService.getUsers();
-      console.log("Fetched users:", response); // Kiểm tra dữ liệu lấy về từ API
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
@@ -19,13 +18,12 @@ export const blockUser = createAsyncThunk(
   "customer/block-user",
   async (userId, thunkAPI) => {
     try {
-      const token = localStorage.getItem("token"); // Assuming you store the token in the auth state
+      const token = localStorage.getItem("access_token"); // Assuming you store the token in the auth state
       if (!token) throw new Error("No token provided");
-      console.log("Token:", token); // Debugging step
       const response = await customerService.blockUser(userId, token);
       return response;
     } catch (error) {
-      console.error("blockUser error:", error);  // Detailed logging
+      console.error("blockUser error:", error); // Detailed logging
       return thunkAPI.rejectWithValue(error.message);
     }
   }
@@ -35,13 +33,12 @@ export const unblockUser = createAsyncThunk(
   "customer/unblock-user",
   async (userId, thunkAPI) => {
     try {
-      const token = localStorage.getItem("token"); // Assuming you store the token in the auth state
+      const token = localStorage.getItem("access_token"); // Assuming you store the token in the auth state
       if (!token) throw new Error("No token provided");
-      console.log("Token:", token); // Debugging step
       const response = await customerService.unblockUser(userId, token);
       return response;
     } catch (error) {
-      console.error("unblockUser error:", error);  // Detailed logging
+      console.error("unblockUser error:", error); // Detailed logging
       return thunkAPI.rejectWithValue(error.message);
     }
   }
@@ -51,13 +48,12 @@ export const updateUser = createAsyncThunk(
   "customer/edit-user",
   async (user, thunkAPI) => {
     try {
-      const token = localStorage.getItem("token"); // Assuming you store the token in the auth state
+      const token = localStorage.getItem("access_token"); // Assuming you store the token in the auth state
       if (!token) throw new Error("No token provided");
-      console.log("Token:", token); // Debugging step
       const response = await customerService.updateUser(user, token);
       return response;
     } catch (error) {
-      console.error("updateUser error:", error);  // Detailed logging
+      console.error("updateUser error:", error); // Detailed logging
       return thunkAPI.rejectWithValue(error.message);
     }
   }

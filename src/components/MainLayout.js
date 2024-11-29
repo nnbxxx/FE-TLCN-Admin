@@ -18,13 +18,13 @@ import { SiBrandfolder } from "react-icons/si";
 import { BiCategoryAlt } from "react-icons/bi";
 import { Layout, Menu, theme } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 import logo from "../assets/LogoS.jpg";
 
 const { Header, Sider, Content } = Layout;
 
 const MainLayout = () => {
-  const authState = useSelector((state) => state?.auth?.user)
+  const authState = useSelector((state) => state?.auth?.user.user);
 
   const [collapsed, setCollapsed] = useState(false);
   const {
@@ -39,13 +39,18 @@ const MainLayout = () => {
   return (
     <Layout>
       <Sider trigger={null} collapsible collapsed={collapsed}>
-        <div className="logo" 
-        style={{
-          backgroundColor: "#000000FF", // Màu nền logo
-          
-        }}>
+        <div
+          className="logo"
+          style={{
+            backgroundColor: "#000000FF", // Màu nền logo
+          }}
+        >
           <h2 className="text-white fs-5 text-center py-0 mb-0">
-            <img src={logo} alt="Logo" style={{ width: "80px", height: "auto" }} />
+            <img
+              src={logo}
+              alt="Logo"
+              style={{ width: "80px", height: "auto" }}
+            />
           </h2>
         </div>
         <Menu
@@ -54,7 +59,7 @@ const MainLayout = () => {
           defaultSelectedKeys={[""]}
           onClick={({ key }) => {
             if (key === "signout") {
-              handleLogout(); 
+              handleLogout();
             } else {
               navigate(key);
             }
@@ -175,7 +180,6 @@ const MainLayout = () => {
               key: "signout",
               icon: <AiOutlineLogout className="fs-4" />,
               label: "Sign Out",
-              
             },
           ]}
         />
@@ -199,17 +203,10 @@ const MainLayout = () => {
             <div className="d-flex gap-3 align-items-center">
               {/* Dropdown content */}
               <div>
-                <img
-                  width={32}
-                  height={32}
-                  src="https://png.pngtree.com/png-vector/20190223/ourlarge/pngtree-admin-rolls-glyph-black-icon-png-image_691507.jpg"
-                  alt=""
-                />
+                <img width={60} height={60} src={authState?.avatar} alt="" />
               </div>
-              <div
-                className="dropdownMenuLink"
-              >
-                <h5 className="mb-0">{authState?.firstname + " " + authState?.lastname}</h5>
+              <div className="dropdownMenuLink">
+                <h5 className="mb-0">{authState?.name}</h5>
                 <p className="mb-0">{authState?.email}</p>
               </div>
             </div>
