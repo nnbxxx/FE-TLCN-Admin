@@ -4,50 +4,55 @@ import couponService from "./couponService";
 export const getAllCoupon = createAsyncThunk(
   "coupon/get-coupons",
   async (thunkAPI) => {
-    try {
-      return await couponService.getCoupons();
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await couponService.getCoupons();
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
 export const createCoupon = createAsyncThunk(
   "coupon/create-coupon",
   async (couponData, thunkAPI) => {
-    try {
-      return await couponService.createCoupons(couponData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await couponService.createCoupons(couponData);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
 export const deleteACoupon = createAsyncThunk(
   "coupon/delete-coupon",
   async (id, thunkAPI) => {
-    try {
-      return await couponService.deleteCoupon(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await couponService.deleteCoupon(id);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
 export const getACoupon = createAsyncThunk(
   "coupon/get-coupon",
   async (id, thunkAPI) => {
-    try {
-      return await couponService.getCoupon(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await couponService.getCoupon(id);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
 export const updateACoupon = createAsyncThunk(
   "color/update-coupon",
   async (coupon, thunkAPI) => {
-    try {
-      return await couponService.updateCoupon(coupon);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await couponService.updateCoupon(coupon);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -73,7 +78,7 @@ export const couponSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.coupons = action.payload;
+        state.coupons = action.payload.data.result;
       })
       .addCase(getAllCoupon.rejected, (state, action) => {
         state.isLoading = false;
@@ -118,9 +123,10 @@ export const couponSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.couponName = action.payload.name;
-        state.couponExpiry = action.payload.expiry;
-        state.couponDiscount = action.payload.discount;
+        state.couponName = action.payload.data.name;
+        state.couponCode = action.payload.data.code;
+        state.couponExpiry = action.payload.data.couponExpired;
+        state.couponDiscount = action.payload.data.description.value;
       })
       .addCase(getACoupon.rejected, (state, action) => {
         state.isLoading = false;

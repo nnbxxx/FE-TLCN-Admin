@@ -81,10 +81,24 @@ const AddBlog = () => {
     validationSchema: schema,
     onSubmit: (values) => {
       if (getBlogId !== undefined) {
-        const data = { id: getBlogId, blogData: values };
-        dispatch(updateABlog(data));
+        dispatch(
+          updateABlog({
+            _id: getBlogId,
+            title: values.title,
+            description: values.description,
+            category: values.category,
+            images: values.images,
+          })
+        );
       } else {
-        dispatch(createBlogs(values));
+        dispatch(
+          createBlogs({
+            title: values.title,
+            description: values.description,
+            category: values.category,
+            images: values.images,
+          })
+        );
         formik.resetForm();
         setTimeout(() => {
           dispatch(resetState());
@@ -96,11 +110,16 @@ const AddBlog = () => {
   useEffect(() => {
     formik.setFieldValue("images", blogImages);
   }, [blogImages]);
+  useEffect(() => {
+    formik.setFieldValue("images", imgState);
+  }, [imgState]);
 
   const handleImageUpload = (acceptedFiles) => {
-    dispatch(uploadImg(acceptedFiles)).then(() => {
-      formik.setFieldValue("images", imgState);
-    });
+    dispatch(uploadImg(acceptedFiles));
+  };
+  const handleDeleteImage = (index) => {
+    const updatedImages = formik.values.images.filter((_, i) => i !== index);
+    formik.setFieldValue("images", updatedImages);
   };
 
   return (
@@ -133,8 +152,8 @@ const AddBlog = () => {
           >
             <option value="">Chọn danh mục bài viết</option>
             {bCatState.map((i, j) => (
-              <option key={j} value={i.title}>
-                {i.title}
+              <option key={j} value={i.subject}>
+                {i.subject}
               </option>
             ))}
           </select>
@@ -164,15 +183,15 @@ const AddBlog = () => {
             </Dropzone>
           </div>
           <div className="showimages d-flex flex-wrap mt-3 gap-3">
-            {formik.values.images?.map((i, j) => (
-              <div className="position-relative" key={j}>
+            {formik.values.images?.map((image, index) => (
+              <div className="position-relative" key={index}>
                 <button
                   type="button"
-                  onClick={() => dispatch(delImg(i.public_id))}
+                  onClick={() => handleDeleteImage(index)}
                   className="btn-close position-absolute"
                   style={{ top: "10px", right: "10px" }}
                 ></button>
-                <img src={i.url} alt="" width={200} height={200} />
+                <img src={image} alt="" width={200} height={200} />
               </div>
             ))}
           </div>

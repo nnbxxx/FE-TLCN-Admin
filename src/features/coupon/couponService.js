@@ -1,40 +1,31 @@
-import axios from "axios";
-import { config } from "../../utils/axiosconfig";
-import { base_url } from "../../utils/baseUrl";
-const getCoupons = async () => {
-  const response = await axios.get(`${base_url}coupon/`, config);
+import instance from "../../utils/axios-customize";
 
-  return response.data;
+const getCoupons = async (query = "") => {
+  const response = await instance.get(`coupons?${query}`);
+
+  return response;
 };
 
 const createCoupons = async (coupon) => {
-  const response = await axios.post(`${base_url}coupon/`, coupon, config);
+  const response = await instance.post(`coupons`, coupon);
 
-  return response.data;
+  return response;
 };
 const updateCoupon = async (coupon) => {
-  const response = await axios.put(
-    `${base_url}coupon/${coupon.id}`,
-    {
-      name: coupon.couponData.name,
-      expiry: coupon.couponData.expiry,
-      discount: coupon.couponData.discount,
-    },
-    config
-  );
+  const response = await instance.patch(`coupons`, coupon);
 
-  return response.data;
+  return response;
 };
 const getCoupon = async (id) => {
-  const response = await axios.get(`${base_url}coupon/${id}`, config);
+  const response = await instance.get(`coupons/${id}`);
 
-  return response.data;
+  return response;
 };
 
 const deleteCoupon = async (id) => {
-  const response = await axios.delete(`${base_url}coupon/${id}`, config);
+  const response = await instance.delete(`coupons/${id}`);
 
-  return response.data;
+  return response;
 };
 const couponService = {
   getCoupons,

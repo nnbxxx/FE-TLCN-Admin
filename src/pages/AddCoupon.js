@@ -14,6 +14,7 @@ import {
 
 let schema = yup.object().shape({
   name: yup.string().required("Coupon Name is Required"),
+  code: yup.string().required("Coupon Code is Required"),
   expiry: yup.date().required("Expiry Date is Required"),
   discount: yup.number().required("Discount Percentage is Required"),
 });
@@ -30,6 +31,7 @@ const AddCoupon = () => {
     isLoading,
     createdCoupon,
     couponName,
+    couponCode,
     couponDiscount,
     couponExpiry,
     updatedCoupon,
@@ -66,6 +68,7 @@ const AddCoupon = () => {
     enableReinitialize: true,
     initialValues: {
       name: couponName || "",
+      code: couponCode || "",
       expiry: changeDateFormet(couponExpiry) || "",
       discount: couponDiscount || "",
     },
@@ -73,10 +76,35 @@ const AddCoupon = () => {
     onSubmit: (values) => {
       if (getCouponId !== undefined) {
         const data = { id: getCouponId, couponData: values };
-        dispatch(updateACoupon(data));
+        dispatch(
+          updateACoupon({
+            _id: getCouponId,
+            code: values.code,
+            name: values.name,
+            type: "PRICE",
+            quantity: 1000,
+            couponExpired: values.expiry,
+            description: {
+              value: values.discount,
+              pointAccept: 0,
+            },
+          })
+        );
         dispatch(resetState());
       } else {
-        dispatch(createCoupon(values));
+        dispatch(
+          createCoupon({
+            code: values.code,
+            name: values.name,
+            type: "PRICE",
+            quantity: 1000,
+            couponExpired: values.expiry,
+            description: {
+              value: values.discount,
+              pointAccept: 0,
+            },
+          })
+        );
         formik.resetForm();
         setTimeout(() => {
           dispatch(resetState);
@@ -103,6 +131,18 @@ const AddCoupon = () => {
           />
           <div className="error">
             {formik.touched.name && formik.errors.name}
+          </div>
+          <CustomInput
+            type="text"
+            name="code"
+            onChng={formik.handleChange("code")}
+            onBlr={formik.handleBlur("code")}
+            val={formik.values.code}
+            label="Nhập mã giảm giá"
+            id="code"
+          />
+          <div className="error">
+            {formik.touched.code && formik.errors.code}
           </div>
           <CustomInput
             type="date"

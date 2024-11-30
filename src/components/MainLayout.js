@@ -9,7 +9,7 @@ import {
 } from "react-icons/ai";
 
 import { RiCouponLine } from "react-icons/ri";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Outlet } from "react-router-dom";
 import { ImBlog } from "react-icons/im";
@@ -20,6 +20,7 @@ import { Layout, Menu, theme } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import logo from "../assets/LogoS.jpg";
+import instance from "../../src/utils/axios-customize";
 
 const { Header, Sider, Content } = Layout;
 
@@ -32,9 +33,13 @@ const MainLayout = () => {
   } = theme.useToken();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.clear();
     window.location.reload();
+    const res = await instance.post("auth/logout");
+    if (res && res.data) {
+      toast.success({ content: "Logout Success" });
+    }
   };
   return (
     <Layout>

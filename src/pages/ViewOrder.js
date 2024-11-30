@@ -39,12 +39,13 @@ const ViewOrder = () => {
   const location = useLocation();
   const orderId = location.pathname.split("/")[3];
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
     dispatch(getaOrder(orderId));
   }, [dispatch, orderId]);
-  
-  const orderState = useSelector((state) => state?.auth?.singleorder?.orders);
+
+  const orderState = useSelector((state) => state?.auth?.singleorder);
+  console.log("🚀 ~ ViewOrder ~ orderState:", orderState);
 
   const data1 = [];
   if (orderState?.orderItems) {
@@ -85,14 +86,45 @@ const ViewOrder = () => {
       <div>
         {orderState && (
           <div className="order-details">
-            <p><strong>ID:</strong> {orderState._id}</p>
-            <p><strong>Status:</strong> {orderState.orderStatus}</p>
-            <p><strong>Price:</strong> {orderState.totalPrice} đ</p>
-            <p><strong>Date:</strong> {new Date(orderState.createdAt).toLocaleString()}</p>
-            <p><strong>Payment Method:</strong> {orderState.paymentMethod}</p>
-            <p><strong>Người nhận:</strong> {orderState.shippingInfo.firstname} {orderState.shippingInfo.lastname}</p>
-            <p><strong>Recipient:</strong> {orderState.shippingInfo.address},{orderState.shippingInfo.city},{orderState.shippingInfo.state},{orderState.shippingInfo.country}</p>
-            <p><strong>Phone:</strong> {orderState.shippingInfo.pincode}</p>
+            <p>
+              <strong>ID:</strong> {orderState._id}
+            </p>
+            <p>
+              <strong>Status:</strong> {orderState.statusUser}
+            </p>
+            <p>
+              <strong>Price:</strong> {orderState.total} đ
+            </p>
+            <p>
+              <strong>Date:</strong>{" "}
+              {new Date(orderState.createdAt).toLocaleString()}
+            </p>
+            <p>
+              <strong>Payment Method:</strong> {orderState.paymentMethod}
+            </p>
+            <p>
+              <strong>Người nhận:</strong> abc xyz
+            </p>
+            <p>
+              <div>
+                <strong>Địa chỉ:</strong>
+              </div>
+              <p>
+                <strong>Tỉnh/Thành Phố:</strong> {orderState.address.province}
+              </p>
+              <p>
+                <strong>Quận/Huyện:</strong> {orderState.address.district}
+              </p>
+              <p>
+                <strong>Phường/Xã:</strong> {orderState.address.ward}
+              </p>
+              <p>
+                <strong>Cụ thể:</strong> {orderState.address.detail}
+              </p>
+            </p>
+            <p>
+              <strong>Phone:</strong> 0123456789
+            </p>
           </div>
         )}
         <Table columns={columns} dataSource={data1} />

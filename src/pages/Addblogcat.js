@@ -54,12 +54,20 @@ const Addblogcat = () => {
     },
     validationSchema: schema,
     onSubmit: (values) => {
-      const data = { id: getBlogCatId, blogCatData: values };
       if (getBlogCatId !== undefined) {
-        dispatch(updateABlogCat(data));
+        dispatch(
+          updateABlogCat({
+            _id: getBlogCatId,
+            subject: values.title,
+          })
+        );
         dispatch(resetState());
       } else {
-        dispatch(createNewblogCat(values));
+        dispatch(
+          createNewblogCat({
+            subject: values.title,
+          })
+        );
         formik.resetForm();
         setTimeout(() => {
           dispatch(resetState());

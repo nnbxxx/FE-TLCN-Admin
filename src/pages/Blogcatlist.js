@@ -11,23 +11,6 @@ import {
 } from "../features/bcategory/bcategorySlice";
 import CustomModal from "../components/CustomModal";
 
-const columns = [
-  {
-    title: "SNo",
-    dataIndex: "key",
-  },
-  {
-    title: "Name",
-    dataIndex: "name",
-    sorter: (a, b) => a.name.length - b.name.length,
-  },
-
-  {
-    title: "Action",
-    dataIndex: "action",
-  },
-];
-
 const Blogcatlist = () => {
   const [open, setOpen] = useState(false);
   const [blogCatId, setblogCatId] = useState("");
@@ -45,30 +28,42 @@ const Blogcatlist = () => {
     dispatch(getCategories());
   }, []);
   const bCatState = useSelector((state) => state.bCategory.bCategories);
-  console.log(bCatState);
-  const data1 = [];
-  for (let i = 0; i < bCatState.length; i++) {
-    data1.push({
-      key: i + 1,
-      name: bCatState[i].title,
-      action: (
-        <>
-          <Link
-            to={`/admin/blog-category/${bCatState[i]._id}`}
-            className=" fs-3 text-danger"
-          >
-            <BiEdit />
-          </Link>
-          <button
-            className="ms-3 fs-3 text-danger bg-transparent border-0"
-            onClick={() => showModal(bCatState[i]._id)}
-          >
-            <AiFillDelete />
-          </button>
-        </>
-      ),
-    });
-  }
+  const columns = [
+    {
+      title: "Id",
+      dataIndex: "_id",
+      width: 100,
+    },
+    {
+      title: "Subject",
+      dataIndex: "subject",
+      sorter: (a, b) => a.subject.length - b.subject.length,
+    },
+
+    {
+      title: "Action",
+      dataIndex: "action",
+      render: (index, item) => {
+        return (
+          <>
+            <Link
+              to={`/admin/blog-category/${item._id}`}
+              className=" fs-3 text-danger"
+            >
+              <BiEdit />
+            </Link>
+            <button
+              className="ms-3 fs-3 text-danger bg-transparent border-0"
+              onClick={() => showModal(item._id)}
+            >
+              <AiFillDelete />
+            </button>
+          </>
+        );
+      },
+    },
+  ];
+
   const deleteBlogCategory = (e) => {
     dispatch(deleteABlogCat(e));
     setOpen(false);
@@ -80,7 +75,7 @@ const Blogcatlist = () => {
     <div>
       <h3 className="mb-4 title">Danh sách danh mục bài viết</h3>
       <div>
-        <Table columns={columns} dataSource={data1} />
+        <Table columns={columns} dataSource={bCatState} />
       </div>
       <CustomModal
         hideModal={hideModal}

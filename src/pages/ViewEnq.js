@@ -23,7 +23,6 @@ const ViewEnq = () => {
     navigate(-1);
   };
   const setEnquiryStatus = (e, i) => {
-    console.log(e, i);
     const data = { id: i, enqData: e };
     dispatch(updateAEnquiry(data));
     dispatch(resetState());
@@ -81,7 +80,6 @@ const ViewEnq = () => {
               <option value="Contacted">Đã liên hệ</option>
               <option value="In Progress">Đang tiến hành</option>
               <option value="Resolved">Đã giải quyết</option>
-
             </select>
           </div>
         </div>

@@ -10,68 +10,48 @@ import instance from "../../utils/axios-customize";
 const login = async (user) => {
   return await instance.post(`auth/login`, user);
 };
-const getOrders = async (data) => {
-  const response = await axios.get(`${base_url}user/getallorders`, data);
-
-  return response.data;
+const getOrders = async (query = "") => {
+  const response = await instance.get(`receipts/admin`);
+  return response;
 };
 const getOrder = async (id) => {
-  const response = await axios.get(
-    `${base_url}user/getaOrder/${id}`,
+  const response = await instance.get(`receipts/${id}`);
 
-    config
-  );
-
-  return response.data;
+  return response;
 };
 
 const updateOrder = async (data) => {
-  const response = await axios.put(
-    `${base_url}user/updateOrder/${data.id}`,
-    { status: data.status },
-    config
-  );
-
-  return response.data;
+  const response = await instance.patch(`receipts/status`, data);
+  return response;
 };
 
 const getMonthlyOrders = async (data) => {
-  const response = await axios.get(
-    `${base_url}user/getMonthWiseOrderIncome`,
+  const response = await instance.get(
+    `user/getMonthWiseOrderIncome`,
 
-    data,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "69420",
-      },
-    }
+    data
   );
 
-  return response.data;
+  return response;
 };
 
 const getYearlyStats = async (data) => {
-  const response = await axios.get(
-    `${base_url}user/getyearlyorders`,
+  const response = await instance.get(
+    `user/getyearlyorders`,
 
-    data,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "69420",
-      },
-    }
+    data
   );
 
-  return response.data;
+  return response;
 };
 
 const authService = {
   login,
   getOrders,
   getOrder,
+  updateOrder,
   getMonthlyOrders,
   getYearlyStats,
-  updateOrder,
 };
 
 export default authService;

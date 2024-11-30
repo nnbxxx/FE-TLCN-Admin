@@ -4,20 +4,22 @@ import bCategoryService from "./bcategoryService";
 export const getCategories = createAsyncThunk(
   "blogCategory/get-categories",
   async (thunkAPI) => {
-    try {
-      return await bCategoryService.getBlogCategories();
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await bCategoryService.getBlogCategories();
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
 export const createNewblogCat = createAsyncThunk(
   "blogCategory/create-category",
   async (catData, thunkAPI) => {
-    try {
-      return await bCategoryService.createBlogCategory(catData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await bCategoryService.createBlogCategory(catData);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -25,20 +27,22 @@ export const createNewblogCat = createAsyncThunk(
 export const getABlogCat = createAsyncThunk(
   "blogCategory/get-category",
   async (id, thunkAPI) => {
-    try {
-      return await bCategoryService.getBlogCategory(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await bCategoryService.getBlogCategory(id);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
 export const updateABlogCat = createAsyncThunk(
   "blogCategory/update-category",
   async (blogCat, thunkAPI) => {
-    try {
-      return await bCategoryService.updateBlogCategory(blogCat);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await bCategoryService.updateBlogCategory(blogCat);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -46,10 +50,11 @@ export const updateABlogCat = createAsyncThunk(
 export const deleteABlogCat = createAsyncThunk(
   "blogCategory/delete-category",
   async (id, thunkAPI) => {
-    try {
-      return await bCategoryService.deleteBlogCategory(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await bCategoryService.deleteBlogCategory(id);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -74,7 +79,7 @@ export const pCategorySlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.bCategories = action.payload;
+        state.bCategories = action.payload.data.result;
       })
       .addCase(getCategories.rejected, (state, action) => {
         state.isLoading = false;
@@ -104,7 +109,7 @@ export const pCategorySlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.blogCatName = action.payload.title;
+        state.blogCatName = action.payload.data.subject;
       })
       .addCase(getABlogCat.rejected, (state, action) => {
         state.isLoading = false;

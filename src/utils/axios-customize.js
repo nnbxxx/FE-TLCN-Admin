@@ -1,7 +1,7 @@
 import axios from "axios";
 /* eslint-disable */
 const handleRefreshToken = async () => {
-  const res = await instance.get("/api/v1/auth/refresh");
+  const res = await instance.get("/auth/refresh");
   if (res && res.data) return res.data.access_token;
   else null;
 };

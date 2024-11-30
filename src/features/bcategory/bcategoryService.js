@@ -1,40 +1,30 @@
-import axios from "axios";
-import { base_url } from "../../utils/baseUrl";
-import { config } from "../../utils/axiosconfig";
+import instance from "../../utils/axios-customize";
 
-const getBlogCategories = async () => {
-  const response = await axios.get(`${base_url}blogcategory/`, {
-    headers: {
-      "ngrok-skip-browser-warning": "69420"
-    }
-  });
+const getBlogCategories = async (query = "") => {
+  const response = await instance.get(`blog-category?${query}`);
 
-  return response.data;
+  return response;
 };
 const createBlogCategory = async (bcat) => {
-  const response = await axios.post(`${base_url}blogcategory/`, bcat, config);
+  const response = await instance.post(`blog-category`, bcat);
 
-  return response.data;
+  return response;
 };
 const updateBlogCategory = async (blogCat) => {
-  const response = await axios.put(
-    `${base_url}blogcategory/${blogCat.id}`,
-    { title: blogCat.blogCatData.title },
-    config
-  );
+  const response = await instance.patch(`blog-category`, blogCat);
 
-  return response.data;
+  return response;
 };
 const getBlogCategory = async (id) => {
-  const response = await axios.get(`${base_url}blogcategory/${id}`, config);
+  const response = await instance.get(`blog-category/${id}`);
 
-  return response.data;
+  return response;
 };
 
 const deleteBlogCategory = async (id) => {
-  const response = await axios.delete(`${base_url}blogcategory/${id}`, config);
+  const response = await instance.delete(`blog-category/${id}`);
 
-  return response.data;
+  return response;
 };
 const bCategoryService = {
   getBlogCategories,

@@ -10,33 +10,8 @@ import {
   resetState,
 } from "../features/coupon/couponSlice";
 import CustomModal from "../components/CustomModal";
-
-const columns = [
-  {
-    title: "SNo",
-    dataIndex: "key",
-  },
-
-  {
-    title: "Name",
-    dataIndex: "name",
-    sorter: (a, b) => a.name.length - b.name.length,
-  },
-  {
-    title: "Discount",
-    dataIndex: "discount",
-    sorter: (a, b) => a.discount - b.discount,
-  },
-  {
-    title: "Expiry",
-    dataIndex: "expiry",
-    sorter: (a, b) => a.name.length - b.name.length,
-  },
-  {
-    title: "Action",
-    dataIndex: "action",
-  },
-];
+import { render } from "@testing-library/react";
+import { convertISOToDate } from "../utils/dayUltils";
 
 const Couponlist = () => {
   const [open, setOpen] = useState(false);
@@ -55,31 +30,59 @@ const Couponlist = () => {
     dispatch(getAllCoupon());
   }, []);
   const couponState = useSelector((state) => state.coupon.coupons);
-  const data1 = [];
-  for (let i = 0; i < couponState.length; i++) {
-    data1.push({
-      key: i + 1,
-      name: couponState[i].name,
-      discount: couponState[i].discount,
-      expiry: new Date(couponState[i].expiry).toLocaleString(),
-      action: (
-        <>
-          <Link
-            to={`/admin/coupon/${couponState[i]._id}`}
-            className=" fs-3 text-danger"
-          >
-            <BiEdit />
-          </Link>
-          <button
-            className="ms-3 fs-3 text-danger bg-transparent border-0"
-            onClick={() => showModal(couponState[i]._id)}
-          >
-            <AiFillDelete />
-          </button>
-        </>
-      ),
-    });
-  }
+
+  const columns = [
+    {
+      title: "Id",
+      dataIndex: "_id",
+      width: 100,
+    },
+
+    {
+      title: "Code",
+      dataIndex: "code",
+      sorter: (a, b) => a.code.length - b.code.length,
+    },
+    {
+      title: "Discount",
+      dataIndex: "description",
+      sorter: (a, b) => a.discount - b.discount,
+      render: (index, item) => {
+        return item.description.value;
+      },
+    },
+    {
+      title: "Expiry",
+      dataIndex: "couponExpired",
+      sorter: (a, b) => a.couponExpired.length - b.couponExpired.length,
+      render: (index, item) => {
+        return convertISOToDate(item.couponExpired);
+      },
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      render: (index, item) => {
+        return (
+          <>
+            <Link
+              to={`/admin/coupon/${item._id}`}
+              className=" fs-3 text-danger"
+            >
+              <BiEdit />
+            </Link>
+            <button
+              className="ms-3 fs-3 text-danger bg-transparent border-0"
+              onClick={() => showModal(item._id)}
+            >
+              <AiFillDelete />
+            </button>
+          </>
+        );
+      },
+    },
+  ];
+
   const deleteCoupon = (e) => {
     dispatch(deleteACoupon(e));
 
@@ -92,7 +95,7 @@ const Couponlist = () => {
     <div>
       <h3 className="mb-4 title">Danh sách mã giảm giá</h3>
       <div>
-        <Table columns={columns} dataSource={data1} />
+        <Table columns={columns} dataSource={couponState} />
       </div>
       <CustomModal
         hideModal={hideModal}

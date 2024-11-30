@@ -2,19 +2,21 @@ import { createSlice, createAsyncThunk, createAction } from "@reduxjs/toolkit";
 import blogService from "./blogService";
 
 export const getBlogs = createAsyncThunk("blog/get-blogs", async (thunkAPI) => {
-  try {
-    return await blogService.getBlogs();
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error);
+  const re = await blogService.getBlogs();
+  if (re && re.data) {
+    return re;
+  } else {
+    return thunkAPI.rejectWithValue(re);
   }
 });
 export const createBlogs = createAsyncThunk(
   "blog/create-blogs",
   async (blogData, thunkAPI) => {
-    try {
-      return await blogService.createBlog(blogData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await blogService.createBlog(blogData);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -22,20 +24,22 @@ export const createBlogs = createAsyncThunk(
 export const getABlog = createAsyncThunk(
   "blog/get-blog",
   async (id, thunkAPI) => {
-    try {
-      return await blogService.getBlog(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await blogService.getBlog(id);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
 export const updateABlog = createAsyncThunk(
   "blog/update-blog",
   async (brand, thunkAPI) => {
-    try {
-      return await blogService.updateBlog(brand);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await blogService.updateBlog(brand);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -43,10 +47,11 @@ export const updateABlog = createAsyncThunk(
 export const deleteABlog = createAsyncThunk(
   "blog/delete-blog",
   async (id, thunkAPI) => {
-    try {
-      return await blogService.deleteBlog(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await blogService.deleteBlog(id);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -72,7 +77,7 @@ export const blogSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.blogs = action.payload;
+        state.blogs = action.payload.data.result;
       })
       .addCase(getBlogs.rejected, (state, action) => {
         state.isLoading = false;
@@ -102,10 +107,10 @@ export const blogSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.blogName = action.payload.title;
-        state.blogDesc = action.payload.description;
-        state.blogCategory = action.payload.category;
-        state.blogImages = action.payload.images;
+        state.blogName = action.payload.data.title;
+        state.blogDesc = action.payload.data.description;
+        state.blogCategory = action.payload.data.category;
+        state.blogImages = action.payload.data.images;
       })
       .addCase(getABlog.rejected, (state, action) => {
         state.isLoading = false;
@@ -120,6 +125,7 @@ export const blogSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
+        state.updatedBlog = action.payload;
       })
       .addCase(updateABlog.rejected, (state, action) => {
         state.isLoading = false;

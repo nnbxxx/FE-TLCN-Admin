@@ -8,25 +8,6 @@ import { deleteABlog, getBlogs, resetState } from "../features/blogs/blogSlice";
 import CustomModal from "../components/CustomModal";
 import { delImg } from "../features/upload/uploadSlice";
 
-const columns = [
-  {
-    title: "SNo",
-    dataIndex: "key",
-  },
-  {
-    title: "Title",
-    dataIndex: "name",
-  },
-  {
-    title: "Category",
-    dataIndex: "category",
-  },
-  {
-    title: "Action",
-    dataIndex: "action",
-  },
-];
-
 const Bloglist = () => {
   const [open, setOpen] = useState(false);
   const [blogId, setblogId] = useState("");
@@ -34,6 +15,40 @@ const Bloglist = () => {
     setOpen(true);
     setblogId(e);
   };
+  const columns = [
+    {
+      title: "Id",
+      dataIndex: "_id",
+      width: 100,
+    },
+    {
+      title: "Title",
+      dataIndex: "title",
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      render: (index, item) => {
+        return (
+          <>
+            <Link to={`/admin/blog/${item._id}`} className=" fs-3 text-danger">
+              <BiEdit />
+            </Link>
+            <button
+              className="ms-3 fs-3 text-danger bg-transparent border-0"
+              onClick={() => showModal(item._id)}
+            >
+              <AiFillDelete />
+            </button>
+          </>
+        );
+      },
+    },
+  ];
 
   const hideModal = () => {
     setOpen(false);
@@ -44,31 +59,7 @@ const Bloglist = () => {
     dispatch(getBlogs());
   }, []);
   const getBlogState = useSelector((state) => state.blogs.blogs);
-  const data1 = [];
-  for (let i = 0; i < getBlogState.length; i++) {
-    data1.push({
-      key: i + 1,
-      name: getBlogState[i].title,
-      category: getBlogState[i].category,
 
-      action: (
-        <>
-          <Link
-            to={`/admin/blog/${getBlogState[i].id}`}
-            className=" fs-3 text-danger"
-          >
-            <BiEdit />
-          </Link>
-          <button
-            className="ms-3 fs-3 text-danger bg-transparent border-0"
-            onClick={() => showModal(getBlogState[i]._id)}
-          >
-            <AiFillDelete />
-          </button>
-        </>
-      ),
-    });
-  }
   const deleteBlog = (e) => {
     dispatch(deleteABlog(e));
     dispatch(delImg(e));
@@ -82,7 +73,7 @@ const Bloglist = () => {
     <div>
       <h3 className="mb-4 title">Danh sách bài viết</h3>
       <div>
-        <Table columns={columns} dataSource={data1} />
+        <Table columns={columns} dataSource={getBlogState} />
       </div>
       <CustomModal
         hideModal={hideModal}

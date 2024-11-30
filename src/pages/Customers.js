@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Table, Tag, Button, Modal, Form, Input, message, Select  } from "antd";
+import { Table, Tag, Button, Modal, Form, Input, message, Select } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { getUsers, blockUser, unblockUser, updateUser } from "../features/cutomers/customerSlice";
+import {
+  getUsers,
+  blockUser,
+  unblockUser,
+  updateUser,
+} from "../features/cutomers/customerSlice";
 import styled from "styled-components";
 import { EditOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
 
@@ -58,17 +63,17 @@ const columns = (editUser, handleBlock, handleUnblock) => [
     render: (text, record) => (
       <div style={{ display: "flex", gap: "10px" }}>
         <EditOutlined
-          style={{ color: "#1890ff", cursor: "pointer",fontSize: "20px" }}
+          style={{ color: "#1890ff", cursor: "pointer", fontSize: "20px" }}
           onClick={() => editUser(record)}
         />
         {record.isBlocked ? (
           <UnlockOutlined
-            style={{ color: "green", cursor: "pointer",fontSize: "20px" }}
+            style={{ color: "green", cursor: "pointer", fontSize: "20px" }}
             onClick={() => handleUnblock(record.key)}
           />
         ) : (
           <LockOutlined
-            style={{ color: "red", cursor: "pointer",fontSize: "20px" }}
+            style={{ color: "red", cursor: "pointer", fontSize: "20px" }}
             onClick={() => handleBlock(record.key)}
           />
         )}
@@ -97,10 +102,9 @@ const Customers = () => {
   }));
 
   const handleEditUser = (user) => {
-    const nameParts = user.name.split(' ');
+    const nameParts = user.name.split(" ");
     const firstname = nameParts[0];
-    const lastname = nameParts.slice(1).join(' ');
-    console.log(firstname)
+    const lastname = nameParts.slice(1).join(" ");
     setCurrentUser({
       ...user,
       firstname,
@@ -130,8 +134,9 @@ const Customers = () => {
   };
 
   const handleOk = () => {
-    form.validateFields()
-      .then(values => {
+    form
+      .validateFields()
+      .then((values) => {
         dispatch(updateUser({ ...currentUser, ...values }))
           .unwrap()
           .then(() => {
@@ -144,9 +149,7 @@ const Customers = () => {
             message.error(`Failed to update user: ${error}`);
           });
       })
-      .catch(info => {
-        console.log('Validate Failed:', info);
-      });
+      .catch((info) => {});
   };
 
   const handleCancel = () => {
@@ -159,7 +162,7 @@ const Customers = () => {
   useEffect(() => {
     if (currentUser) {
       const { name, email, mobile, ...rest } = currentUser;
-      const [firstname, lastname] = name.split(' ');
+      const [firstname, lastname] = name.split(" ");
       form.setFieldsValue({
         name: [firstname, lastname],
         firstname: currentUser.firstname,
@@ -171,28 +174,59 @@ const Customers = () => {
     }
   }, [currentUser, form]);
 
-
   return (
     <div>
       <h3 className="mb-4 title">Người dùng</h3>
       <div>
-        <Table columns={columns(handleEditUser, handleBlockUser, handleUnblockUser)} dataSource={data1} />
+        <Table
+          columns={columns(handleEditUser, handleBlockUser, handleUnblockUser)}
+          dataSource={data1}
+        />
       </div>
-      <Modal title="Edit User" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+      <Modal
+        title="Edit User"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
         <Form form={form} layout="vertical" name="form_in_modal">
-          <Form.Item name='firstname' label="First Name" rules={[{ required: true, message: 'Please input the first name!' }]}>
+          <Form.Item
+            name="firstname"
+            label="First Name"
+            rules={[
+              { required: true, message: "Please input the first name!" },
+            ]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name='lastname' label="Last Name" rules={[{ required: true, message: 'Please input the last name!' }]}>
+          <Form.Item
+            name="lastname"
+            label="Last Name"
+            rules={[{ required: true, message: "Please input the last name!" }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Please input the email!' }]}>
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[{ required: true, message: "Please input the email!" }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="mobile" label="Mobile" rules={[{ required: true, message: 'Please input the mobile number!' }]}>
+          <Form.Item
+            name="mobile"
+            label="Mobile"
+            rules={[
+              { required: true, message: "Please input the mobile number!" },
+            ]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="role" label="Role" rules={[{ required: true, message: 'Please select a role!' }]}>
+          <Form.Item
+            name="role"
+            label="Role"
+            rules={[{ required: true, message: "Please select a role!" }]}
+          >
             <Select placeholder="Select a role">
               <Option value="admin">Admin</Option>
               <Option value="user">User</Option>

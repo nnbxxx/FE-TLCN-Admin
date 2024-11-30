@@ -1,7 +1,7 @@
 import { React, useEffect, useState } from "react";
 import CustomInput from "../components/CustomInput";
 import ReactQuill from "react-quill";
-import { Link,useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
 import * as yup from "yup";
@@ -41,7 +41,6 @@ let schema = yup.object().shape({
     .required("Số lượng không được để trống"),
 });
 
-
 const Addproduct = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -49,7 +48,6 @@ const Addproduct = () => {
   const navigate = useNavigate();
   const [color, setColor] = useState([]);
   const [images, setImages] = useState([]);
-  console.log(color);
   useEffect(() => {
     dispatch(getBrands());
     dispatch(getCategories());
@@ -177,11 +175,10 @@ const Addproduct = () => {
     },
     validationSchema: schema,
     onSubmit: (values) => {
-      console.log(values);
       if (getProductId !== undefined) {
         const data = { id: getProductId, productData: values };
         dispatch(updateAProduct(data));
-        navigate('/admin/list-product');
+        navigate("/admin/list-product");
       } else {
         dispatch(createProducts(values));
         formik.resetForm();
@@ -194,7 +191,6 @@ const Addproduct = () => {
   });
   const handleColors = (e) => {
     setColor(e);
-    console.log(color);
   };
 
   return (
@@ -330,9 +326,7 @@ const Addproduct = () => {
                 <section>
                   <div {...getRootProps()}>
                     <input {...getInputProps()} />
-                    <p>
-                    Kéo và thả các tệp vào đây, hoặc nhấp để chọn tệp
-                    </p>
+                    <p>Kéo và thả các tệp vào đây, hoặc nhấp để chọn tệp</p>
                   </div>
                 </section>
               )}
@@ -368,9 +362,19 @@ const Addproduct = () => {
           </div>
           <div className="text-center">
             <button className="btn btn-success btn-lg mx-3" type="submit">
-              {getProductId !== undefined ? <><i className="fas fa-edit me-1"></i> Edit</> : "Thêm"} Sản phẩm
+              {getProductId !== undefined ? (
+                <>
+                  <i className="fas fa-edit me-1"></i> Edit
+                </>
+              ) : (
+                "Thêm"
+              )}{" "}
+              Sản phẩm
             </button>
-            <Link to="/admin/list-product" className="btn btn-danger btn-lg mx-3">
+            <Link
+              to="/admin/list-product"
+              className="btn btn-danger btn-lg mx-3"
+            >
               <i className="fas fa-times me-1"></i> Hủy
             </Link>
           </div>
