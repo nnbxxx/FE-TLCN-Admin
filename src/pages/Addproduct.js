@@ -12,7 +12,11 @@ import { getCategories } from "../features/pcategory/pcategorySlice";
 import { getColors } from "../features/color/colorSlice";
 import { Select } from "antd";
 import Dropzone from "react-dropzone";
-import { delImg, uploadImg } from "../features/upload/uploadSlice";
+import {
+  delImg,
+  uploadImg,
+  resetState as resetStateUpload,
+} from "../features/upload/uploadSlice";
 import {
   createProducts,
   getAProduct,
@@ -106,7 +110,7 @@ const Addproduct = () => {
               width: "20px",
               height: "20px",
               marginBottom: "10px",
-              backgroundColor: i.title,
+              backgroundColor: i.color,
               borderRadius: "50%", // Added inline style for rounded shape
               listStyle: "none", // Hide bullet points
               border: "2px solid transparent",
@@ -129,7 +133,7 @@ const Addproduct = () => {
               width: "20px",
               height: "20px",
               marginBottom: "10px",
-              backgroundColor: i.title,
+              backgroundColor: i.color,
               borderRadius: "50%", // Added inline style for rounded shape
               listStyle: "none", // Hide bullet points
               border: "2px solid transparent",
@@ -141,26 +145,9 @@ const Addproduct = () => {
     });
   });
 
-  const img = [];
-  imgState?.forEach((i) => {
-    img.push({
-      public_id: i.public_id,
-      url: i.url,
-    });
-  });
-
-  const imgshow = [];
-  productImages?.forEach((i) => {
-    imgshow.push({
-      public_id: i.public_id,
-      url: i.url,
-    });
-  });
-
   useEffect(() => {
     formik.values.color = color ? color : " ";
-    formik.values.images = img;
-  }, [color, img]);
+  }, [color]);
   const formik = useFormik({
     initialValues: {
       title: productName || "",
@@ -171,27 +158,63 @@ const Addproduct = () => {
       tags: productTag || "",
       color: productColors || "",
       quantity: productQuantity || "",
-      images: productImages || "",
+      images: productImages || [],
     },
     validationSchema: schema,
     onSubmit: (values) => {
+      console.log(values);
       if (getProductId !== undefined) {
         const data = { id: getProductId, productData: values };
-        dispatch(updateAProduct(data));
+        dispatch(
+          updateAProduct({
+            _id: getProductId,
+            name: values.title,
+            category: values.category,
+            brand: values.brand,
+            price: +values.price,
+            tags: values.tags,
+            description: values.description,
+            images: values.images,
+            colors: values.color,
+            quantity: values.quantity,
+          })
+        );
         navigate("/admin/list-product");
       } else {
-        dispatch(createProducts(values));
+        dispatch(
+          createProducts({
+            name: values.title,
+            category: values.category,
+            brand: values.brand,
+            price: +values.price,
+            tags: values.tags,
+            description: values.description,
+            images: values.images,
+            colors: values.color,
+            quantity: values.quantity,
+          })
+        );
         formik.resetForm();
         setColor(null);
         setTimeout(() => {
           dispatch(resetState());
+          dispatch(resetStateUpload());
         }, 3000);
       }
     },
   });
+  const handleDeleteImage = (index) => {
+    const updatedImages = formik.values.images.filter((_, i) => i !== index);
+    formik.setFieldValue("images", updatedImages);
+  };
   const handleColors = (e) => {
     setColor(e);
+    console.log(color);
   };
+  useEffect(() => {
+    let tmp = formik.values.images;
+    formik.setFieldValue("images", [...tmp, ...imgState]);
+  }, [imgState]);
 
   return (
     <div>
@@ -247,8 +270,8 @@ const Addproduct = () => {
             <option value="">Chọn thương hiệu</option>
             {brandState.map((i, j) => {
               return (
-                <option key={j} value={i.title}>
-                  {i.title}
+                <option key={j} value={i.brand}>
+                  {i.brand}
                 </option>
               );
             })}
@@ -267,8 +290,8 @@ const Addproduct = () => {
             <option value="">Chọn danh mục sản phẩm</option>
             {catState.map((i, j) => {
               return (
-                <option key={j} value={i.title}>
-                  {i.title}
+                <option key={j} value={i.name}>
+                  {i.name}
                 </option>
               );
             })}
@@ -333,32 +356,17 @@ const Addproduct = () => {
             </Dropzone>
           </div>
           <div className="showimages d-flex flex-wrap gap-3">
-            {imgshow?.map((i, j) => {
-              return (
-                <div className=" position-relative" key={j}>
-                  <button
-                    type="button"
-                    onClick={() => dispatch(delImg(i.public_id))}
-                    className="btn-close position-absolute"
-                    style={{ top: "10px", right: "10px" }}
-                  ></button>
-                  <img src={i.url} alt="" width={200} height={200} />
-                </div>
-              );
-            })}
-            {imgState?.map((i, j) => {
-              return (
-                <div className=" position-relative" key={j}>
-                  <button
-                    type="button"
-                    onClick={() => dispatch(delImg(i.public_id))}
-                    className="btn-close position-absolute"
-                    style={{ top: "10px", right: "10px" }}
-                  ></button>
-                  <img src={i.url} alt="" width={200} height={200} />
-                </div>
-              );
-            })}
+            {formik.values.images?.map((image, index) => (
+              <div className="position-relative" key={index}>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteImage(index)}
+                  className="btn-close position-absolute"
+                  style={{ top: "10px", right: "10px" }}
+                ></button>
+                <img src={image} alt="" width={200} height={200} />
+              </div>
+            ))}
           </div>
           <div className="text-center">
             <button className="btn btn-success btn-lg mx-3" type="submit">

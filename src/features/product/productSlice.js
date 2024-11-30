@@ -4,10 +4,11 @@ import productService from "./productService";
 export const getProducts = createAsyncThunk(
   "product/get-products",
   async (thunkAPI) => {
-    try {
-      return await productService.getProducts();
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await productService.getProducts();
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -15,10 +16,11 @@ export const getProducts = createAsyncThunk(
 export const getAProduct = createAsyncThunk(
   "blog/get-product",
   async (id, thunkAPI) => {
-    try {
-      return await productService.getProduct(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await productService.getProduct(id);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -26,20 +28,22 @@ export const getAProduct = createAsyncThunk(
 export const createProducts = createAsyncThunk(
   "product/create-products",
   async (productData, thunkAPI) => {
-    try {
-      return await productService.createProduct(productData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await productService.createProduct(productData);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
 export const deleteAProduct = createAsyncThunk(
   "product/delete-product",
   async (id, thunkAPI) => {
-    try {
-      return await productService.deleteproduct(id);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await productService.deleteproduct(id);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -47,10 +51,11 @@ export const deleteAProduct = createAsyncThunk(
 export const updateAProduct = createAsyncThunk(
   "product/update-product",
   async (brand, thunkAPI) => {
-    try {
-      return await productService.updateProduct(brand);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    const re = await productService.updateProduct(brand);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -76,7 +81,7 @@ export const productSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.products = action.payload;
+        state.products = action.payload.data.result;
       })
       .addCase(getProducts.rejected, (state, action) => {
         state.isLoading = false;
@@ -106,16 +111,19 @@ export const productSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.productName = action.payload.title;
-        state.productDesc = action.payload.description;
-        state.productPrice = action.payload.price;
-        state.productBrand = action.payload.brand;
-        state.productCategory = action.payload.category;
-        state.productTag = action.payload.tags;
-        state.productColors = action.payload.color;
-        state.productQuantity = action.payload.quantity;
-
-        state.productImages = action.payload.images;
+        state.productName = action.payload.data.name;
+        state.productDesc = action.payload.data.description;
+        state.productPrice = action.payload.data.price;
+        state.productBrand = action.payload.data.brand;
+        state.productCategory = action.payload.data.category;
+        state.productTag = action.payload.data.tags;
+        state.productColors = action.payload.data.colors;
+        // console.log(
+        //   "🚀 ~ .addCase ~ action.payload.data.colors:",
+        //   action.payload.data
+        // );
+        state.productQuantity = action.payload.data.quantity;
+        state.productImages = action.payload.data.images;
       })
       .addCase(getAProduct.rejected, (state, action) => {
         state.isLoading = false;

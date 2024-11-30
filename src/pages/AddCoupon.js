@@ -37,7 +37,6 @@ const AddCoupon = () => {
     updatedCoupon,
   } = newCoupon;
 
-  //console.log(couponDiscount, couponName, couponExpiry, getCouponId);
   const changeDateFormet = (date) => {
     const newDate = new Date(date).toLocaleDateString();
     const [month, day, year] = newDate.split("/");

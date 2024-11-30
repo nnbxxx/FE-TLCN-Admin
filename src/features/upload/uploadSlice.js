@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, createAction } from "@reduxjs/toolkit";
 import uploadService from "./uploadService";
 
 export const uploadImg = createAsyncThunk(
@@ -33,12 +33,14 @@ const initialState = {
   isSuccess: false,
   message: "",
 };
+export const resetState = createAction("Reset_all");
 export const uploadSlice = createSlice({
   name: "images",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(resetState, () => initialState)
       .addCase(uploadImg.pending, (state) => {
         state.isLoading = true;
       })

@@ -5,11 +5,11 @@ import customerService from "./customerService";
 export const getUsers = createAsyncThunk(
   "customer/all-users",
   async (_, thunkAPI) => {
-    try {
-      const response = await customerService.getUsers();
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
+    const re = await customerService.getUsers();
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -17,14 +17,11 @@ export const getUsers = createAsyncThunk(
 export const blockUser = createAsyncThunk(
   "customer/block-user",
   async (userId, thunkAPI) => {
-    try {
-      const token = localStorage.getItem("access_token"); // Assuming you store the token in the auth state
-      if (!token) throw new Error("No token provided");
-      const response = await customerService.blockUser(userId, token);
-      return response;
-    } catch (error) {
-      console.error("blockUser error:", error); // Detailed logging
-      return thunkAPI.rejectWithValue(error.message);
+    const re = await customerService.blockUser(userId);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -32,14 +29,11 @@ export const blockUser = createAsyncThunk(
 export const unblockUser = createAsyncThunk(
   "customer/unblock-user",
   async (userId, thunkAPI) => {
-    try {
-      const token = localStorage.getItem("access_token"); // Assuming you store the token in the auth state
-      if (!token) throw new Error("No token provided");
-      const response = await customerService.unblockUser(userId, token);
-      return response;
-    } catch (error) {
-      console.error("unblockUser error:", error); // Detailed logging
-      return thunkAPI.rejectWithValue(error.message);
+    const re = await customerService.unblockUser(userId);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -47,14 +41,11 @@ export const unblockUser = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   "customer/edit-user",
   async (user, thunkAPI) => {
-    try {
-      const token = localStorage.getItem("access_token"); // Assuming you store the token in the auth state
-      if (!token) throw new Error("No token provided");
-      const response = await customerService.updateUser(user, token);
-      return response;
-    } catch (error) {
-      console.error("updateUser error:", error); // Detailed logging
-      return thunkAPI.rejectWithValue(error.message);
+    const re = await customerService.updateUser(user);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
     }
   }
 );
@@ -80,7 +71,7 @@ const customerSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.customers = action.payload;
+        state.customers = action.payload.data.result;
       })
       .addCase(getUsers.rejected, (state, action) => {
         state.isLoading = false;

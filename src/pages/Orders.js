@@ -16,7 +16,6 @@ const Orders = () => {
   const orderState = useSelector((state) => state?.auth?.orders);
 
   const updateOrderStatus = (orderId, status) => {
-    console.log("🚀 ~ updateOrderStatus ~ orderId:", orderId);
     dispatch(
       updateAOrder({
         _id: orderId,

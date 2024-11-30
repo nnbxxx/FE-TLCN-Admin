@@ -45,7 +45,6 @@ const ViewOrder = () => {
   }, [dispatch, orderId]);
 
   const orderState = useSelector((state) => state?.auth?.singleorder);
-  console.log("🚀 ~ ViewOrder ~ orderState:", orderState);
 
   const data1 = [];
   if (orderState?.orderItems) {

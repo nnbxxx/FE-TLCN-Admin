@@ -4,7 +4,7 @@ import brandService from "./brandService";
 export const getBrands = createAsyncThunk(
   "brand/get-brands",
   async (thunkAPI) => {
-    const re = await await brandService.getBrands();
+    const re = await brandService.getBrands();
     if (re && re.data) {
       return re;
     } else {

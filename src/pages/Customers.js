@@ -25,8 +25,8 @@ const RoleTag = styled(Tag)`
 
 const columns = (editUser, handleBlock, handleUnblock) => [
   {
-    title: "SNo",
-    dataIndex: "key",
+    title: "Id",
+    dataIndex: "_id",
   },
   {
     title: "Name",
@@ -37,10 +37,10 @@ const columns = (editUser, handleBlock, handleUnblock) => [
     title: "Email",
     dataIndex: "email",
   },
-  {
-    title: "Mobile",
-    dataIndex: "mobile",
-  },
+  // {
+  //   title: "Mobile",
+  //   dataIndex: "mobile",
+  // },
   {
     title: "Role",
     dataIndex: "role",
@@ -69,12 +69,12 @@ const columns = (editUser, handleBlock, handleUnblock) => [
         {record.isBlocked ? (
           <UnlockOutlined
             style={{ color: "green", cursor: "pointer", fontSize: "20px" }}
-            onClick={() => handleUnblock(record.key)}
+            onClick={() => handleUnblock(record._id)}
           />
         ) : (
           <LockOutlined
             style={{ color: "red", cursor: "pointer", fontSize: "20px" }}
-            onClick={() => handleBlock(record.key)}
+            onClick={() => handleBlock(record._id)}
           />
         )}
       </div>
@@ -93,22 +93,16 @@ const Customers = () => {
 
   const customerState = useSelector((state) => state.customer.customers);
   const data1 = customerState.map((customer, index) => ({
-    key: customer._id,
-    name: `${customer.firstname} ${customer.lastname}`,
+    _id: customer._id,
+    name: `${customer.name}`,
     email: customer.email,
-    mobile: customer.mobile,
     role: customer.role,
     isBlocked: customer.isBlocked,
   }));
 
   const handleEditUser = (user) => {
-    const nameParts = user.name.split(" ");
-    const firstname = nameParts[0];
-    const lastname = nameParts.slice(1).join(" ");
     setCurrentUser({
       ...user,
-      firstname,
-      lastname,
     });
     setIsModalVisible(true);
   };
@@ -116,7 +110,10 @@ const Customers = () => {
   const handleBlockUser = (Id) => {
     dispatch(blockUser(Id))
       .unwrap()
-      .then(() => message.success("User blocked successfully"))
+      .then(() => {
+        message.success("User blocked successfully");
+        dispatch(getUsers());
+      })
       .catch((error) => {
         console.error("Failed to block user:", error);
         message.error(`Failed to block user: ${error}`);
@@ -126,7 +123,10 @@ const Customers = () => {
   const handleUnblockUser = (Id) => {
     dispatch(unblockUser(Id))
       .unwrap()
-      .then(() => message.success("User unblocked successfully"))
+      .then(() => {
+        message.success("User unblocked successfully");
+        dispatch(getUsers());
+      })
       .catch((error) => {
         console.error("Failed to unblock user:", error);
         message.error(`Failed to unblock user: ${error}`);
@@ -137,11 +137,12 @@ const Customers = () => {
     form
       .validateFields()
       .then((values) => {
-        dispatch(updateUser({ ...currentUser, ...values }))
+        dispatch(updateUser({ _id: currentUser._id, role: values.role }))
           .unwrap()
           .then(() => {
             message.success("User updated successfully");
             setIsModalVisible(false);
+            dispatch(getUsers());
             setCurrentUser(null);
           })
           .catch((error) => {
@@ -161,14 +162,10 @@ const Customers = () => {
 
   useEffect(() => {
     if (currentUser) {
-      const { name, email, mobile, ...rest } = currentUser;
-      const [firstname, lastname] = name.split(" ");
+      const { name, email, ...rest } = currentUser;
       form.setFieldsValue({
-        name: [firstname, lastname],
-        firstname: currentUser.firstname,
-        lastname: currentUser.lastname,
+        name: currentUser.name,
         email,
-        mobile,
         ...rest,
       });
     }
@@ -191,29 +188,21 @@ const Customers = () => {
       >
         <Form form={form} layout="vertical" name="form_in_modal">
           <Form.Item
-            name="firstname"
-            label="First Name"
-            rules={[
-              { required: true, message: "Please input the first name!" },
-            ]}
+            name="name"
+            label="Name"
+            rules={[{ required: true, message: "Please input the name!" }]}
           >
-            <Input />
+            <Input disabled />
           </Form.Item>
-          <Form.Item
-            name="lastname"
-            label="Last Name"
-            rules={[{ required: true, message: "Please input the last name!" }]}
-          >
-            <Input />
-          </Form.Item>
+
           <Form.Item
             name="email"
             label="Email"
             rules={[{ required: true, message: "Please input the email!" }]}
           >
-            <Input />
+            <Input disabled />
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             name="mobile"
             label="Mobile"
             rules={[
@@ -221,7 +210,7 @@ const Customers = () => {
             ]}
           >
             <Input />
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item
             name="role"
             label="Role"

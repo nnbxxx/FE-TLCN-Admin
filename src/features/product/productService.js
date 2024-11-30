@@ -1,52 +1,31 @@
-import axios from "axios";
-import { config } from "../../utils/axiosconfig";
-import { base_url } from "../../utils/baseUrl";
+import instance from "../../utils/axios-customize";
 
-const getProducts = async () => {
-  const response = await axios.get(`${base_url}product/`, {
-    headers: {
-      "ngrok-skip-browser-warning": "69420"
-    }
-  });
-
-  return response.data;
+const getProducts = async (query = "") => {
+  const response = await instance.get(`products?${query}`);
+  return response;
 };
 const createProduct = async (product) => {
-  const response = await axios.post(`${base_url}product/`, product, config);
+  const response = await instance.post(`products`, product);
 
-  return response.data;
+  return response;
 };
 
 const getProduct = async (id) => {
-  const response = await axios.get(`${base_url}product/${id}`, config);
+  const response = await instance.get(`products/${id}`);
 
-  return response.data;
+  return response;
 };
 
 const updateProduct = async (product) => {
-  const response = await axios.put(
-    `${base_url}product/${product.id}`,
-    {
-      title: product.productData.title,
-      description: product.productData.description,
-      price: product.productData.price,
-      brand: product.productData.brand,
-      quantity: product.productData.quantity,
-      category: product.productData.category,
-      tags: product.productData.tags,
-      color: product.productData.color,
-      images: product.productData.images,
-    },
-    config
-  );
+  const response = await instance.patch(`products`, product);
 
-  return response.data;
+  return response;
 };
 
 const deleteproduct = async (id) => {
-  const response = await axios.delete(`${base_url}product/${id}`, config);
+  const response = await instance.delete(`products/${id}`);
 
-  return response.data;
+  return response;
 };
 
 const productService = {
