@@ -8,6 +8,8 @@ import {
   getOrders,
   getYearlyData,
 } from "../features/auth/authSlice";
+import { getInforDashBoard } from "../utils/api";
+import { Link } from "react-router-dom";
 
 const columns = [
   {
@@ -41,32 +43,14 @@ const Dashboard = () => {
 
   const monthlyDataState = useSelector((state) => state?.auth?.monthlyData);
   const yearlyDataState = useSelector((state) => state?.auth?.yearlyData);
-  const orderState = useSelector((state) => state?.auth?.orders?.orders);
 
   const [dataMonthly, setDataMonthly] = useState([]);
   const [dataMonthlySales, setDataMonthlySales] = useState([]);
   const [orderData, setOrderData] = useState([]);
 
-  const getTokenFromLocalStorage = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
-    : null;
-
-  const config3 = {
-    headers: {
-      Authorization: `Bearer ${
-        getTokenFromLocalStorage !== null
-          ? getTokenFromLocalStorage.access_token
-          : ""
-      }`,
-      Accept: "application/json",
-      "ngrok-skip-browser-warning": "69420",
-    },
-  };
-
+  const [dataInitDashBorad, setDataInitDashBorad] = useState();
   useEffect(() => {
-    dispatch(getMonthlyData(config3));
-    dispatch(getYearlyData(config3));
-    dispatch(getOrders(config3));
+    dispatch(getOrders("current=1&pageSize=10&statusUser=UNCONFIRMED"));
   }, []);
 
   useEffect(() => {
@@ -101,21 +85,6 @@ const Dashboard = () => {
 
     setDataMonthly(data);
     setDataMonthlySales(monthlyOrderCount);
-
-    const data1 = [];
-
-    for (let i = 0; i < orderState?.length; i++) {
-      data1.push({
-        key: i,
-        name:
-          orderState[i].user?.firstname + " " + orderState[i].user?.lastname,
-        product: orderState[i].orderItems?.length,
-        price: orderState[i]?.totalPrice,
-        dprice: orderState[i]?.totalPriceAfterDiscount,
-        staus: orderState[i]?.orderStatus,
-      });
-    }
-    setOrderData(data1);
   }, [monthlyDataState, yearlyDataState]);
 
   const colors = [
@@ -191,6 +160,61 @@ const Dashboard = () => {
     },
   };
 
+  const getInfoDashBoard = async () => {
+    const re = await getInforDashBoard();
+    if (re && re.data) {
+      setDataInitDashBorad(re.data);
+    }
+  };
+  useEffect(() => {
+    getInfoDashBoard();
+    return () => {};
+  }, []);
+  const orderState = useSelector((state) => state?.auth?.orders);
+  const columns = [
+    {
+      title: "Id",
+      dataIndex: "_id",
+      width: 100,
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      render: (index, item) => {
+        return item?.createdBy.email;
+      },
+    },
+    {
+      title: "Product",
+      dataIndex: "product",
+      sorter: (a, b) => a.amount - b.amount,
+      render: (index, item) => {
+        return <Link to={`/admin/order/${item?._id}`}>View Orders</Link>;
+      },
+    },
+    {
+      title: "Amount",
+      dataIndex: "total",
+    },
+    {
+      title: "Date",
+      dataIndex: "date",
+      sorter: (a, b) => new Date(a.date) - new Date(b.date),
+      render: (index, item) => {
+        return new Date(item?.createdAt).toLocaleString();
+      },
+    },
+    {
+      title: "Payment Method",
+      dataIndex: "paymentMethod",
+    },
+    {
+      title: "Order Status",
+      dataIndex: "statusUser",
+      sorter: (a, b) => a.statusUser.localeCompare(b.statusUser),
+    },
+  ];
   return (
     <div>
       <h3 className="mb-4 title">Dashboard</h3>
@@ -199,29 +223,35 @@ const Dashboard = () => {
           <div>
             <p className="desc">Tổng doanh thu Sắc</p>
             <h4 className="mb-0 sub-title">
-              {yearlyDataState && yearlyDataState[0]?.amount
-                ? yearlyDataState[0].amount.toLocaleString("vi-VN")
+              {dataInitDashBorad && dataInitDashBorad?.totalRevenue
+                ? dataInitDashBorad?.totalRevenue.toLocaleString("vi-VN")
                 : 0}
               ₫
             </h4>
-          </div>
-          <div className="d-flex flex-column align-items-end">
-            <p className="mb-0  desc">Thu nhập trong năm vừa qua tính đến </p>
-            <p className="mb-0  desc"> 22/11/2024 </p>
           </div>
         </div>
         <div className="d-flex p-3 justify-content-between align-items-end flex-grow-1 bg-white p-3 roudned-3">
           <div>
             <p className="desc">Số lượng sản phẩm đã bán</p>
             <h4 className="mb-0 sub-title">
-              {yearlyDataState && yearlyDataState[0]?.count}
+              {dataInitDashBorad && dataInitDashBorad?.totalProductPruchased}
             </h4>
           </div>
-          <div className="d-flex flex-column align-items-end">
-            <p className="mb-0  desc">
-              Số lượng sản phẩm đã bán trong năm vừa qua tính đến
-            </p>
-            <p className="mb-0  desc"> 22/11/2024 </p>
+        </div>
+        <div className="d-flex p-3 justify-content-between align-items-end flex-grow-1 bg-white p-3 roudned-3">
+          <div>
+            <p className="desc">Số lượng người dùng</p>
+            <h4 className="mb-0 sub-title">
+              {dataInitDashBorad && dataInitDashBorad?.quantityUser}
+            </h4>
+          </div>
+        </div>
+        <div className="d-flex p-3 justify-content-between align-items-end flex-grow-1 bg-white p-3 roudned-3">
+          <div>
+            <p className="desc">Số lượng bài viết</p>
+            <h4 className="mb-0 sub-title">
+              {dataInitDashBorad && dataInitDashBorad?.quantityBlog}
+            </h4>
           </div>
         </div>
       </div>
