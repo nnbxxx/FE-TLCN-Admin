@@ -47,14 +47,14 @@ const ViewOrder = () => {
   const orderState = useSelector((state) => state?.auth?.singleorder);
 
   const data1 = [];
-  if (orderState?.orderItems) {
-    for (let i = 0; i < orderState.orderItems.length; i++) {
+  if (orderState?.items) {
+    for (let i = 0; i < orderState.items.length; i++) {
       data1.push({
         key: i + 1,
-        name: orderState.orderItems[i]?.product?.title,
-        brand: orderState.orderItems[i]?.product?.brand,
-        count: orderState.orderItems[i]?.quantity,
-        amount: orderState.orderItems[i]?.price,
+        name: orderState.items[i]?.product?.name,
+        brand: orderState.items[i]?.product?.brand,
+        count: orderState.items[i]?.quantity,
+        amount: orderState.items[i]?.price,
         color: (
           <div className="col-3">
             <ul
@@ -64,14 +64,14 @@ const ViewOrder = () => {
                 height: "30px",
                 borderRadius: "50%",
                 marginBottom: "10px",
-                backgroundColor: orderState.orderItems[i]?.color?.title,
+                backgroundColor: orderState.items[i]?.color?.color,
               }}
             ></ul>
           </div>
         ),
         image: (
           <img
-            src={orderState.orderItems[i]?.product?.images[0]?.url}
+            src={orderState.items[i]?.product?.images[0]}
             style={{ width: "100px", height: "100px" }}
           />
         ),
@@ -102,7 +102,10 @@ const ViewOrder = () => {
               <strong>Payment Method:</strong> {orderState.paymentMethod}
             </p>
             <p>
-              <strong>Người nhận:</strong> abc xyz
+              <strong>Người nhận:</strong> {orderState.address.receiver}
+            </p>
+            <p>
+              <strong>Phone:</strong> {orderState.address.phone}
             </p>
             <p>
               <div>
@@ -112,17 +115,14 @@ const ViewOrder = () => {
                 <strong>Tỉnh/Thành Phố:</strong> {orderState.address.province}
               </p>
               <p>
-                <strong>Quận/Huyện:</strong> {orderState.address.district}
+                <strong>Quận/Huyện:</strong> {orderState.address.districts}
               </p>
               <p>
-                <strong>Phường/Xã:</strong> {orderState.address.ward}
+                <strong>Phường/Xã:</strong> {orderState.address.wards}
               </p>
               <p>
-                <strong>Cụ thể:</strong> {orderState.address.detail}
+                <strong>Cụ thể:</strong> {orderState.address.specific}
               </p>
-            </p>
-            <p>
-              <strong>Phone:</strong> 0123456789
             </p>
           </div>
         )}
