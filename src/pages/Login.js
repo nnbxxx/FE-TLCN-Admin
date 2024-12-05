@@ -40,8 +40,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      // window.location.href = "/admin";
-      navigate("/admin");
+      window.location.href = "/admin";
     }
   }, [user, isError, isSuccess, isLoading]);
 

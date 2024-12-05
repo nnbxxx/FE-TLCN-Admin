@@ -1,11 +1,5 @@
-import axios from "axios";
-import { config } from "../../utils/axiosconfig";
-import { base_url } from "../../utils/baseUrl";
 import instance from "../../utils/axios-customize";
 
-// const getTokenFromLocalStorage = localStorage.get("user")
-//   ? JSON.parse(localStorage.getItem("user"))
-//   : null;
 
 const login = async (user) => {
   return await instance.post(`auth/login`, user);

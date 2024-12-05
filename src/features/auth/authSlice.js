@@ -18,10 +18,6 @@ export const login = createAsyncThunk(
   async (userData, thunkAPI) => {
     const re = await authService.login(userData);
     if (re && re.data) {
-      const { data } = re;
-      if (data) {
-        // localStorage.setItem("user", JSON.stringify(re.data.user));
-      }
       return re;
     } else {
       return thunkAPI.rejectWithValue(re);
@@ -98,19 +94,23 @@ export const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.isError = false;
         state.isLoading = false;
-        state.isSuccess = true;
-        state.user = action.payload;
+
         state.message = "success";
-        if (state.isSuccess === true) {
-          if (action.payload.data.user.role === "admin") {
-            localStorage.setItem(
-              "access_token",
-              action.payload.data.access_token
-            );
-            toast.success("Login Successfully !");
-          } else {
-            toast.error("User không thể đăng nhập");
-          }
+        if (action.payload.data.user.role === "admin") {
+          state.isSuccess = true;
+          localStorage.setItem(
+            "access_token",
+            action.payload.data.access_token
+          );
+          localStorage.setItem(
+            "user",
+            JSON.stringify(action.payload.data.user)
+          );
+          state.user = action.payload.data.user;
+          toast.success("Login Successfully !");
+        } else {
+          toast.error("User không thể đăng nhập");
+          state.isSuccess = false;
         }
       })
       .addCase(login.rejected, (state, action) => {

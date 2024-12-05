@@ -25,7 +25,8 @@ import instance from "../../src/utils/axios-customize";
 const { Header, Sider, Content } = Layout;
 
 const MainLayout = () => {
-  const authState = useSelector((state) => state?.auth?.user.user);
+  const authState = useSelector((state) => state?.auth?.user);
+  console.log("🚀 ~ MainLayout ~ authState:", authState);
 
   const [collapsed, setCollapsed] = useState(false);
   const {
