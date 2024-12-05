@@ -10,82 +10,54 @@ import {
 } from "../features/auth/authSlice";
 import { getInforDashBoard } from "../utils/api";
 import { Link } from "react-router-dom";
-
-const columns = [
-  {
-    title: "SNo",
-    dataIndex: "key",
-  },
-  {
-    title: "Name",
-    dataIndex: "name",
-  },
-  {
-    title: "Product Count",
-    dataIndex: "product",
-  },
-  {
-    title: "Total Price",
-    dataIndex: "price",
-  },
-  {
-    title: "Total Price After Discount",
-    dataIndex: "dprice",
-  },
-  {
-    title: "Status",
-    dataIndex: "staus",
-  },
+const data = [
+  { type: "product1", value: 0.16 },
+  { type: "product2", value: 0.125 },
+  { type: "product3", value: 0.24 },
+  { type: "product4", value: 0.19 },
+  { type: "product5", value: 0.22 },
+  { type: "product6", value: 0.05 },
+  { type: "product7", value: 0 },
+  { type: "produc8", value: 0.015 },
 ];
+const configx = {
+  data,
+  xField: "type",
+  yField: "value",
+  // color: "#FF5733",
 
+  label: {
+    text: (originData) => {
+      return originData.value;
+    },
+    offset: 10,
+    textBaseline: "bottom",
+  },
+  shapeField: "hollow",
+  colorField: "type",
+  legend: {
+    color: { size: 72, autoWrap: true, maxRows: 3, cols: 4 },
+  },
+  axis: {
+    y: {
+      // tick: false,
+      // title: false,
+    },
+    x: {
+      grid: false,
+      tick: false,
+      label: false,
+      // title: false,
+    },
+  },
+};
 const Dashboard = () => {
   const dispatch = useDispatch();
-
-  const monthlyDataState = useSelector((state) => state?.auth?.monthlyData);
-  const yearlyDataState = useSelector((state) => state?.auth?.yearlyData);
-
-  const [dataMonthly, setDataMonthly] = useState([]);
-  const [dataMonthlySales, setDataMonthlySales] = useState([]);
-  const [orderData, setOrderData] = useState([]);
 
   const [dataInitDashBorad, setDataInitDashBorad] = useState();
   useEffect(() => {
     dispatch(getOrders("current=1&pageSize=10&statusUser=UNCONFIRMED"));
   }, []);
-
-  useEffect(() => {
-    let monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    let data = [];
-
-    let monthlyOrderCount = [];
-    for (let index = 0; index < monthlyDataState?.length; index++) {
-      const element = monthlyDataState[index];
-      data.push({
-        type: monthNames[element?._id?.month],
-        income: element?.amount,
-      });
-      monthlyOrderCount.push({
-        type: monthNames[element?._id?.month],
-        income: element?.count,
-      });
-    }
-
-    setDataMonthly(data);
-    setDataMonthlySales(monthlyOrderCount);
-  }, [monthlyDataState, yearlyDataState]);
 
   const colors = [
     "#ffd333",
@@ -99,66 +71,6 @@ const Dashboard = () => {
     "#ffb6c1",
     "#87cefa",
   ];
-
-  const config = {
-    data: dataMonthly,
-    xField: "type",
-    yField: "income",
-    color: ({ type }) => {
-      return colors[Math.floor(Math.random() * colors.length)];
-    },
-    label: {
-      position: "middle",
-      style: {
-        fill: "#FFFFFF",
-        opacity: 1,
-      },
-    },
-    xAxis: {
-      label: {
-        autoHide: true,
-        autoRotate: false,
-      },
-    },
-    meta: {
-      type: {
-        alias: "Month",
-      },
-      sales: {
-        alias: "Income",
-      },
-    },
-  };
-
-  const config2 = {
-    data: dataMonthlySales,
-    xField: "type",
-    yField: "income",
-    color: ({ type }) => {
-      return colors[Math.floor(Math.random() * colors.length)];
-    },
-    label: {
-      position: "middle",
-      style: {
-        fill: "#FFFFFF",
-        opacity: 1,
-      },
-    },
-    xAxis: {
-      label: {
-        autoHide: true,
-        autoRotate: false,
-      },
-    },
-    meta: {
-      type: {
-        alias: "Month",
-      },
-      sales: {
-        alias: "Income",
-      },
-    },
-  };
 
   const getInfoDashBoard = async () => {
     const re = await getInforDashBoard();
@@ -254,25 +166,33 @@ const Dashboard = () => {
             </h4>
           </div>
         </div>
+        <div className="d-flex p-3 justify-content-between align-items-end flex-grow-1 bg-white p-3 roudned-3">
+          <div>
+            <p className="desc">Số lượng thương hiệu</p>
+            <h4 className="mb-0 sub-title">
+              {dataInitDashBorad && dataInitDashBorad?.quantityBlog}
+            </h4>
+          </div>
+        </div>
       </div>
       <div className="d-flex justify-content-between align-items gap-3">
         <div className="mt-4 flex-grow-1 w-50">
           <h3 className="mb-5 title">Thu nhập </h3>
           <div>
-            <Column {...config} />
+            <Column {...configx} />
           </div>
         </div>
         <div className="mt-4 flex-grow-1 ">
           <h3 className="mb-5 title">Doanh số </h3>
           <div>
-            <Column {...config2} />
+            <Column {...configx} />
           </div>
         </div>
       </div>
       <div className="mt-4">
         <h3 className="mb-5 title">Đơn hàng gần đây</h3>
         <div>
-          <Table columns={columns} dataSource={orderData} />
+          <Table columns={columns} dataSource={orderState} />
         </div>
       </div>
     </div>
