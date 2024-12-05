@@ -11,7 +11,7 @@ const login = async (user) => {
   return await instance.post(`auth/login`, user);
 };
 const getOrders = async (query = "") => {
-  const response = await instance.get(`receipts/admin`);
+  const response = await instance.get(`receipts/admin?${query}`);
   return response;
 };
 const getOrder = async (id) => {

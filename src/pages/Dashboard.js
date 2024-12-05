@@ -56,7 +56,7 @@ const Dashboard = () => {
 
   const [dataInitDashBorad, setDataInitDashBorad] = useState();
   useEffect(() => {
-    dispatch(getOrders("current=1&pageSize=10&statusUser=UNCONFIRMED"));
+    dispatch(getOrders("current=1&pageSize=10&sort=-createdAt"));
   }, []);
 
   const colors = [

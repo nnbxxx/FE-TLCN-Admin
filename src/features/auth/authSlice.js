@@ -32,7 +32,7 @@ export const login = createAsyncThunk(
 export const getOrders = createAsyncThunk(
   "order/get-orders",
   async (data, thunkAPI) => {
-    const re = await authService.getOrders();
+    const re = await authService.getOrders(data);
     if (re && re.data) {
       return re;
     } else {
