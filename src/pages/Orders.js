@@ -14,6 +14,7 @@ const Orders = () => {
   }, [dispatch]);
 
   const orderState = useSelector((state) => state?.auth?.orders);
+<<<<<<< HEAD
 
 
 
@@ -25,6 +26,8 @@ const Orders = () => {
       })
     );
   };
+=======
+>>>>>>> 467c44160941790dd54c842e4ac53c2b2be24d83
   const columns = [
     {
       title: "Id",
@@ -95,6 +98,14 @@ const Orders = () => {
       },
     },
   ];
+  const updateOrderStatus = (orderId, status) => {
+    dispatch(
+      updateAOrder({
+        _id: orderId,
+        statusSupplier: status,
+      })
+    );
+  };
 
   return (
     <div>
