@@ -19,6 +19,10 @@ const data = [
   { type: "product6", value: 0.05 },
   { type: "product7", value: 0 },
   { type: "produc8", value: 0.015 },
+  { type: "product9", value: 0.22 },
+  { type: "product10", value: 0.05 },
+  { type: "product11", value: 0 },
+  { type: "produc12", value: 0.015 },
 ];
 const configx = {
   data,
@@ -182,6 +186,10 @@ const Dashboard = () => {
             <Column {...configx} />
           </div>
         </div>
+        
+      </div>
+      <div className="d-flex justify-content-between align-items gap-3">
+        
         <div className="mt-4 flex-grow-1 ">
           <h3 className="mb-5 title">Doanh số </h3>
           <div>
@@ -200,3 +208,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
