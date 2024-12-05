@@ -19,6 +19,7 @@ const Orders = () => {
       title: "Id",
       dataIndex: "_id",
       width: 100,
+      sorter: (a, b) => a._id.localeCompare(b._id),
     },
     {
       title: "Name",
@@ -52,11 +53,11 @@ const Orders = () => {
       title: "Payment Method",
       dataIndex: "paymentMethod",
     },
-    {
-      title: "Order Status",
-      dataIndex: "statusUser",
-      sorter: (a, b) => a.statusUser.localeCompare(b.statusUser),
-    },
+    // {
+    //   title: "Order Status",
+    //   dataIndex: "statusUser",
+    //   sorter: (a, b) => a.statusUser.localeCompare(b.statusUser),
+    // },
     {
       title: "Action",
       dataIndex: "action",

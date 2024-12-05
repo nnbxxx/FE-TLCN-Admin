@@ -119,6 +119,8 @@ export const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getOrders.fulfilled, (state, action) => {
+
+
         state.isError = false;
         state.isLoading = false;
         state.isSuccess = true;
