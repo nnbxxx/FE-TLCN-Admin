@@ -33,6 +33,9 @@ export const getOrders = createAsyncThunk(
   "order/get-orders",
   async (data, thunkAPI) => {
     const re = await authService.getOrders();
+
+    console.log("🚀 ~ file: authSlice.js:37 ~ re:", re);
+
     if (re && re.data) {
       return re;
     } else {
@@ -119,6 +122,8 @@ export const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getOrders.fulfilled, (state, action) => {
+
+
         state.isError = false;
         state.isLoading = false;
         state.isSuccess = true;
