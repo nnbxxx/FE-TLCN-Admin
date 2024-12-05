@@ -20,7 +20,7 @@ export const login = createAsyncThunk(
     if (re && re.data) {
       const { data } = re;
       if (data) {
-        localStorage.setItem("user", JSON.stringify(re.data));
+        // localStorage.setItem("user", JSON.stringify(re.data.user));
       }
       return re;
     } else {
@@ -102,8 +102,15 @@ export const authSlice = createSlice({
         state.user = action.payload;
         state.message = "success";
         if (state.isSuccess === true) {
-          localStorage.setItem("access_token", action.payload.access_token);
-          toast.success("Login Successfully !");
+          if (action.payload.data.user.role === "admin") {
+            localStorage.setItem(
+              "access_token",
+              action.payload.data.access_token
+            );
+            toast.success("Login Successfully !");
+          } else {
+            toast.error("User không thể đăng nhập");
+          }
         }
       })
       .addCase(login.rejected, (state, action) => {
@@ -119,8 +126,6 @@ export const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getOrders.fulfilled, (state, action) => {
-
-
         state.isError = false;
         state.isLoading = false;
         state.isSuccess = true;

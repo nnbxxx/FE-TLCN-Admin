@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { login } from "../features/auth/authSlice";
 import logo from "../assets/Logo_Sac.png"; // Adjust the path as needed
 import { ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 let schema = yup.object().shape({
   email: yup
@@ -17,6 +18,7 @@ let schema = yup.object().shape({
 
 const Login = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -38,7 +40,8 @@ const Login = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      window.location.href = "/admin";
+      // window.location.href = "/admin";
+      navigate("/admin");
     }
   }, [user, isError, isSuccess, isLoading]);
 
