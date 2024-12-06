@@ -20,13 +20,23 @@ const Orders = () => {
       dataIndex: "_id",
       width: 100,
       sorter: (a, b) => a._id.localeCompare(b._id),
+      render: (text) => (
+        <span title={text}>
+          {text.length > 10 ? `${text.slice(0, 10)}...` : text}
+        </span>
+      ),
     },
     {
       title: "Name",
       dataIndex: "name",
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: (index, item) => {
-        return item?.createdBy.email;
+        const name = item?.createdBy?.email || "N/A";
+        return (
+          <span title={name}>
+            {name.length > 15 ? `${name.slice(0, 15)}...` : name}
+          </span>
+        );
       },
     },
     {

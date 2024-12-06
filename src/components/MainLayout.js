@@ -209,7 +209,16 @@ const MainLayout = () => {
             <div className="d-flex gap-3 align-items-center">
               {/* Dropdown content */}
               <div>
-                <img width={60} height={60} src={authState?.avatar} alt="" />
+                <img
+                  width={60}
+                  height={60}
+                  src={authState?.avatar}
+                  alt=""
+                  style={{
+                    borderRadius: "50%", // Làm ảnh thành hình tròn
+                    objectFit: "cover", // Đảm bảo ảnh vừa khung
+                  }}
+                />
               </div>
               <div className="dropdownMenuLink">
                 <h5 className="mb-0">{authState?.name}</h5>
@@ -217,6 +226,7 @@ const MainLayout = () => {
               </div>
             </div>
           </div>
+
         </Header>
         <Content
           style={{

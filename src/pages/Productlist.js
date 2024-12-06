@@ -26,6 +26,7 @@ const Productlist = () => {
       title: "Name",
       dataIndex: "name",
       sorter: (a, b) => a.name.length - b.name.length,
+      render: (text) => (text.length > 20 ? text.substring(0, 20) + "..." : text),
     },
     {
       title: "Brand",
