@@ -63,11 +63,11 @@ const Orders = () => {
       title: "Payment Method",
       dataIndex: "paymentMethod",
     },
-    // {
-    //   title: "Order Status",
-    //   dataIndex: "statusUser",
-    //   sorter: (a, b) => a.statusUser.localeCompare(b.statusUser),
-    // },
+    {
+      title: "Order Status",
+      dataIndex: "statusUser",
+      sorter: (a, b) => a.statusUser.localeCompare(b.statusUser),
+    },
     {
       title: "Action",
       dataIndex: "action",
