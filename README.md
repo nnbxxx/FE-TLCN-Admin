@@ -1,3 +1,12 @@
+# XÂY DỰNG ỨNG DỤNG THƯƠNG MẠI VỀ THỜI TRANG
+
+Nhận thấy tầm quan trọng và ý nghĩa văn hóa của cổ phục Việt Nam, nhóm chúng em quyết định xây dựng một Ứng dụng Shop bán cổ phục Việt Nam. Ứng dụng không chỉ hướng đến việc cung cấp trải nghiệm mua sắm đơn giản, tiết kiệm thời gian cho người tiêu dùng mà còn giúp các cửa hàng kinh doanh cổ phục dễ dàng quản lý, lưu trữ thông tin và phát triển bền vững. Hơn nữa, ứng dụng còn góp phần lan tỏa và bảo tồn giá trị truyền thống thông qua việc đưa các sản phẩm cổ phục đến gần hơn với đông đảo người tiêu dùng hiện đại một cách tiện lợi trên thiết bị di động.
+
+## Nhóm phát triển
+
+- **Ngô Nguyên Bảo** - 21119170
+- **Lê Minh Quang** - 21110270
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
