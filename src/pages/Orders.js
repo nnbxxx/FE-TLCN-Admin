@@ -3,9 +3,6 @@ import { Table } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { getOrders, updateAOrder } from "../features/auth/authSlice";
-import { BiEdit } from "react-icons/bi";
-import { AiFillDelete } from "react-icons/ai";
-import { render } from "@testing-library/react";
 
 const Orders = () => {
   const dispatch = useDispatch();
@@ -14,6 +11,12 @@ const Orders = () => {
   }, [dispatch]);
 
   const orderState = useSelector((state) => state?.auth?.orders);
+
+  // Sắp xếp đơn hàng theo thứ tự mới nhất
+  const sortedOrders = orderState?.slice()?.sort((a, b) => {
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
   const columns = [
     {
       title: "Id",
@@ -67,6 +70,38 @@ const Orders = () => {
       title: "Order Status",
       dataIndex: "statusUser",
       sorter: (a, b) => a.statusUser.localeCompare(b.statusUser),
+      render: (status) => {
+        let color = "";
+        switch (status) {
+          case "CONFIRMED":
+            color = "green";
+            break;
+          case "DELIVERED":
+            color = "blue";
+            break;
+          case "CANCEL":
+            color = "red";
+            break;
+          case "ON_DELIVERY":
+            color = "orange";
+            break;
+          case "PREPARE":
+            color = "purple";
+            break;
+          default:
+            color = "gray";
+        }
+        return (
+          <span
+            style={{
+              color,
+              fontWeight: "bold",
+            }}
+          >
+            {status}
+          </span>
+        );
+      },
     },
     {
       title: "Action",
@@ -93,6 +128,7 @@ const Orders = () => {
       },
     },
   ];
+
   const updateOrderStatus = (orderId, status) => {
     dispatch(
       updateAOrder({
@@ -105,7 +141,7 @@ const Orders = () => {
   return (
     <div>
       <h3 className="mb-4 title">Danh sách đặt hàng</h3>
-      <div>{<Table columns={columns} dataSource={orderState} />}</div>
+      <div>{<Table columns={columns} dataSource={sortedOrders} />}</div>
     </div>
   );
 };
