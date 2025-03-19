@@ -36,7 +36,18 @@ const columns = (editUser, handleBlock, handleUnblock) => [
     title: "Name",
     dataIndex: "name",
     sorter: (a, b) => a.name.length - b.name.length,
+    render: (text, record) => (
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <img
+          src={record.avatar || "https://via.placeholder.com/50"}
+          alt={text}
+          style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "50%" }}
+        />
+        <span>{text.length > 20 ? text.substring(0, 20) + "..." : text}</span>
+      </div>
+    ),
   },
+  
   {
     title: "Email",
     dataIndex: "email",
@@ -264,7 +275,7 @@ const Customers = () => {
           pagination={{
           pageSize,
           showSizeChanger: false,
-          showTotal: (total, range) => `${range[0]}-${range[1]} trong tổng số ${total} sản phẩm`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} trong tổng số ${total} người dùng`,
         }}
         />
       </div>

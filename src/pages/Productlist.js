@@ -182,7 +182,7 @@ const latestProduct = products.length > 0
 
       {/* Nút thêm mới sản phẩm */}
       <div style={{ display: "flex", justifyContent: "end", marginBottom: 16 }}>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/admin/product/add")}>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/admin/product")}>
           Thêm mới
         </Button>
       </div>
