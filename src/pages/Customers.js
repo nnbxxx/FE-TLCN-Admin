@@ -9,6 +9,10 @@ import {
 } from "../features/cutomers/customerSlice";
 import styled from "styled-components";
 import { EditOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
+import moment from "moment/moment";
+import { FaSyncAlt } from "react-icons/fa";
+
+const { Search } = Input;
 
 const { Option } = Select;
 
@@ -86,6 +90,9 @@ const Customers = () => {
   const dispatch = useDispatch();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [pageSize, setPageSize] = useState(10);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     dispatch(getUsers());
@@ -171,13 +178,94 @@ const Customers = () => {
     }
   }, [currentUser, form]);
 
+  const customers = useSelector((state) => state.customer.customers);
+  const latestcustomers = customers.length > 0 
+    ? customers.reduce((latest, customer) => 
+        new Date(customer.createdAt) > new Date(latest.createdAt) ? customer : latest
+      )
+    : null;
+
+    // Lấy danh sách danh mục (không trùng lặp)
+  const user = [...new Set(customers?.map((customer) => customer.role))];
+
+  // Lọc sản phẩm theo danh mục hoặc tìm kiếm
+    const filteredUser = customers?.filter((customer) => {
+    const matchesCategory = selectedCategory ? customer.role === selectedCategory : true;
+    const matchesSearch = Object.values(customer)
+      .some((value) => value?.toString().toLowerCase().includes(searchText.toLowerCase()));
+    return matchesCategory && matchesSearch;
+  });
+
   return (
     <div>
-      <h3 className="mb-4 title">Người dùng</h3>
+          <div className="bg-white p-3 rounded shadow-sm mb-4">
+            <div className="d-flex justify-content-between align-items-center mx-4 py-3">
+              <h3 className="m-0">Người dùng</h3>
+              {latestcustomers && (
+                <span className="text-muted fs-6 d-flex align-items-center">
+                  Dữ liệu mới nhất
+                  <FaSyncAlt className="ms-2 text-primary" style={{ cursor: "pointer" }} />
+                  <span className="ms-2 border px-2 py-1 rounded">
+                    {moment(latestcustomers.createdAt).format("HH:mm:ss DD/MM/YYYY")}
+                  </span>
+                </span>
+              )}
+            </div>
+          </div>
+
+      {/* Bộ lọc và tìm kiếm */}
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+        {/* Phần "Hiển thị" nằm bên trái */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span style={{ marginRight: 8 }}>Hiển thị:</span>
+          <Select
+                  defaultValue={10}
+                  style={{ width: 60 }}
+                  onChange={(value) => setPageSize(value)}
+                >
+                    <Option value={5}>5</Option>
+                    <Option value={10}>10</Option>
+                    <Option value={20}>20</Option>
+                    <Option value={50}>50</Option>
+              </Select>
+        </div>
+
+        {/* Phần danh mục và tìm kiếm nằm bên phải */}
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Select
+            placeholder="Lọc theo danh mục"
+            allowClear
+            style={{ width: "170px" }}
+            onChange={(value) => setSelectedCategory(value)}
+          >
+            {user.map((role) => (
+              <Option key={role} value={role}>
+                {role}
+              </Option>
+            ))}
+          </Select>
+
+          <Search
+            placeholder="Tìm kiếm..."
+            allowClear
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ width: "210px" }}
+          />
+        </div>
+      </div>
+
+
       <div>
         <Table
           columns={columns(handleEditUser, handleBlockUser, handleUnblockUser)}
-          dataSource={data1}
+          // dataSource={data1}
+          dataSource={filteredUser || []}
+          rowKey={(record) => record._id || record.key}
+          pagination={{
+          pageSize,
+          showSizeChanger: false,
+          showTotal: (total, range) => `${range[0]}-${range[1]} trong tổng số ${total} sản phẩm`,
+        }}
         />
       </div>
       <Modal

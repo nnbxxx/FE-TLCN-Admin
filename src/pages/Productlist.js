@@ -153,7 +153,7 @@ const Productlist = () => {
     },
   ];
 
-  const products = useSelector((state) => state?.product?.products || []);
+const products = useSelector((state) => state?.product?.products || []);
 const latestProduct = products.length > 0 
     ? products.reduce((latest, product) => 
         new Date(product.createdAt) > new Date(latest.createdAt) ? product : latest
@@ -337,10 +337,6 @@ const latestProduct = products.length > 0
         </div>
       </div>
     )}
-
-
-      
-
 
 
       {/* Modal xác nhận xóa */}
