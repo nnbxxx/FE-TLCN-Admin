@@ -1,17 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { Table } from "antd";
+import { Button, Input, Select, Table } from "antd";
 import { BiEdit } from "react-icons/bi";
 import { AiFillDelete } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   deleteABlogCat,
   getCategories,
   resetState,
 } from "../features/bcategory/bcategorySlice";
 import CustomModal from "../components/CustomModal";
+import moment from "moment/moment";
+import { FaSyncAlt } from "react-icons/fa";
+import { DeleteOutlined, EditFilled, PlusOutlined } from "@ant-design/icons";
+const { Search } = Input;
+const { Option } = Select;
 
 const Blogcatlist = () => {
+   const [selectedCategory, setSelectedCategory] = useState("");
+    const [searchText, setSearchText] = useState("");
+    const [pageSize, setPageSize] = useState(10); 
+    const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [blogCatId, setblogCatId] = useState("");
   const showModal = (e) => {
@@ -71,11 +80,86 @@ const Blogcatlist = () => {
       dispatch(getCategories());
     }, 100);
   };
+
+  const blogs = useSelector((state) => state?.bCategory.bCategories || []);
+      const latestcategorys = blogs.length > 0 
+          ? blogs.reduce((latest, product) => 
+              new Date(product.createdAt) > new Date(latest.createdAt) ? product : latest
+            )
+          : null;
+  
+ // Lấy danh sách danh mục (không trùng lặp)
+ const categoryss = [...new Set(blogs?.map((pCategory) => pCategory.pCategories))];
+
+ // Lọc sản phẩm theo danh mục hoặc tìm kiếm
+ const filteredcategory = blogs?.filter((pCategory) => {
+   const matchesCategory = selectedCategory ? pCategory.pCategories === selectedCategory : true;
+   const matchesSearch = Object.values(pCategory)
+     .some((value) => value?.toString().toLowerCase().includes(searchText.toLowerCase()));
+   return matchesCategory && matchesSearch;
+ });
+
   return (
     <div>
-      <h3 className="mb-4 title">Danh sách danh mục bài viết</h3>
+    <div className="bg-white p-3 rounded shadow-sm mb-4">
+                    <div className="d-flex justify-content-between align-items-center mx-4 py-3">
+                      <h3 className="m-0">Danh sách danh mục bài viết</h3>
+                      {latestcategorys && (
+                        <span className="text-muted fs-6 d-flex align-items-center">
+                          Dữ liệu mới nhất
+                          <FaSyncAlt className="ms-2 text-primary" style={{ cursor: "pointer" }} />
+                          <span className="ms-2 border px-2 py-1 rounded">
+                            {moment(latestcategorys.createdAt).format("HH:mm:ss DD/MM/YYYY")}
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+       {/* Nút thêm mới sản phẩm */}
+       <div style={{ display: "flex", justifyContent: "end", marginBottom: 16 }}>
+                  <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/admin/blog-category")}>
+                    Thêm mới
+                  </Button>
+                </div>
+
+                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+                                  {/* Phần "Hiển thị" nằm bên trái */}
+                                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                    <span style={{ marginRight: 8 }}>Hiển thị:</span>
+                                    <Select
+                                            defaultValue={10}
+                                            style={{ width: 60 }}
+                                            onChange={(value) => setPageSize(value)}
+                                          >
+                                              <Option value={5}>5</Option>
+                                              <Option value={10}>10</Option>
+                                              <Option value={20}>20</Option>
+                                              <Option value={50}>50</Option>
+                                        </Select>
+                                  </div>
+                
+                                  {/* Phần danh mục và tìm kiếm nằm bên phải */}
+                                  <div style={{ display: "flex", gap: "10px" }}>
+                                    
+                
+                                    <Search
+                                      placeholder="Tìm kiếm..."
+                                      allowClear
+                                      onChange={(e) => setSearchText(e.target.value)}
+                                      style={{ width: "210px" }}
+                                    />
+                                  </div>
+                                </div> 
       <div>
-        <Table columns={columns} dataSource={bCatState} />
+        <Table columns={columns} 
+        dataSource={filteredcategory || []}
+         rowKey={(record) => record._id || record.key}
+          pagination={{
+          pageSize,
+          showSizeChanger: false,
+          showTotal: (total, range) => `${range[0]}-${range[1]} trong tổng số ${total} danh mục bài viết`,
+        }}
+        />
       </div>
       <CustomModal
         hideModal={hideModal}
