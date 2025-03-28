@@ -25,6 +25,8 @@ import ViewEnq from "./pages/ViewEnq";
 import ViewOrder from "./pages/ViewOrder";
 import { OpenRoutes } from "./routing/OpenRoutes";
 import { PrivateRoutes } from "./routing/PrivateRoutes";
+import AddWareHouse from "./pages/AddWareHouse";
+import WareHouseList from "./pages/WareHouseList";
 function App() {
   return (
     <Router>
@@ -74,6 +76,8 @@ function App() {
           <Route path="list-product" element={<Productlist />} />
           <Route path="product" element={<Addproduct />} />
           <Route path="product/:id" element={<Addproduct />} />
+          <Route path="warehouse" element={<AddWareHouse />} />
+          <Route path="warehouse-list" element={<WareHouseList />} />
         </Route>
       </Routes>
     </Router>

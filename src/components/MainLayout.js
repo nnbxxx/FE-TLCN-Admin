@@ -13,7 +13,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Outlet } from "react-router-dom";
 import { ImBlog } from "react-icons/im";
-import { FaClipboardList, FaBloggerB } from "react-icons/fa";
+import { FaClipboardList, FaBloggerB, FaWarehouse } from "react-icons/fa";
 import { SiBrandfolder } from "react-icons/si";
 import { BiCategoryAlt } from "react-icons/bi";
 import { Layout, Menu, theme } from "antd";
@@ -21,6 +21,8 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import logo from "../assets/LogoS.jpg";
 import instance from "../../src/utils/axios-customize";
+import { TbBuildingWarehouse } from "react-icons/tb";
+
 
 const { Header, Sider, Content } = Layout;
 
@@ -125,6 +127,23 @@ const MainLayout = () => {
                   key: "list-color",
                   icon: <AiOutlineBgColors className="fs-4" />,
                   label: "Color List",
+                },
+              ],
+            },
+            {
+              key: "warehouse",
+              icon: <FaWarehouse className="fs-4" />,
+              label: "WareHouse",
+              children: [
+                {
+                  key: "warehouse",
+                  icon: <ImBlog className="fs-4" />,
+                  label: "Nhập thêm hàng",
+                },
+                {
+                  key: "warehouse-list",
+                  icon: <TbBuildingWarehouse  className="fs-4" />,
+                  label: "Lịch sử nhập hàng",
                 },
               ],
             },
