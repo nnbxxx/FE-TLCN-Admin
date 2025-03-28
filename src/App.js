@@ -27,6 +27,7 @@ import { OpenRoutes } from "./routing/OpenRoutes";
 import { PrivateRoutes } from "./routing/PrivateRoutes";
 import AddWareHouse from "./pages/AddWareHouse";
 import WareHouseList from "./pages/WareHouseList";
+import HistoryDelivery from "./pages/HistoryDelivery";
 function App() {
   return (
     <Router>
@@ -78,6 +79,7 @@ function App() {
           <Route path="product/:id" element={<Addproduct />} />
           <Route path="warehouse" element={<AddWareHouse />} />
           <Route path="warehouse-list" element={<WareHouseList />} />
+          <Route path="history-delivery" element={<HistoryDelivery />} />
         </Route>
       </Routes>
     </Router>

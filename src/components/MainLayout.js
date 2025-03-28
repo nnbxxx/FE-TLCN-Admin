@@ -21,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import logo from "../assets/LogoS.jpg";
 import instance from "../../src/utils/axios-customize";
-import { TbBuildingWarehouse } from "react-icons/tb";
+import { TbBuildingWarehouse, TbTruckDelivery } from "react-icons/tb";
 
 
 const { Header, Sider, Content } = Layout;
@@ -144,6 +144,11 @@ const MainLayout = () => {
                   key: "warehouse-list",
                   icon: <TbBuildingWarehouse  className="fs-4" />,
                   label: "Lịch sử nhập hàng",
+                },
+                {
+                  key: "history-delivery",
+                  icon: <TbTruckDelivery  className="fs-4" />,
+                  label: "Lịch sử xuất hàng",
                 },
               ],
             },
