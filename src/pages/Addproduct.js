@@ -30,23 +30,9 @@ import {
 let schema = yup.object().shape({
   title: yup.string().required("Tiêu đề không được để trống"),
   description: yup.string().required("Mô tả không được để trống"),
-  price: yup
-    .number()
-    .typeError("Giá phải là một số") // Kiểm tra giá trị phải là số
-    .moreThan(0, "Giá phải lớn hơn 0") // Kiểm tra giá trị phải lớn hơn 0
-    .required("Giá không được để trống"),
   brand: yup.string().required("Thương hiệu không được để trống"),
   category: yup.string().required("Danh mục không được để trống"),
   tags: yup.string().required("Thẻ không được để trống"),
-  color: yup
-    .array()
-    .min(1, "Chọn ít nhất một màu")
-    .required("Màu sắc không được để trống"),
-  quantity: yup
-    .number()
-    .typeError("Số lượng phải là một số") // Kiểm tra giá trị phải là số
-    .moreThan(0, "Số lượng phải lớn hơn 0") // Kiểm tra giá trị phải lớn hơn 0
-    .required("Số lượng không được để trống"),
 });
 
 const Addproduct = () => {
@@ -75,12 +61,9 @@ const Addproduct = () => {
     updatedProduct,
     productName,
     productDesc,
-    productPrice,
     productBrand,
     productCategory,
     productTag,
-    productColors,
-    productQuantity,
     productImages,
   } = newProduct;
 
@@ -127,27 +110,27 @@ const Addproduct = () => {
   });
 
   const productcolor = [];
-  productColors?.forEach((i) => {
-    productcolor.push({
-      label: (
-        <div className="col-3">
-          <ul
-            className="colors ps-0"
-            style={{
-              width: "20px",
-              height: "20px",
-              marginBottom: "10px",
-              backgroundColor: i.color,
-              borderRadius: "50%", // Added inline style for rounded shape
-              listStyle: "none", // Hide bullet points
-              border: "2px solid transparent",
-            }}
-          ></ul>
-        </div>
-      ),
-      value: i._id,
-    });
-  });
+  // productColors?.forEach((i) => {
+  //   productcolor.push({
+  //     label: (
+  //       <div className="col-3">
+  //         <ul
+  //           className="colors ps-0"
+  //           style={{
+  //             width: "20px",
+  //             height: "20px",
+  //             marginBottom: "10px",
+  //             backgroundColor: i.color,
+  //             borderRadius: "50%", // Added inline style for rounded shape
+  //             listStyle: "none", // Hide bullet points
+  //             border: "2px solid transparent",
+  //           }}
+  //         ></ul>
+  //       </div>
+  //     ),
+  //     value: i._id,
+  //   });
+  // });
 
   useEffect(() => {
     formik.values.color = color ? color : " ";
@@ -156,57 +139,97 @@ const Addproduct = () => {
     initialValues: {
       title: productName || "",
       description: productDesc || "",
-      price: productPrice || "",
       brand: productBrand || "",
       category: productCategory || "",
       tags: productTag || "",
-      color: productColors || "",
-      quantity: productQuantity || "",
       images: productImages || [],
+      variants: []
     },
     validationSchema: schema,
     onSubmit: (values) => {
-      console.log(values);
-      if (getProductId !== undefined) {
-        const data = { id: getProductId, productData: values };
-        dispatch(
-          updateAProduct({
-            _id: getProductId,
-            name: values.title,
-            category: values.category,
-            brand: values.brand,
-            price: +values.price,
-            tags: values.tags,
-            description: values.description,
-            images: values.images,
-            colors: values.color,
-            quantity: values.quantity,
-          })
-        );
-        navigate("/admin/list-product");
-      } else {
-        dispatch(
-          createProducts({
-            name: values.title,
-            category: values.category,
-            brand: values.brand,
-            price: +values.price,
-            tags: values.tags,
-            description: values.description,
-            images: values.images,
-            colors: values.color,
-            quantity: values.quantity,
-          })
-        );
-        formik.resetForm();
-        setColor(null);
-        setTimeout(() => {
-          dispatch(resetState());
-          dispatch(resetStateUpload());
-        }, 3000);
-      }
-    },
+
+      const formattedVariants = variants.map(variant => {
+        // Regex linh hoạt để tìm mã màu và kích thước
+        const colorMatch = variant.name.match(/#([0-9a-fA-F]{6})/); // Tìm mã màu dạng #604848
+        const sizeMatch = variant.name.match(/-(\w)(?!#)/); // Tìm ký tự size nhưng không chứa mã màu
+    
+        // Xử lý mã màu và size
+        const colorCode = colorMatch ? `#${colorMatch[1]}` : ""; // Nếu có mã màu
+        const sizeValue = sizeMatch ? sizeMatch[1] : ""; // Nếu có size
+    
+        return {
+            attributes: {
+                color: {
+                    name: colorCode,
+                    desc: variant.image || ""
+                },
+                size: {
+                    name: sizeValue
+                }
+            }
+        };
+    });
+    
+
+      const formattedData = {
+        name: values.title,
+        category: values.category,
+        brand: values.brand,
+        description: values.description,
+        images: values.images,
+        tags: values.tags,
+        features: attributes.map(attr => attr.name),
+       variants: formattedVariants
+      };
+  
+      // In ra console
+      console.log("Dữ liệu sản phẩm:", JSON.stringify(formattedData, null, 2));
+    }
+
+    // onSubmit: (values) => {
+    //   console.log(values);
+    //   if (getProductId !== undefined) {
+    //     const data = { id: getProductId, productData: values };
+    //     dispatch(
+    //       updateAProduct({
+    //         _id: getProductId,
+    //         name: values.title,
+    //         category: values.category,
+    //         brand: values.brand,
+    //         // price: +values.price,
+    //         tags: values.tags,
+    //         description: values.description,
+    //         images: values.images,
+    //         // colors: values.color,
+    //         // quantity: values.quantity,
+    //       })
+    //     );
+    //     navigate("/admin/list-product");
+    //   } else {
+    //     dispatch(
+    //       createProducts({
+    //         name: values.title,
+    //         category: values.category,
+    //         brand: values.brand,
+    //         // price: +values.price,
+    //         tags: values.tags,
+    //         description: values.description,
+    //         images: values.images,
+    //         // colors: values.color,
+    //         // quantity: values.quantity,
+    //       })
+    //     );
+    //     formik.resetForm();
+    //     setColor(null);
+    //     setTimeout(() => {
+    //       dispatch(resetState());
+    //       dispatch(resetStateUpload());
+    //     }, 3000);
+    //   }
+    // }
   });
+
+  
   const handleDeleteImage = (index) => {
     const updatedImages = formik.values.images.filter((_, i) => i !== index);
     formik.setFieldValue("images", updatedImages);
@@ -253,7 +276,7 @@ const Addproduct = () => {
     setAttributes(updatedAttributes);
   
     // Nếu thuộc tính là màu sắc, tự động gán danh sách màu
-    if (field === "name" && value === "Màu sắc") {
+    if (field === "name" && value === "Color") {
       const colorValues = colorState.map((c) => c.color).join("\n"); // Lấy danh sách màu
       setAttributes((prev) =>
         prev.map((attr) =>
@@ -274,7 +297,7 @@ const Addproduct = () => {
     );
 
     setVariants(
-      combinations.filter((item) => item !== "").map((variant, index) => ({ id: index + 1, name: variant, cost: 0, price: 0, stock: 0 }))
+      combinations.filter((item) => item !== "").map((variant, index) => ({  name: variant }))
     );
   };
 
@@ -290,9 +313,8 @@ const Addproduct = () => {
 
   //--------------------------------
   const [availableAttributes, setAvailableAttributes] = useState([
-    "Màu sắc",
-    "Kích thước",
-    "Chất liệu",
+    "Color",
+    "Size",
   ]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newAttributeName, setNewAttributeName] = useState("");
@@ -381,17 +403,6 @@ const Addproduct = () => {
           <div className="error">
             {formik.touched.description && formik.errors.description}
           </div>
-          <CustomInput
-            type="number"
-            label="Nhập giá sản phẩm"
-            name="price"
-            onChng={formik.handleChange("price")}
-            onBlr={formik.handleBlur("price")}
-            val={formik.values.price}
-          />
-          <div className="error">
-            {formik.touched.price && formik.errors.price}
-          </div>
           <select
             name="brand"
             onChange={formik.handleChange("brand")}
@@ -451,29 +462,8 @@ const Addproduct = () => {
             {formik.touched.tags && formik.errors.tags}
           </div>
 
-          <Select
-            mode="multiple"
-            allowClear
-            className="w-100"
-            placeholder="Chọn màu sắc"
-            defaultValue={productcolor || color}
-            onChange={(i) => handleColors(i)}
-            options={coloropt}
-          />
-          <div className="error">
-            {formik.touched.color && formik.errors.color}
-          </div>
-          <CustomInput
-            type="number"
-            label="Nhập số lượng sản phẩm"
-            name="quantity"
-            onChng={formik.handleChange("quantity")}
-            onBlr={formik.handleBlur("quantity")}
-            val={formik.values.quantity}
-          />
-          <div className="error">
-            {formik.touched.quantity && formik.errors.quantity}
-          </div>
+         
+          
 
 
           <div style={{ backgroundColor: "#fff", padding: "20px", borderRadius: "8px" }}>
@@ -601,7 +591,7 @@ const Addproduct = () => {
                       />
                     </Modal>
 
-                    {attribute.name === "Màu sắc" ? (
+                    {attribute.name === "Color" ? (
                     <Select
                       mode="multiple"
                       style={{ width: "100%" }}
@@ -662,9 +652,6 @@ const Addproduct = () => {
                   <thead>
                     <tr className="table-light">
                       <th className="p-2">Tên</th>
-                      <th className="p-2">Giá vốn</th>
-                      <th className="p-2">Giá bán</th>
-                      <th className="p-2">Tồn kho</th>
                       <th className="p-2">Ảnh</th>
                       <th className="p-2 text-center">Hành động</th>
                     </tr>
@@ -674,48 +661,6 @@ const Addproduct = () => {
                       return items.map((variant, index) => (
                         <tr key={variant.id}>
                           <td className="p-2">{variant.name}</td>
-                          <td className="p-2">
-                            <input
-                              type="number"
-                              className="form-control"
-                              value={variant.cost}
-                              onChange={(e) =>
-                                setVariants(
-                                  variants.map((v) =>
-                                    v.id === variant.id ? { ...v, cost: e.target.value } : v
-                                  )
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="p-2">
-                            <input
-                              type="number"
-                              className="form-control"
-                              value={variant.price}
-                              onChange={(e) =>
-                                setVariants(
-                                  variants.map((v) =>
-                                    v.id === variant.id ? { ...v, price: e.target.value } : v
-                                  )
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="p-2 text-center">
-                            <input
-                              type="number"
-                              className="form-control"
-                              value={variant.stock}
-                              onChange={(e) =>
-                                setVariants(
-                                  variants.map((v) =>
-                                    v.id === variant.id ? { ...v, stock: e.target.value } : v
-                                  )
-                                )
-                              }
-                            />
-                          </td>
 
                           {/* Chỉ hiển thị ô upload ảnh ở dòng đầu tiên của mỗi nhóm màu */}
                           {index === 0 && (
