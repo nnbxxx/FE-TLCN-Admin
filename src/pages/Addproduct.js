@@ -349,17 +349,39 @@ const Addproduct = () => {
     colorGroups[color].push(variant);
   });
 
-  const handleUploadImage = (acceptedFiles, color) => {
+  const handleUploadImage = async (acceptedFiles, color) => {
     if (acceptedFiles.length === 0) return;
   
-    const newImage = URL.createObjectURL(acceptedFiles[0]);
+    const formData = new FormData();
+    formData.append("files", acceptedFiles[0]);
   
-    setVariants((prevVariants) =>
-      prevVariants.map((variant) =>
-        variant.name.includes(color) ? { ...variant, image: newImage } : variant
-      )
-    );
+    try {
+      const response = await fetch("http://localhost:8800/api/v1/files/files", {
+        method: "PATCH",
+        headers: {
+          accept: "application/json",
+        },
+        body: formData,
+      });
+  
+      const result = await response.json();
+  
+      if (response.ok && result.data?.length > 0) {
+        const uploadedImageUrl = result.data[0];
+  
+        setVariants((prevVariants) =>
+          prevVariants.map((variant) =>
+            variant.name.includes(color) ? { ...variant, image: uploadedImageUrl } : variant
+          )
+        );
+      } else {
+        console.error("Upload failed:", result.message);
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
   };
+  
   
   
   const handleDeleteI = (color) => {
