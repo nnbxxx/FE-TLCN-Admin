@@ -15,6 +15,7 @@ import Dropzone from "react-dropzone";
 import { LuImagePlus } from "react-icons/lu";
 import { MdDelete } from "react-icons/md";
 import { DeleteOutlined, PlusOutlined, TagsOutlined } from "@ant-design/icons";
+import { HexColorPicker } from "react-colorful";
 
 import {
   delImg,
@@ -179,11 +180,51 @@ const Addproduct = () => {
         images: values.images,
         tags: values.tags,
         features: attributes.map(attr => attr.name),
-       variants: formattedVariants
+        variants: formattedVariants
       };
   
       // In ra console
       console.log("Dữ liệu sản phẩm:", JSON.stringify(formattedData, null, 2));
+
+
+      if (getProductId !== undefined) {
+            const data = { id: getProductId, productData: values };
+            dispatch(
+              updateAProduct({
+                _id: getProductId,
+                name: values.title,
+                category: values.category,
+                brand: values.brand,
+                description: values.description,
+                images: values.images,
+                tags: values.tags,
+                features: attributes.map(attr => attr.name),
+                variants: formattedVariants
+              })
+            );
+            navigate("/admin/list-product");
+          } else {
+            dispatch(
+              createProducts({
+                name: values.title,
+                category: values.category,
+                brand: values.brand,
+                description: values.description,
+                images: values.images,
+                tags: values.tags,
+                features: attributes.map(attr => attr.name),
+                variants: formattedVariants
+              })
+            );
+            formik.resetForm();
+            setColor(null);
+            setTimeout(() => {
+              dispatch(resetState());
+              dispatch(resetStateUpload());
+            }, 3000);
+          }
+
+
     }
 
     // onSubmit: (values) => {
@@ -251,9 +292,11 @@ const Addproduct = () => {
 
   const imagesByName = {};
 
-  const handleAddAttribute = () => {
+  const handleAddAttribute = (event) => {
+    event.preventDefault(); // Ngăn submit form
     setAttributes([...attributes, { id: Date.now(), name: "", values: "" }]);
-  };
+};
+
 
   const handleRemoveAttribute = (id) => {
     setAttributes(attributes.filter((attr) => attr.id !== id));
@@ -392,6 +435,37 @@ const Addproduct = () => {
     );
   };
   
+  const [newColor, setNewColor] = useState("");
+  const [showColorPicker, setShowColorPicker] = useState(false);
+
+  const handleAddColor = () => {
+    if (newColor) {
+      const colorAttribute = attributes.find((attr) => attr.name === "Color");
+      const currentColors = colorAttribute.values ? colorAttribute.values.split("\n") : [];
+      const updatedColors = [...currentColors, newColor];
+
+      handleAttributeChange(
+        colorAttribute.id,
+        "values",
+        updatedColors.join("\n")
+      );
+
+      setNewColor("");
+      setShowColorPicker(false);
+    }
+  };
+
+  const handleRemoveColor = (colorToRemove) => {
+    const colorAttribute = attributes.find((attr) => attr.name === "Color");
+    const currentColors = colorAttribute.values ? colorAttribute.values.split("\n") : [];
+    const updatedColors = currentColors.filter((color) => color !== colorToRemove);
+
+    handleAttributeChange(
+      colorAttribute.id,
+      "values",
+      updatedColors.join("\n")
+    );
+  };
 
   return (
     <div>
@@ -456,7 +530,7 @@ const Addproduct = () => {
             <option value="">Chọn danh mục sản phẩm</option>
             {catState.map((i, j) => {
               return (
-                <option key={j} value={i.name}>
+                <option key={j} value={i._id}>
                   {i.name}
                 </option>
               );
@@ -587,10 +661,73 @@ const Addproduct = () => {
                     ))}
 
                   </select>
-                
+                   
 
-                   {/* Popup Modal */}
-                   <Modal
+                    {attribute.name === "Color" ? (
+                      <>
+                        <div className="mt-2 ">
+                          {showColorPicker && (
+                            <div className="mb-2">
+                              <HexColorPicker color={newColor} onChange={setNewColor} />
+                            </div>
+                          )}
+                          <Button onClick={() => setShowColorPicker(!showColorPicker)}>
+                            {showColorPicker ? "Đóng" : "Thêm màu sắc"}
+                          </Button>
+                          {showColorPicker && (
+                            <Button type="primary" className="ml-2" onClick={handleAddColor}>
+                              Xác nhận
+                            </Button>
+                          )}
+                        </div>
+                        <div className="mt-2">
+                          {attribute.values.split("\n").map((color, index) => (
+                            <div key={index} style={{ display: "inline-block", marginRight: "8px", cursor: "pointer" }} onClick={() => handleRemoveColor(color)}>
+                              <span
+                                style={{
+                                  display: "inline-block",
+                                  width: "20px",
+                                  height: "20px",
+                                  backgroundColor: color,
+                                  borderRadius: "50%",
+                                  border: "1px solid #ccc",
+                                  marginRight: "5px",
+                                }}
+                              ></span>
+                              {color}
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <textarea
+                        className="form-control form-control-sm flex-grow-1"
+                        rows="2"
+                        style={{ height: "37px" }}
+                        placeholder="Nhập từng giá trị và enter"
+                        value={attribute.values.split("\n").join(", ")}
+                        onChange={(e) =>
+                          handleAttributeChange(
+                            attribute.id,
+                            "values",
+                            e.target.value.replace(/, /g, "\n")
+                          )
+                        }
+                      />
+                    )}
+
+                  <button onClick={() => handleRemoveAttribute(attribute.id)} className="absolute top-0 right-0 btn btn-outline-danger">
+                    <DeleteOutlined size={22} />
+                  </button>
+                </div>
+              ))}
+              <button onClick={handleAddAttribute} type="button" className="btn btn-outline-secondary d-flex align-items-center gap-2">
+                <PlusOutlined />
+                Thêm thuộc tính
+              </button>
+
+                    {/* Popup Modal */}
+                    <Modal
                       title="Thêm thuộc tính mới"
                       open={isModalVisible}
                       onOk={handleOk}
@@ -613,62 +750,7 @@ const Addproduct = () => {
                       />
                     </Modal>
 
-                    {attribute.name === "Color" ? (
-                    <Select
-                      mode="multiple"
-                      style={{ width: "100%" }}
-                      placeholder="Chọn màu sắc"
-                      defaultValue={[]}
-                      onChange={(selectedColors) =>
-                        handleAttributeChange(attribute.id, "values", selectedColors.join("\n"))
-                      }
-                    >
-                      {colorState.map((color) => (
-                        <Select.Option key={color._id} value={color.color}>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "5px",
-                            }}
-                          >
-                            <span
-                              style={{
-                                width: "20px",
-                                height: "20px",
-                                backgroundColor: color.color,
-                                display: "inline-block",
-                                borderRadius: "50%",
-                                border: "1px solid #ccc",
-                              }}
-                            ></span>
-                            {color.color}
-                          </div>
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  ) : (
-                    <textarea
-                      className="form-control form-control-sm flex-grow-1"
-                      rows="2"
-                      style={{ height: "37px" }}
-                      placeholder="Nhập từng giá trị và enter"
-                      value={attribute.values.split("\n").join(", ")} // Hiển thị nằm ngang
-                      onChange={(e) => handleAttributeChange(attribute.id, "values", e.target.value.replace(/, /g, "\n"))}
-                    />
-                  )}
-
-                  <button onClick={() => handleRemoveAttribute(attribute.id)} className="btn btn-outline-danger">
-                    <DeleteOutlined size={22} />
-                  </button>
-                </div>
-              ))}
-              <button onClick={handleAddAttribute} className="btn btn-outline-secondary d-flex align-items-center gap-2">
-                <PlusOutlined />
-                Thêm thuộc tính
-              </button>
-
-
+                    
               <h2 className="fw-semibold fs-5 mt-4 mb-3">Danh sách hàng hóa cùng loại</h2>
               <table className="table table-bordered text-start">
                   <thead>
