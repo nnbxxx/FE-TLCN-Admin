@@ -90,6 +90,37 @@ const AddWareHouse = () => {
             </div>
           ),
         },
+        {
+          title: "Màu sắc",
+          dataIndex: "color",
+          render: (_, record) => (
+            <div style={{ display: "flex", gap: "10px" }}>
+              {record.variants?.map((variant, index) => (
+                <div key={index} style={{ textAlign: "center" }}>
+                  <img
+                    src={variant.attributes.color.desc}
+                    alt={variant.attributes.color.name}
+                    style={{ width: "40px", height: "40px", objectFit: "cover", borderRadius: "5px" }}
+                  />
+                  <p>{variant.attributes.color.name}</p>
+                </div>
+              ))}
+            </div>
+          ),
+        },
+        {
+          title: "Kích thước",
+          dataIndex: "size",
+          render: (_, record) => (
+            <div style={{ display: "flex", gap: "10px" }}>
+              {record.variants?.map((variant, index) => (
+                <span key={index}>{variant.attributes.size.name}</span>
+              ))}
+            </div>
+          ),
+        },
+
+
     {
       title: "Nhập số lượng",
       dataIndex: "quantity",

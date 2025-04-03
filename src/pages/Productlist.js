@@ -9,6 +9,7 @@ import { delImg } from "../features/upload/uploadSlice";
 import { DeleteOutlined, EditFilled, PlusOutlined } from "@ant-design/icons";
 import moment from "moment/moment";
 import { FaSyncAlt } from "react-icons/fa";
+import pCategoryService from "../features/pcategory/pcategoryService"; // Đường dẫn đúng đến API categories
 
 const { Search } = Input;
 const { Option } = Select;
@@ -21,6 +22,7 @@ const Productlist = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [deleteMultiple, setDeleteMultiple] = useState(false);
   const [pageSize, setPageSize] = useState(10); // Mặc định hiển thị 10 sản phẩm
+  const [categoriess, setCategoriess] = useState([]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -32,6 +34,24 @@ const Productlist = () => {
     dispatch(getProducts());
   }, [dispatch]);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+        try {
+            const response = await pCategoryService.getProductCategories();
+            console.log("Danh sách danh mục:", response.data.result);
+            setCategoriess(response.data.result); // Đúng định dạng
+        } catch (error) {
+            console.error("Lỗi khi lấy danh mục sản phẩm:", error);
+        }
+    };
+
+    dispatch(getProducts());
+    fetchCategories();
+}, [dispatch]);
+
+  
+
+  
   const productState = useSelector((state) => state?.product?.products);
 
   // Xử lý chọn checkbox
@@ -123,8 +143,15 @@ const Productlist = () => {
     {
       title: "Category",
       dataIndex: "category",
-      sorter: (a, b) => a.category.length - b.category.length,
+      render: (categoryId) => {
+        // Kiểm tra categoriess trước khi tìm kiếm
+        if (!categoriess || categoriess.length === 0) return "Đang tải...";
+
+        const category = categoriess.find(item => item._id === categoryId);
+        return category ? category.name : "Không xác định";
+      },
     },
+    
     {
       title: "Quantity",
       dataIndex: "quantity",
@@ -303,9 +330,13 @@ const latestProduct = products.length > 0
           <p><strong>ID:</strong> {selectedProduct._id}</p>
           <p><strong>Tên sản phẩm:</strong> {selectedProduct.name}</p>
           <p><strong>Thương hiệu:</strong> {selectedProduct.brand}</p>
-          <p><strong>Danh mục:</strong> {selectedProduct.category}</p>
-          <p><strong>Số lượng trong kho:</strong> {selectedProduct.quantity}</p>
-          <p><strong>Giá bán:</strong> {selectedProduct.price.toLocaleString()} VND</p>
+          <p><strong>Danh mục:</strong>{" "}
+            {categoriess && categoriess.length > 0 ? 
+              categoriess.find(cat => cat._id === selectedProduct.category)?.name || "Không xác định" 
+              : "Đang tải..."}
+          </p>
+          {/* <p><strong>Số lượng trong kho:</strong> {selectedProduct.quantity}</p>
+          <p><strong>Giá bán:</strong> {selectedProduct.price.toLocaleString()} VND</p> */}
           <p><strong>Mô tả sản phẩm:</strong></p>
             <div dangerouslySetInnerHTML={{ __html: selectedProduct.description || "Chưa có mô tả." }} />
 
