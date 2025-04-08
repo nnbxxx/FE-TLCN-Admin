@@ -66,6 +66,8 @@ const Addproduct = () => {
     productCategory,
     productTag,
     productImages,
+    productFeatures,
+    productVariants,
   } = newProduct;
 
   useEffect(() => {
@@ -111,27 +113,7 @@ const Addproduct = () => {
   });
 
   const productcolor = [];
-  // productColors?.forEach((i) => {
-  //   productcolor.push({
-  //     label: (
-  //       <div className="col-3">
-  //         <ul
-  //           className="colors ps-0"
-  //           style={{
-  //             width: "20px",
-  //             height: "20px",
-  //             marginBottom: "10px",
-  //             backgroundColor: i.color,
-  //             borderRadius: "50%", // Added inline style for rounded shape
-  //             listStyle: "none", // Hide bullet points
-  //             border: "2px solid transparent",
-  //           }}
-  //         ></ul>
-  //       </div>
-  //     ),
-  //     value: i._id,
-  //   });
-  // });
+
 
   useEffect(() => {
     formik.values.color = color ? color : " ";
@@ -144,7 +126,8 @@ const Addproduct = () => {
       category: productCategory || "",
       tags: productTag || "",
       images: productImages || [],
-      variants: []
+      features: productFeatures || [],
+      variants: productVariants || [],
     },
     validationSchema: schema,
     onSubmit: (values) => {
@@ -217,57 +200,15 @@ const Addproduct = () => {
               })
             );
             formik.resetForm();
+            setVariants([]);
+            setAttributes([]);
             setColor(null);
             setTimeout(() => {
               dispatch(resetState());
               dispatch(resetStateUpload());
             }, 3000);
           }
-
-
     }
-
-    // onSubmit: (values) => {
-    //   console.log(values);
-    //   if (getProductId !== undefined) {
-    //     const data = { id: getProductId, productData: values };
-    //     dispatch(
-    //       updateAProduct({
-    //         _id: getProductId,
-    //         name: values.title,
-    //         category: values.category,
-    //         brand: values.brand,
-    //         // price: +values.price,
-    //         tags: values.tags,
-    //         description: values.description,
-    //         images: values.images,
-    //         // colors: values.color,
-    //         // quantity: values.quantity,
-    //       })
-    //     );
-    //     navigate("/admin/list-product");
-    //   } else {
-    //     dispatch(
-    //       createProducts({
-    //         name: values.title,
-    //         category: values.category,
-    //         brand: values.brand,
-    //         // price: +values.price,
-    //         tags: values.tags,
-    //         description: values.description,
-    //         images: values.images,
-    //         // colors: values.color,
-    //         // quantity: values.quantity,
-    //       })
-    //     );
-    //     formik.resetForm();
-    //     setColor(null);
-    //     setTimeout(() => {
-    //       dispatch(resetState());
-    //       dispatch(resetStateUpload());
-    //     }, 3000);
-    //   }
-    // }
   });
 
   
@@ -303,13 +244,6 @@ const Addproduct = () => {
     generateVariants(attributes.filter((attr) => attr.id !== id));
   };
 
-  // const handleAttributeChange = (id, field, value) => {
-  //   const updatedAttributes = attributes.map((attr) =>
-  //     attr.id === id ? { ...attr, [field]: value } : attr
-  //   );
-  //   setAttributes(updatedAttributes);
-  //   generateVariants(updatedAttributes);
-  // };
 
   const handleAttributeChange = (id, field, value) => {
     const updatedAttributes = attributes.map((attr) =>
@@ -319,7 +253,7 @@ const Addproduct = () => {
     setAttributes(updatedAttributes);
   
     // Nếu thuộc tính là màu sắc, tự động gán danh sách màu
-    if (field === "name" && value === "Color") {
+    if (field === "name" && value === "color") {
       const colorValues = colorState.map((c) => c.color).join("\n"); // Lấy danh sách màu
       setAttributes((prev) =>
         prev.map((attr) =>
@@ -344,20 +278,15 @@ const Addproduct = () => {
     );
   };
 
-  // const availableAttributes = [
-  //   "Màu sắc",
-  //   "Kích thước",
-  //   "Chất liệu",
  
-  // ];
   const selectedAttributes = attributes.map((attr) => attr.name);
   
 
 
   //--------------------------------
   const [availableAttributes, setAvailableAttributes] = useState([
-    "Color",
-    "Size",
+    "color",
+    "size",
   ]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newAttributeName, setNewAttributeName] = useState("");
@@ -440,7 +369,7 @@ const Addproduct = () => {
 
   const handleAddColor = () => {
     if (newColor) {
-      const colorAttribute = attributes.find((attr) => attr.name === "Color");
+      const colorAttribute = attributes.find((attr) => attr.name === "color");
       const currentColors = colorAttribute.values ? colorAttribute.values.split("\n") : [];
       const updatedColors = [...currentColors, newColor];
 
@@ -456,7 +385,7 @@ const Addproduct = () => {
   };
 
   const handleRemoveColor = (colorToRemove) => {
-    const colorAttribute = attributes.find((attr) => attr.name === "Color");
+    const colorAttribute = attributes.find((attr) => attr.name === "color");
     const currentColors = colorAttribute.values ? colorAttribute.values.split("\n") : [];
     const updatedColors = currentColors.filter((color) => color !== colorToRemove);
 
@@ -663,7 +592,7 @@ const Addproduct = () => {
                   </select>
                    
 
-                    {attribute.name === "Color" ? (
+                    {attribute.name === "color" ? (
                       <>
                         <div className="mt-2 ">
                           {showColorPicker && (

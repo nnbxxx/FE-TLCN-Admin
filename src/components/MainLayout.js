@@ -8,7 +8,7 @@ import {
   AiOutlineLogout,
 } from "react-icons/ai";
 
-import { RiCouponLine } from "react-icons/ri";
+import { RiCoupon3Line, RiCouponLine } from "react-icons/ri";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Outlet } from "react-router-dom";
@@ -162,6 +162,11 @@ const MainLayout = () => {
               icon: <RiCouponLine className="fs-4" />,
               label: "Marketing",
               children: [
+                {
+                  key: "voucher-list",
+                  icon: <RiCoupon3Line  className="fs-4" />,
+                  label: "Giảm giá sản phẩm",
+                },
                 {
                   key: "coupon",
                   icon: <ImBlog className="fs-4" />,

@@ -28,6 +28,8 @@ import { PrivateRoutes } from "./routing/PrivateRoutes";
 import AddWareHouse from "./pages/AddWareHouse";
 import WareHouseList from "./pages/WareHouseList";
 import HistoryDelivery from "./pages/HistoryDelivery";
+import Voucherlist from "./pages/VoucherList";
+import AddVoucher from "./pages/AddVoucher";
 function App() {
   return (
     <Router>
@@ -80,6 +82,8 @@ function App() {
           <Route path="warehouse" element={<AddWareHouse />} />
           <Route path="warehouse-list" element={<WareHouseList />} />
           <Route path="history-delivery" element={<HistoryDelivery />} />
+          <Route path="voucher-list" element={<Voucherlist />} />
+          <Route path="voucher" element={<AddVoucher />} />
         </Route>
       </Routes>
     </Router>

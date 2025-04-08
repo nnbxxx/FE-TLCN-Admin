@@ -124,6 +124,8 @@ export const productSlice = createSlice({
         // );
         state.productQuantity = action.payload.data.quantity;
         state.productImages = action.payload.data.images;
+        state.productFeatures = action.payload.data.features;
+        state.productVariants = action.payload.data.variants;
       })
       .addCase(getAProduct.rejected, (state, action) => {
         state.isLoading = false;
