@@ -16,7 +16,6 @@ const AddWareHouse = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useDispatch();
   const products = useSelector((state) => state.product.products);
-  // const { isLoading, isError, message } = useSelector((state) => state.warehouses); // Store loading states
 
   useEffect(() => {
     dispatch(getProducts());
@@ -42,12 +41,19 @@ const AddWareHouse = () => {
   
 
   const handleInputChange = (value, record, field, index) => {
+    let newValue = Math.max(0, Number(value)); // Không cho nhỏ hơn 0
+  
+    // Giới hạn discount và exportPrice không quá 100
+    if (field === "discount" || field === "exportPrice") {
+      newValue = Math.min(100, newValue);
+    }
+  
     setSelectedProducts((prev) =>
       prev.map((item) => {
         if (item._id === record._id) {
           const updatedVariants = item.variants.map((variant, idx) => {
             if (idx === index) {
-              return { ...variant, [field]: value };
+              return { ...variant, [field]: newValue };
             }
             return variant;
           });
@@ -57,6 +63,8 @@ const AddWareHouse = () => {
       })
     );
   };
+  
+  
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -153,21 +161,24 @@ const AddWareHouse = () => {
   
 
   const expandedRowRender = (record) => {
+    // Trường hợp sản phẩm không có biến thể
     if (!record.variants || record.variants.length === 0) {
       const noVariantColumns = [
         {
           title: "Số lượng",
           dataIndex: "quantity",
+          width: 120,
           render: (_, item) => (
             <Input
               type="number"
-              min={1}
-              value={item.quantity || 1}
+              min={0}
+              value={item.quantity ?? 0}
+              addonAfter="cái"
               onChange={(e) =>
                 setSelectedProducts((prev) =>
                   prev.map((p) =>
                     p._id === item._id
-                      ? { ...p, quantity: Number(e.target.value) }
+                      ? { ...p, quantity: Math.max(0, Number(e.target.value))}
                       : p
                   )
                 )
@@ -178,16 +189,18 @@ const AddWareHouse = () => {
         {
           title: "Giá nhập",
           dataIndex: "importPrice",
+          width: 150,
           render: (_, item) => (
             <Input
               type="number"
               min={0}
-              value={item.importPrice || 0}
+              value={item.importPrice ?? 0}
+              addonAfter="VND"
               onChange={(e) =>
                 setSelectedProducts((prev) =>
                   prev.map((p) =>
                     p._id === item._id
-                      ? { ...p, importPrice: Number(e.target.value) }
+                      ? { ...p, importPrice: Math.max(0, Number(e.target.value)) }
                       : p
                   )
                 )
@@ -196,18 +209,43 @@ const AddWareHouse = () => {
           ),
         },
         {
-          title: "Giá bán",
+          title: "Lợi nhuận (%)",
           dataIndex: "exportPrice",
+          width: 150,
           render: (_, item) => (
             <Input
               type="number"
               min={0}
-              value={item.exportPrice || 0}
+              value={item.exportPrice ?? 0}
+              addonAfter="%"
               onChange={(e) =>
                 setSelectedProducts((prev) =>
                   prev.map((p) =>
                     p._id === item._id
-                      ? { ...p, exportPrice: Number(e.target.value) }
+                      ? { ...p, exportPrice: Math.max(0, Math.min(100, Number(e.target.value))) }
+                      : p
+                  )
+                )
+              }
+            />
+          ),
+        },
+        {
+          title: "Giảm giá (%)",
+          dataIndex: "discount",
+          width: 150,
+          render: (_, item) => (
+            <Input
+              type="number"
+              min={0}
+              max={100}
+              value={item.discount ?? 0}
+              addonAfter="%"
+              onChange={(e) =>
+                setSelectedProducts((prev) =>
+                  prev.map((p) =>
+                    p._id === item._id
+                      ? { ...p, discount:Math.max(0, Math.min(100, Number(e.target.value))) }
                       : p
                   )
                 )
@@ -216,58 +254,109 @@ const AddWareHouse = () => {
           ),
         },
       ];
+      
   
       return (
         <Table
           columns={noVariantColumns}
-          dataSource={[record]} // Gói lại trong mảng để Table hoạt động
+          dataSource={[record]} // Bọc lại thành mảng
           pagination={false}
           rowKey="_id"
         />
       );
     }
   
-    // Nếu có biến thể, dùng bảng như cũ
+    // Trường hợp có biến thể
     const variantColumns = [
+      {
+        title: "",
+        dataIndex: "image",
+        width: 80,
+        render: (_, variant) => (
+          <img
+            src={
+              variant.attributes?.color?.desc ||
+              "https://via.placeholder.com/60x60?text=No+Image"
+            }
+            alt="variant"
+            style={{
+              width: 60,
+              height: 60,
+              objectFit: "cover",
+              borderRadius: 4,
+            }}
+          />
+        ),
+      },
       {
         title: "Biến thể",
         dataIndex: "variant",
+        width: 150,
         render: (_, variant) =>
-          `${variant.attributes.color.name} - ${variant.attributes.size.name}`,
+          `${variant.attributes?.color?.name ?? "N/A"} - ${variant.attributes?.size?.name ?? "N/A"}`,
       },
       {
         title: "Số lượng",
         dataIndex: "quantity",
+        width: 150,
         render: (_, variant, index) => (
           <Input
             type="number"
-            min={1}
-            value={variant.quantity}
-            onChange={(e) => handleInputChange(e.target.value, record, "quantity", index)}
+            min={0}
+            value={variant.quantity ?? 0}
+            addonAfter="cái"
+            onChange={(e) =>
+              handleInputChange(e.target.value, record, "quantity", index)
+            }
           />
         ),
       },
       {
         title: "Giá nhập",
         dataIndex: "importPrice",
+        width: 150,
         render: (_, variant, index) => (
           <Input
             type="number"
             min={0}
-            value={variant.importPrice}
-            onChange={(e) => handleInputChange(e.target.value, record, "importPrice", index)}
+            value={variant.importPrice ?? 0}
+            addonAfter="VND"
+            onChange={(e) =>
+              handleInputChange(e.target.value, record, "importPrice", index)
+            }
           />
         ),
       },
       {
-        title: "Giá bán",
+        title: "Lợi nhuận (%)",
         dataIndex: "exportPrice",
+        width: 150,
         render: (_, variant, index) => (
           <Input
             type="number"
             min={0}
-            value={variant.exportPrice}
-            onChange={(e) => handleInputChange(e.target.value, record, "exportPrice", index)}
+            value={variant.exportPrice ?? 0}
+            addonAfter="%"
+            onChange={(e) =>
+              handleInputChange(e.target.value, record, "exportPrice", index)
+            }
+          />
+        ),
+      },
+      {
+        title: "Giảm giá (%)",
+        dataIndex: "discount",
+        width: 150,
+        render: (_, variant, index) => (
+          <Input
+            type="number"
+            min={0}
+            max={100}
+            value={variant.discount ?? 0}
+            addonAfter="%"
+            onChange={(e) =>
+              handleInputChange(e.target.value, record, "discount", index)
+            }
           />
         ),
       },
@@ -282,6 +371,7 @@ const AddWareHouse = () => {
       />
     );
   };
+  
   
   
 
@@ -305,6 +395,7 @@ const AddWareHouse = () => {
           quantity: Number(variant?.quantity) || 0,
           importPrice: Number(variant?.importPrice) || 0,
           exportPrice: Number(variant?.exportPrice) || 0,
+          discount: Number(variant?.discount) || 0,
         })),
       };
     } else {
@@ -318,12 +409,14 @@ const AddWareHouse = () => {
             quantity: Number(product?.quantity) || 0,
             importPrice: Number(product?.importPrice) || 0,
             exportPrice: Number(product?.exportPrice) || 0,
+            discount: Number(product?.discount) || 0,
           },
         ],
       };
     }
   
     try {
+      console.log("Payload gửi lên:", payload);
       await dispatch(inventoryProduct(payload));
       notification.success({
         message: "Thành công",

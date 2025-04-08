@@ -70,6 +70,7 @@ const Addproduct = () => {
     productVariants,
   } = newProduct;
 
+
   useEffect(() => {
     if (getProductId !== undefined) {
       dispatch(getAProduct(getProductId));
@@ -171,22 +172,26 @@ const Addproduct = () => {
 
 
       if (getProductId !== undefined) {
-            const data = { id: getProductId, productData: values };
-            dispatch(
-              updateAProduct({
-                _id: getProductId,
-                name: values.title,
-                category: values.category,
-                brand: values.brand,
-                description: values.description,
-                images: values.images,
-                tags: values.tags,
-                features: attributes.map(attr => attr.name),
-                variants: formattedVariants
-              })
-            );
-            navigate("/admin/list-product");
-          } else {
+        const dataToUpdate = {
+          _id: getProductId,
+          name: values.title,
+          category: values.category,
+          brand: values.brand,
+          description: values.description,
+          images: values.images,
+          tags: values.tags,
+          features: attributes.map(attr => attr.name),
+          variants: formattedVariants
+        };
+      
+        // ✅ Log dữ liệu trước khi cập nhật
+        console.log("Dữ liệu gửi đi để cập nhật sản phẩm:", JSON.stringify(dataToUpdate, null, 2));
+      
+        dispatch(updateAProduct(dataToUpdate));
+        navigate("/admin/list-product");
+      }
+      
+           else {
             dispatch(
               createProducts({
                 name: values.title,
@@ -211,7 +216,6 @@ const Addproduct = () => {
     }
   });
 
-  
   const handleDeleteImage = (index) => {
     const updatedImages = formik.values.images.filter((_, i) => i !== index);
     formik.setFieldValue("images", updatedImages);
@@ -280,6 +284,9 @@ const Addproduct = () => {
 
  
   const selectedAttributes = attributes.map((attr) => attr.name);
+
+
+
   
 
 
@@ -582,7 +589,7 @@ const Addproduct = () => {
                     onChange={(e) => handleAttributeChange(attribute.id, "name", e.target.value)}
                   >
                     <option value="">Chọn thuộc tính</option>
-                    {availableAttributes.map((attr) => (
+                    {availableAttributes.map((attr) => (   
                       <option key={attr} value={attr} disabled={selectedAttributes.includes(attr) && attr !== attribute.name}>
                           {attr}
                         </option>
@@ -590,7 +597,7 @@ const Addproduct = () => {
                     ))}
 
                   </select>
-                   
+                 
 
                     {attribute.name === "color" ? (
                       <>
@@ -650,6 +657,8 @@ const Addproduct = () => {
                   </button>
                 </div>
               ))}
+
+
               <button onClick={handleAddAttribute} type="button" className="btn btn-outline-secondary d-flex align-items-center gap-2">
                 <PlusOutlined />
                 Thêm thuộc tính
