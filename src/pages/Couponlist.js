@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button, Input, Select, Table } from "antd";
 import { BiEdit } from "react-icons/bi";
-import { AiFillDelete } from "react-icons/ai";
+import { AiFillDelete, AiOutlineCopy } from "react-icons/ai";
+import { RiCoupon3Line } from "react-icons/ri";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -15,6 +16,7 @@ import { convertISOToDate } from "../utils/dayUltils";
 import moment from "moment/moment";
 import { FaSyncAlt } from "react-icons/fa";
 import { DeleteOutlined, EditFilled, PlusOutlined } from "@ant-design/icons";
+import { message } from "antd";
 const { Search } = Input;
 const { Option } = Select;
 
@@ -41,33 +43,120 @@ const Couponlist = () => {
   const couponState = useSelector((state) => state.coupon.coupons);
 
   const columns = [
+    // {
+    //   title: "Id",
+    //   dataIndex: "_id",
+    //   width: 100,
+    // },
     {
-      title: "Id",
-      dataIndex: "_id",
-      width: 100,
+      title: "Têm khuyến mãi",
+      dataIndex: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      render: (text) => (
+        <span>
+          {text.length > 20 ? `${text.slice(0, 20)}...` : text}
+        </span>
+      ),
     },
-
     {
-      title: "Code",
+      title: "Mã khuyến mãi",
       dataIndex: "code",
       sorter: (a, b) => a.code.length - b.code.length,
-    },
+      render: (code) => {
+        const handleCopy = () => {
+          navigator.clipboard.writeText(code);
+          message.success("Đã sao chép mã khuyến mãi");
+        };
+    
+        return (
+          <div
+            style={{
+              backgroundColor: "#f5f5f5",
+              padding: "8px 12px",
+              borderRadius: "4px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <RiCoupon3Line style={{ color: "red", fontSize: "18px" }} />
+              <span style={{ color: "red", fontWeight: 600 }}>{code}</span>
+            </div>
+            <button
+              onClick={handleCopy}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "#888",
+                cursor: "pointer",
+                fontSize: "16px",
+              }}
+            >
+              <AiOutlineCopy />
+            </button>
+          </div>
+        );
+      },
+    }
+    ,
     {
-      title: "Discount",
+      title: "Giá trị",
       dataIndex: "description",
       sorter: (a, b) => a.discount - b.discount,
       render: (index, item) => {
-        return item.description.value;
+        return `${item.description.value}%`;
       },
-    },
+    },    
     {
-      title: "Expiry",
+      title: "Thời gian bắt đầu",
       dataIndex: "couponExpired",
       sorter: (a, b) => a.couponExpired.length - b.couponExpired.length,
       render: (index, item) => {
         return convertISOToDate(item.couponExpired);
       },
     },
+    {
+      title: "Thời gian kết thúc",
+      dataIndex: "couponExpired",
+      sorter: (a, b) => a.couponExpired.length - b.couponExpired.length,
+      render: (index, item) => {
+        return convertISOToDate(item.couponExpired);
+      },
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      render: (_, record) => {
+        const isExpired = new Date(record.couponExpired) < new Date();
+        const statusText = isExpired ? "Hết hạn" : "Còn hạn";
+        const color = isExpired ? "#ff4d4f" : "#52c41a"; // đỏ / xanh
+    
+        return (
+          <span
+            style={{
+              backgroundColor: `${color}20`, // màu nền nhạt hơn
+              color: color,
+              padding: "4px 8px",
+              borderRadius: "6px",
+              fontWeight: 500,
+            }}
+          >
+            {statusText}
+          </span>
+        );
+      },
+    },
+    {
+      title: "Đã sử dụng",
+      dataIndex: "used",
+      render: (index, item) => {
+        // Tạm mặc định 0 cho đến khi có API
+        return <span>{item?.usedCount || 0}</span>;
+      },
+    },
+    
     {
       title: "Action",
       dataIndex: "action",
@@ -76,7 +165,7 @@ const Couponlist = () => {
           <>
             <Link
               to={`/admin/coupon/${item._id}`}
-              className=" fs-3 text-danger"
+              className=" fs-3 text-success"
             >
               <BiEdit />
             </Link>

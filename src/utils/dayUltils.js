@@ -12,7 +12,7 @@ export function convertISOToDate(isoString) {
   const seconds = date.getUTCSeconds().toString().padStart(2, "0");
 
   // Trả về định dạng dd/mm/yyyy hh:mm:ss
-  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  return `${hours}:${minutes}:${seconds} ${day}/${month}/${year} `;
 }
 
 // Sử dụng hàm
