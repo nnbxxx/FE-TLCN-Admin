@@ -22,7 +22,7 @@ import { useSelector } from "react-redux";
 import logo from "../assets/LogoS.jpg";
 import instance from "../../src/utils/axios-customize";
 import { TbBuildingWarehouse, TbTruckDelivery } from "react-icons/tb";
-
+import { VscGraphLine } from "react-icons/vsc";
 
 const { Header, Sider, Content } = Layout;
 
@@ -135,6 +135,11 @@ const MainLayout = () => {
               icon: <FaWarehouse className="fs-4" />,
               label: "WareHouse",
               children: [
+                {
+                  key: "stock-inventory",
+                  icon: <VscGraphLine className="fs-4" />,
+                  label: "Thống kê hàng tồn kho ",
+                },
                 {
                   key: "warehouse",
                   icon: <ImBlog className="fs-4" />,

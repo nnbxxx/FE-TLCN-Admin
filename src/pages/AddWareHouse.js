@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button, Input, Select, Table, Modal, Checkbox, notification } from "antd";
 import { AiFillDelete, AiFillSave } from "react-icons/ai";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
@@ -7,7 +7,7 @@ import { getProducts } from "../features/product/productSlice";
 import moment from "moment";
 import { FaCheck, FaSyncAlt } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
-import { inventoryProduct } from "../features/warehouse/warehouseSlice";
+import { inventoryProduct, getInventoryProducts } from "../features/warehouse/warehouseSlice";
 
 const AddWareHouse = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -17,9 +17,13 @@ const AddWareHouse = () => {
   const dispatch = useDispatch();
   const products = useSelector((state) => state.product.products);
 
+  const warehouses = useSelector(state => state.warehouse?.warehouses);
+
   useEffect(() => {
     dispatch(getProducts());
+    dispatch(getInventoryProducts())
   }, [dispatch]);
+
 
   const showModal = () => setOpen(true);
   const hideModal = () => setOpen(false);
@@ -37,6 +41,19 @@ const AddWareHouse = () => {
       }
     });
   };
+  
+  const selectedProductsWithWarehouseData = useMemo(() => {
+    return selectedProducts.map(product => {
+      const warehouseEntry = warehouses.find(w => w.productId === product._id);
+      return {
+        ...product,
+        totalQuantity: warehouseEntry?.totalQuantity ?? 0,
+        exportPrice: warehouseEntry?.exportPrice ?? 0,
+        discount: warehouseEntry?.discount ?? 0,
+      };
+    });
+  }, [selectedProducts, warehouses]);
+  
   
   
 
@@ -63,6 +80,7 @@ const AddWareHouse = () => {
       })
     );
   };
+  
   
   
 
@@ -126,6 +144,13 @@ const AddWareHouse = () => {
         </div>
       ),
     },
+    {
+      title: "Tổng trong kho",
+      dataIndex: "totalQuantity",
+      key: "totalQuantity",
+      sorter: (a, b) => a.totalQuantity - b.totalQuantity,
+      render: (text) => <span>{text}</span>,
+    },   
     {
       title: "Action",
       dataIndex: "action",
@@ -470,7 +495,7 @@ const AddWareHouse = () => {
 
       <Table
         columns={selectedColumns}
-        dataSource={selectedProducts}
+        dataSource={selectedProductsWithWarehouseData}
         rowKey="_id"
         expandable={{ expandedRowRender }}
         pagination={{

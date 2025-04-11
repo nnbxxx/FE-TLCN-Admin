@@ -11,7 +11,7 @@ const createBrand = async (brand) => {
   return response;
 };
 const updateBrand = async (brand) => {
-  const response = await instance .patch(`brand`, brand);
+  const response = await instance.patch(`brand`, brand);
   return response;
 };
 const getBrand = async (id) => {

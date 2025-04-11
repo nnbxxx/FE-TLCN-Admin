@@ -30,6 +30,7 @@ import WareHouseList from "./pages/WareHouseList";
 import HistoryDelivery from "./pages/HistoryDelivery";
 import Voucherlist from "./pages/VoucherList";
 import AddVoucher from "./pages/AddVoucher";
+import StockInventory from "./pages/StockInventory";
 function App() {
   return (
     <Router>
@@ -84,6 +85,7 @@ function App() {
           <Route path="history-delivery" element={<HistoryDelivery />} />
           <Route path="voucher-list" element={<Voucherlist />} />
           <Route path="voucher" element={<AddVoucher />} />
+          <Route path="stock-inventory" element={<StockInventory />} />
         </Route>
       </Routes>
     </Router>

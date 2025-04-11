@@ -15,10 +15,22 @@ export const inventoryProduct = createAsyncThunk(
   }
 );
 
+export const getInventoryProducts = createAsyncThunk(
+  "warehouse/get-inventory-product",
+  async (thunkAPI) => {
+    const re = await warehouseService.getInventoryProduct();
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
+    }
+  }
+);
+
 export const resetState = createAction("Reset_all");
 
 const initialState = {
-  warehouse: [],
+  warehouses: [],
   isError: false,
   isLoading: false,
   isSuccess: false,
@@ -41,6 +53,21 @@ export const warehouseSlice = createSlice({
         state.createWarehouse = action.payload;
       })
       .addCase(inventoryProduct.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.error;
+      })
+      .addCase(getInventoryProducts.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getInventoryProducts.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.warehouses = action.payload.data.result;
+      })
+      .addCase(getInventoryProducts.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;

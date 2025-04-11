@@ -1,5 +1,9 @@
 import instance from "../../utils/axios-customize";
 
+const getInventoryProduct = async (query = "") => {
+  const response = await instance.get(`inventory-product?${query}`);
+  return response;
+};
 
 const createWarehouse = async (warehouse) => {
   const response = await instance.post(`inventory-product/import-stock`, warehouse);
@@ -8,8 +12,8 @@ const createWarehouse = async (warehouse) => {
 };
 
 const warehouseService = {
-
-createWarehouse
+  getInventoryProduct,
+  createWarehouse
 };
 
 export default warehouseService;
