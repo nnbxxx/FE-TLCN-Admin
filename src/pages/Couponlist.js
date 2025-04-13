@@ -43,18 +43,14 @@ const Couponlist = () => {
   const couponState = useSelector((state) => state.coupon.coupons);
 
   const columns = [
-    // {
-    //   title: "Id",
-    //   dataIndex: "_id",
-    //   width: 100,
-    // },
+ 
     {
       title: "Têm khuyến mãi",
       dataIndex: "name",
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: (text) => (
-        <span>
-          {text.length > 20 ? `${text.slice(0, 20)}...` : text}
+        <span title={text}>
+          {text && text.length > 15 ? `${text.slice(0, 15)}...` : text}
         </span>
       ),
     },
@@ -99,22 +95,37 @@ const Couponlist = () => {
           </div>
         );
       },
-    }
-    ,
+    },
     {
       title: "Giá trị",
       dataIndex: "description",
-      sorter: (a, b) => a.discount - b.discount,
-      render: (index, item) => {
-        return `${item.description.value}%`;
+      sorter: (a, b) => a.description.value - b.description.value,
+      render: (_, item) => {
+        const { value } = item.description || {};
+        const type = item.type;
+    
+        if (type === "PRICE") {
+          return `${value.toLocaleString()} VND`;
+        } else if (type === "PERCENT") {
+          return `${value}%`;
+        } else {
+          return value ?? "—";
+        }
       },
-    },    
+    },     
     {
-      title: "Thời gian bắt đầu",
-      dataIndex: "couponExpired",
-      sorter: (a, b) => a.couponExpired.length - b.couponExpired.length,
-      render: (index, item) => {
-        return convertISOToDate(item.couponExpired);
+      title: "Mức giảm tối đa",
+      dataIndex: "description",
+      render: (_, item) => {
+        const { maxDiscount, value } = item.description || {};
+        const type = item.type;
+    
+        if (type === "PERCENT") {
+          return maxDiscount ? `${maxDiscount.toLocaleString()} VND` : "Không giới hạn";
+        }
+    
+        // Nếu type không phải là PERCENT, hiển thị giá trị của PRICE
+        return value ? `${value.toLocaleString()} VND` : "—";
       },
     },
     {
@@ -125,6 +136,24 @@ const Couponlist = () => {
         return convertISOToDate(item.couponExpired);
       },
     },
+    {
+      title: "Còn lại (ngày)",
+      dataIndex: "couponExpired",
+      render: (index, item) => {
+        const expiryDate = new Date(item.couponExpired);
+        const currentDate = new Date();
+        const diffTime = expiryDate - currentDate; // Sự chênh lệch thời gian
+        const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24)); // Chuyển đổi thành số ngày
+    
+        // Nếu hết hạn, hiển thị "Hết hạn", nếu còn thì hiển thị số ngày
+        if (diffDays < 0) {
+          return "Hết hạn";
+        } else {
+          return `${diffDays} ngày`;
+        }
+      },
+    },
+    
     {
       title: "Trạng thái",
       dataIndex: "status",
@@ -148,14 +177,14 @@ const Couponlist = () => {
         );
       },
     },
-    {
-      title: "Đã sử dụng",
-      dataIndex: "used",
-      render: (index, item) => {
-        // Tạm mặc định 0 cho đến khi có API
-        return <span>{item?.usedCount || 0}</span>;
-      },
-    },
+    // {
+    //   title: "Đã sử dụng",
+    //   dataIndex: "used",
+    //   render: (index, item) => {
+    //     // Tạm mặc định 0 cho đến khi có API
+    //     return <span>{item?.usedCount || 0}</span>;
+    //   },
+    // },
     
     {
       title: "Action",
