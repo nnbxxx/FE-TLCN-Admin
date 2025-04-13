@@ -21,6 +21,16 @@ let schema = yup.object().shape({
   code: yup.string().required("Coupon Code is Required"),
   expiry: yup.date().required("Expiry Date is Required"),
   discount: yup.number().required("Discount Percentage is Required"),
+  quantity: yup.number().required("Số lượng là bắt buộc"),
+  pointAccept: yup.number().required("Điểm khách hàng là bắt buộc"),
+  type: yup.string().required("Loại giảm giá là bắt buộc"),
+  maxDiscount: yup
+  .number()
+  .when("type", {
+    is: "PERCENT",
+    then: () => yup.number().required("Giá trị giảm tối đa là bắt buộc"),
+    otherwise: () => yup.number().notRequired(),
+  }),
 });
 const AddCoupon = () => {
   const dispatch = useDispatch();
@@ -38,7 +48,11 @@ const AddCoupon = () => {
     couponCode,
     couponDiscount,
     couponExpiry,
+    couponPointAccept,
+    couponQuantity,
+    couponType,
     updatedCoupon,
+    couponMaxDiscount
   } = newCoupon;
 
   const changeDateFormet = (date) => {
@@ -72,8 +86,12 @@ const AddCoupon = () => {
     initialValues: {
       name: couponName || "",
       code: couponCode || "",
-      expiry: changeDateFormet(couponExpiry) || "",
+      expiry: couponExpiry ? dayjs(couponExpiry).toISOString() : "",
       discount: couponDiscount || "",
+      quantity: couponQuantity || "",
+      pointAccept: couponPointAccept || "",
+      type:  couponType || "" ,
+      maxDiscount: couponMaxDiscount ||"",
     },
     validationSchema: schema,
     onSubmit: (values) => {
@@ -84,12 +102,13 @@ const AddCoupon = () => {
             _id: getCouponId,
             code: values.code,
             name: values.name,
-            type: "PRICE",
-            quantity: 1000,
+            type: values.type,
+            quantity: values.quantity,
             couponExpired: values.expiry,
             description: {
               value: values.discount,
-              pointAccept: 0,
+              pointAccept: values.pointAccept,
+              maxDiscount: values.type === "PERCENT" ? values.maxDiscount : undefined,
             },
           })
         );
@@ -99,19 +118,20 @@ const AddCoupon = () => {
           createCoupon({
             code: values.code,
             name: values.name,
-            type: "PRICE",
-            quantity: 1000,
+            type: values.type,
+            quantity: values.quantity,
             couponExpired: values.expiry,
             description: {
               value: values.discount,
-              pointAccept: 0,
+              pointAccept: values.pointAccept,
+              maxDiscount: values.type === "PERCENT" ? values.maxDiscount : undefined,
             },
           })
         );
         formik.resetForm();
         setTimeout(() => {
-          dispatch(resetState);
-        }, 300);
+          dispatch(resetState());
+        }, 300);        
       }
     },
   });
@@ -198,46 +218,148 @@ const generateCouponCode = () => {
                       {formik.touched.code && formik.errors.code}
                     </div>
 
-                  <label htmlFor="name" className="form-label fw-semibold mb-0 mt-3">
-                    Thời gian bắt đầu <span className="text-danger">*</span>
-                  </label>
-                  <DatePicker
-                    className="form-control mt-3 "
-                    showTime
-                    format="HH:mm DD-MM-YYYY"
-                    id="expiry"
-                    name="expiry"
-                    style={{ width: "100%", height: "60px" , display: "flex", alignItems: "center"}}
-                    value={
-                      formik.values.expiry && dayjs(formik.values.expiry).isValid()
-                        ? dayjs(formik.values.expiry)
-                        : null
-                    }
-                    onChange={(value) => {
-                      formik.setFieldValue("expiry", value ? value.toISOString() : null);
-                    }}
-                    onBlur={() => formik.setFieldTouched("expiry", true)}
-                    placeholder="Chọn thời gian bắt đầu"
-                  />
-                    <div className="error">
-                      {formik.touched.expiry && formik.errors.expiry}
+                    <div className="row">
+                      {/* Cột số lượng */}
+                      <div className="col-md-6">
+                        <label htmlFor="quantity" className="form-label fw-semibold mb-0 mt-3">
+                          Số lượng <span className="text-danger">*</span>
+                        </label>
+                        <CustomInput
+                          type="number"
+                          name="quantity"
+                          onChng={formik.handleChange("quantity")}
+                          onBlr={formik.handleBlur("quantity")}
+                          val={formik.values.quantity}
+                          label="Nhập số lượng mã giảm giá"
+                          id="quantity"
+                        />
+                        <div className="error">
+                          {formik.touched.quantity && formik.errors.quantity}
+                        </div>
+                      </div>
+
+                      {/* Cột thời gian kết thúc */}
+                      <div className="col-md-6">
+                        <label htmlFor="expiry" className="form-label fw-semibold mb-0 mt-3">
+                          Thời gian kết thúc <span className="text-danger">*</span>
+                        </label>
+                        <DatePicker
+                          className="form-control mt-3"
+                          showTime
+                          format="HH:mm DD-MM-YYYY"
+                          id="expiry"
+                          name="expiry"
+                          style={{
+                            width: "100%",
+                            height: "60px",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                          value={
+                            formik.values.expiry && dayjs(formik.values.expiry).isValid()
+                              ? dayjs(formik.values.expiry)
+                              : null
+                          }
+                          onChange={(value) => {
+                            formik.setFieldValue("expiry", value ? value.toISOString() : null);
+                          }}
+                          onBlur={() => formik.setFieldTouched("expiry", true)}
+                          placeholder="Chọn thời gian kết thúc"
+                        />
+                        <div className="error">
+                          {formik.touched.expiry && formik.errors.expiry}
+                        </div>
+                      </div>
                     </div>
 
+
+                    <label htmlFor="type" className="form-label fw-semibold mb-0 mt-3">
+                      Loại giảm giá <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      name="type"
+                      id="type"
+                      className="form-select"
+                      value={formik.values.type}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                    >
+                      <option value="">Lựa chọn</option>
+                      <option value="PRICE">Giảm theo số tiền</option>
+                      <option value="PERCENT">Giảm theo phần trăm</option>
+                    </select>
+                    <div className="error">
+                      {formik.touched.type && formik.errors.type}
+                    </div>
+
+
                   <label htmlFor="name" className="form-label fw-semibold mb-0 mt-3">
-                    Mức giảm giá (%) <span className="text-danger">*</span>
+                    Mức giảm giá <span className="text-danger">*</span>
                   </label>
-                    <CustomInput
-                      type="number"
-                      name="discount"
-                      onChng={formik.handleChange("discount")}
-                      onBlr={formik.handleBlur("discount")}
-                      val={formik.values.discount}
-                      label="Nhập mức giảm giá"
-                      id="discount"
-                    />
+                  {formik.values.type === "PRICE" ? (
+                  <CustomInput
+                    type="number"
+                    name="discount"
+                    onChng={formik.handleChange("discount")}
+                    onBlr={formik.handleBlur("discount")}
+                    val={formik.values.discount}
+                    label="Nhập số tiền giảm giá "
+                    id="discount"
+                  />
+                ) : (
+                  <CustomInput
+                    type="number"
+                    name="discount"
+                    onChng={formik.handleChange("discount")}
+                    onBlr={formik.handleBlur("discount")}
+                    val={formik.values.discount}
+                    label="Nhập phần trăm giảm giá"
+                    id="discount"
+                  />
+                )}
+
                     <div className="error">
                       {formik.touched.discount && formik.errors.discount}
                     </div>
+
+                    {formik.values.type === "PERCENT" && (
+                      <>
+                        <label htmlFor="maxDiscount" className="form-label fw-semibold mb-0 mt-3">
+                          Giá trị giảm tối đa <span className="text-danger">*</span>
+                        </label>
+                        <CustomInput
+                          type="number"
+                          name="maxDiscount"
+                          onChng={formik.handleChange("maxDiscount")}
+                          onBlr={formik.handleBlur("maxDiscount")}
+                          val={formik.values.maxDiscount}
+                          label="Nhập giá trị giảm tối đa"
+                          id="maxDiscount"
+                        />
+                        <div className="error">
+                          {formik.touched.maxDiscount && formik.errors.maxDiscount}
+                        </div>
+                      </>
+                    )}
+
+
+                    <label htmlFor="name" className="form-label fw-semibold mb-0 mt-3">
+                      Số điểm khách hàng <span className="text-danger">*</span>
+                    </label>
+                    <CustomInput
+                      type="number"
+                      name="pointAccept"
+                      onChng={formik.handleChange("pointAccept")}
+                      onBlr={formik.handleBlur("pointAccept")}
+                      val={formik.values.pointAccept}
+                      label="Nhập số điểm khách hàng đủ điều kiện"
+                      id="pointAccept"
+                    />
+                    <div className="error">
+                      {formik.touched.pointAccept && formik.errors.pointAccept}
+                    </div>
+
+
                     <button
                       className="btn btn-success border-0 rounded-3 my-3"
                       type="submit"
@@ -255,7 +377,9 @@ const generateCouponCode = () => {
 
                 <div className="mt-3 mb-4">
                   <div className="d-flex align-items-center justify-content-between bg-white border rounded px-3 py-2">
-                    <span className="text-danger small ">{formik.values.code || "(Chưa có mã)"}</span>
+                    <span className="text-danger small">
+                      {formik.values.code || "(Chưa có mã giảm giá)"}
+                    </span>
                     <FaCopy
                       style={{ cursor: "pointer" }}
                       title="Sao chép mã"
@@ -275,7 +399,7 @@ const generateCouponCode = () => {
                   </li>
                   <li className="d-flex justify-content-between">
                     <span><strong>Mã giảm giá:</strong></span>
-                    <span>{formik.values.code || "(Chưa nhập)"}</span>
+                    <span>{formik.values.code || "(Chưa nhập )"}</span>
                   </li>
                   <li className="d-flex justify-content-between">
                     <span><strong>Ngày hết hạn:</strong></span>
@@ -283,12 +407,24 @@ const generateCouponCode = () => {
                   </li>
                   <li className="d-flex justify-content-between">
                     <span><strong>Giảm giá:</strong></span>
-                    <span>{formik.values.discount ? `${formik.values.discount}%` : "(Chưa nhập)"}</span>
+                    <span>{formik.values.discount ? `${formik.values.discount}%` : "(Chưa nhập )"}</span>
+                  </li>
+                  <li className="d-flex justify-content-between">
+                    <span><strong>Loại giảm giá:</strong></span>
+                    <span>{formik.values.type || "(Chưa chọn )"}</span>
+                  </li>
+                  <li className="d-flex justify-content-between">
+                    <span><strong>Điểm khách hàng:</strong></span>
+                    <span>{formik.values.pointAccept || "(Chưa nhập)"}</span>
+                  </li>
+                  <li className="d-flex justify-content-between">
+                    <span><strong>Số lượng sử dụng:</strong></span>
+                    <span>{formik.values.quantity || "(Chưa nhập)"}</span>
                   </li>
                 </ul>
-
               </div>
             </div>
+
           </div>
     </div>
   );
