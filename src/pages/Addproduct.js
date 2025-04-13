@@ -129,6 +129,7 @@ const Addproduct = () => {
       images: productImages || [],
       features: productFeatures || [],
       variants: productVariants || [],
+
     },
     validationSchema: schema,
     onSubmit: (values) => {
@@ -402,6 +403,32 @@ const Addproduct = () => {
       updatedColors.join("\n")
     );
   };
+
+  useEffect(() => {
+    if (getProductId && productFeatures?.length > 0) {
+      const loadedAttributes = productFeatures.map((feature, index) => ({
+        id: Date.now() + index,
+        name: feature,
+        values: ""
+      }));
+      setAttributes(loadedAttributes);
+    }
+  
+    if (getProductId && productVariants?.length > 0) {
+      const loadedVariants = productVariants.map(variant => {
+        const color = variant.attributes?.color?.name || "";
+        const size = variant.attributes?.size?.name || "";
+        const image = variant.attributes?.color?.desc || "";
+        return {
+          name: `${size}-${color}`,
+          image: image,
+          id: Date.now() + Math.random()
+        };
+      });
+      setVariants(loadedVariants);
+    }
+  }, [productFeatures, productVariants]);
+  
 
   return (
     <div>
