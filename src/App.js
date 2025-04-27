@@ -31,6 +31,7 @@ import HistoryDelivery from "./pages/HistoryDelivery";
 import Voucherlist from "./pages/VoucherList";
 import AddVoucher from "./pages/AddVoucher";
 import StockInventory from "./pages/StockInventory";
+import Messages from "./pages/Messages";
 function App() {
   return (
     <Router>
@@ -86,6 +87,7 @@ function App() {
           <Route path="voucher-list" element={<Voucherlist />} />
           <Route path="voucher" element={<AddVoucher />} />
           <Route path="stock-inventory" element={<StockInventory />} />
+          <Route path="messages" element={<Messages />} />
         </Route>
       </Routes>
     </Router>
