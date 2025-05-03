@@ -469,7 +469,6 @@ const AddWareHouse = () => {
     }
   
     try {
-      console.log("Payload gửi lên:", payload);
       await dispatch(inventoryProduct(payload));
       notification.success({
         message: "Thành công",

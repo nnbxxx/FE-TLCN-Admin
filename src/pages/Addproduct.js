@@ -28,6 +28,7 @@ import {
   resetState,
   updateAProduct,
 } from "../features/product/productSlice";
+import { getUniqueLines } from "../utils/dayUltils";
 let schema = yup.object().shape({
   title: yup.string().required("Tiêu đề không được để trống"),
   description: yup.string().required("Mô tả không được để trống"),
@@ -69,8 +70,6 @@ const Addproduct = () => {
     productFeatures,
     productVariants,
   } = newProduct;
-
-  
 
   useEffect(() => {
     if (getProductId !== undefined) {
@@ -116,7 +115,6 @@ const Addproduct = () => {
 
   const productcolor = [];
 
-
   useEffect(() => {
     formik.values.color = color ? color : " ";
   }, [color]);
@@ -130,33 +128,30 @@ const Addproduct = () => {
       images: productImages || [],
       features: productFeatures || [],
       variants: productVariants || [],
-
     },
     validationSchema: schema,
     onSubmit: (values) => {
-
-      const formattedVariants = variants.map(variant => {
+      const formattedVariants = variants.map((variant) => {
         // Regex linh hoạt để tìm mã màu và kích thước
         const colorMatch = variant.name.match(/#([0-9a-fA-F]{6})/); // Tìm mã màu dạng #604848
         const sizeMatch = variant.name.match(/-(\w)(?!#)/); // Tìm ký tự size nhưng không chứa mã màu
-    
+
         // Xử lý mã màu và size
         const colorCode = colorMatch ? `#${colorMatch[1]}` : ""; // Nếu có mã màu
         const sizeValue = sizeMatch ? sizeMatch[1] : ""; // Nếu có size
-    
+
         return {
-            attributes: {
-                color: {
-                    name: colorCode,
-                    desc: variant.image || ""
-                },
-                size: {
-                    name: sizeValue
-                }
-            }
+          attributes: {
+            color: {
+              name: colorCode,
+              desc: variant.image || "",
+            },
+            size: {
+              name: sizeValue,
+            },
+          },
         };
-    });
-    
+      });
 
       const formattedData = {
         name: values.title,
@@ -165,13 +160,11 @@ const Addproduct = () => {
         description: values.description,
         images: values.images,
         tags: values.tags,
-        features: attributes.map(attr => attr.name),
-        variants: formattedVariants
+        features: attributes.map((attr) => attr.name),
+        variants: formattedVariants,
       };
-  
-      // In ra console
-      console.log("Dữ liệu sản phẩm:", JSON.stringify(formattedData, null, 2));
 
+      // In ra console
 
       if (getProductId !== undefined) {
         const dataToUpdate = {
@@ -182,40 +175,35 @@ const Addproduct = () => {
           description: values.description,
           images: values.images,
           tags: values.tags,
-          features: attributes.map(attr => attr.name),
-          variants: formattedVariants
+          features: attributes.map((attr) => attr.name),
+          variants: formattedVariants,
         };
-      
-        // ✅ Log dữ liệu trước khi cập nhật
-        console.log("Dữ liệu gửi đi để cập nhật sản phẩm:", JSON.stringify(dataToUpdate, null, 2));
-      
+
         dispatch(updateAProduct(dataToUpdate));
         navigate("/admin/list-product");
+      } else {
+        dispatch(
+          createProducts({
+            name: values.title,
+            category: values.category,
+            brand: values.brand,
+            description: values.description,
+            images: values.images,
+            tags: values.tags,
+            features: attributes.map((attr) => attr.name),
+            variants: formattedVariants,
+          })
+        );
+        formik.resetForm();
+        setVariants([]);
+        setAttributes([]);
+        setColor(null);
+        setTimeout(() => {
+          dispatch(resetState());
+          dispatch(resetStateUpload());
+        }, 3000);
       }
-      
-           else {
-            dispatch(
-              createProducts({
-                name: values.title,
-                category: values.category,
-                brand: values.brand,
-                description: values.description,
-                images: values.images,
-                tags: values.tags,
-                features: attributes.map(attr => attr.name),
-                variants: formattedVariants
-              })
-            );
-            formik.resetForm();
-            setVariants([]);
-            setAttributes([]);
-            setColor(null);
-            setTimeout(() => {
-              dispatch(resetState());
-              dispatch(resetStateUpload());
-            }, 3000);
-          }
-    }
+    },
   });
 
   const handleDeleteImage = (index) => {
@@ -231,8 +219,6 @@ const Addproduct = () => {
     formik.setFieldValue("images", [...tmp, ...imgState]);
   }, [imgState]);
 
-
-
   //thêm mới
   const [attributes, setAttributes] = useState([]);
   const [variants, setVariants] = useState([]);
@@ -242,22 +228,23 @@ const Addproduct = () => {
   const handleAddAttribute = (event) => {
     event.preventDefault(); // Ngăn submit form
     setAttributes([...attributes, { id: Date.now(), name: "", values: "" }]);
-};
-
+    console.log("🚀 ~ Addproduct ~ attributes:", attributes);
+  };
 
   const handleRemoveAttribute = (id) => {
     setAttributes(attributes.filter((attr) => attr.id !== id));
     generateVariants(attributes.filter((attr) => attr.id !== id));
+    console.log("🚀 ~ Addproduct ~ attributes:", attributes);
   };
-
 
   const handleAttributeChange = (id, field, value) => {
     const updatedAttributes = attributes.map((attr) =>
       attr.id === id ? { ...attr, [field]: value } : attr
     );
-    
+
     setAttributes(updatedAttributes);
-  
+    console.log("🚀 ~ Addproduct ~ attributes:", attributes);
+
     // Nếu thuộc tính là màu sắc, tự động gán danh sách màu
     if (field === "name" && value === "color") {
       const colorValues = colorState.map((c) => c.color).join("\n"); // Lấy danh sách màu
@@ -270,27 +257,28 @@ const Addproduct = () => {
       generateVariants(updatedAttributes);
     }
   };
-  
 
   const generateVariants = (attrs) => {
-    const attrValues = attrs.map((attr) => attr.values.split("\n").map(val => val.trim()).filter(val => val));
+    const attrValues = attrs.map((attr) =>
+      attr.values
+        .split("\n")
+        .map((val) => val.trim())
+        .filter((val) => val)
+    );
     const combinations = attrValues.reduce(
-      (acc, values) => acc.flatMap((item) => values.map((val) => `${item}-${val}`)),
+      (acc, values) =>
+        acc.flatMap((item) => values.map((val) => `${item}-${val}`)),
       [""]
     );
 
     setVariants(
-      combinations.filter((item) => item !== "").map((variant, index) => ({  name: variant }))
+      combinations
+        .filter((item) => item !== "")
+        .map((variant, index) => ({ name: variant }))
     );
   };
 
- 
   const selectedAttributes = attributes.map((attr) => attr.name);
-
-
-
-  
-
 
   //--------------------------------
   const [availableAttributes, setAvailableAttributes] = useState([
@@ -319,7 +307,6 @@ const Addproduct = () => {
     setIsModalVisible(false);
   };
 
-
   const colorGroups = {};
   variants.forEach((variant) => {
     const colorMatch = variant.name.match(/(-#[0-9a-fA-F]{6})/);
@@ -332,10 +319,10 @@ const Addproduct = () => {
 
   const handleUploadImage = async (acceptedFiles, color) => {
     if (acceptedFiles.length === 0) return;
-  
+
     const formData = new FormData();
     formData.append("files", acceptedFiles[0]);
-  
+
     try {
       const response = await fetch("http://localhost:8800/api/v1/files/files", {
         method: "PATCH",
@@ -344,15 +331,17 @@ const Addproduct = () => {
         },
         body: formData,
       });
-  
+
       const result = await response.json();
-  
+
       if (response.ok && result.data?.length > 0) {
         const uploadedImageUrl = result.data[0];
-  
+
         setVariants((prevVariants) =>
           prevVariants.map((variant) =>
-            variant.name.includes(color) ? { ...variant, image: uploadedImageUrl } : variant
+            variant.name.includes(color)
+              ? { ...variant, image: uploadedImageUrl }
+              : variant
           )
         );
       } else {
@@ -362,9 +351,7 @@ const Addproduct = () => {
       console.error("Error uploading image:", error);
     }
   };
-  
-  
-  
+
   const handleDeleteI = (color) => {
     setVariants((prevVariants) =>
       prevVariants.map((variant) =>
@@ -372,14 +359,16 @@ const Addproduct = () => {
       )
     );
   };
-  
+
   const [newColor, setNewColor] = useState("");
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   const handleAddColor = () => {
     if (newColor) {
       const colorAttribute = attributes.find((attr) => attr.name === "color");
-      const currentColors = colorAttribute.values ? colorAttribute.values.split("\n") : [];
+      const currentColors = colorAttribute.values
+        ? colorAttribute.values.split("\n")
+        : [];
       const updatedColors = [...currentColors, newColor];
 
       handleAttributeChange(
@@ -395,8 +384,12 @@ const Addproduct = () => {
 
   const handleRemoveColor = (colorToRemove) => {
     const colorAttribute = attributes.find((attr) => attr.name === "color");
-    const currentColors = colorAttribute.values ? colorAttribute.values.split("\n") : [];
-    const updatedColors = currentColors.filter((color) => color !== colorToRemove);
+    const currentColors = colorAttribute.values
+      ? colorAttribute.values.split("\n")
+      : [];
+    const updatedColors = currentColors.filter(
+      (color) => color !== colorToRemove
+    );
 
     handleAttributeChange(
       colorAttribute.id,
@@ -407,31 +400,44 @@ const Addproduct = () => {
 
   useEffect(() => {
     if (getProductId && productFeatures?.length > 0) {
-      const loadedAttributes = productFeatures.map((feature, index) => ({
-        id: Date.now() + index,
-        name: feature,
-        values: ""
-      }));
+      const loadedAttributes = productFeatures.map((feature, index) => {
+        let tmp = "";
+        productVariants.forEach((variant) => {
+          const value = variant.attributes[feature];
+          if (feature === "color") {
+            tmp += value.name + "\n";
+            console.log("🚀 ~ productVariants.forEach ~ value:", value.name);
+          } else {
+            console.log("🚀 ~ productVariants.forEach ~ value:", value);
+            tmp += value.name + "\n";
+          }
+        });
+        console.log("🚀 ~ productVariants.forEach ~ tmp:", getUniqueLines(tmp));
+
+        return {
+          id: Date.now() + index,
+          name: feature,
+          values: getUniqueLines(tmp),
+        };
+      });
+
       setAttributes(loadedAttributes);
     }
-  
+
     if (getProductId && productVariants?.length > 0) {
-      const loadedVariants = productVariants.map(variant => {
+      const loadedVariants = productVariants.map((variant) => {
         const color = variant.attributes?.color?.name || "";
         const size = variant.attributes?.size?.name || "";
         const image = variant.attributes?.color?.desc || "";
         return {
           name: `${size}-${color}`,
           image: image,
-          id: Date.now() + Math.random()
+          id: Date.now() + Math.random(),
         };
       });
       setVariants(loadedVariants);
     }
-  }, [productFeatures, productVariants]);
-  
-
-  
+  }, [productFeatures, productVariants, getProductId]);
 
   return (
     <div>
@@ -524,12 +530,16 @@ const Addproduct = () => {
             {formik.touched.tags && formik.errors.tags}
           </div>
 
-         
-          
-
-
-          <div style={{ backgroundColor: "#fff", padding: "20px", borderRadius: "8px" }}>
-            <Dropzone onDrop={(acceptedFiles) => dispatch(uploadImg(acceptedFiles))}>
+          <div
+            style={{
+              backgroundColor: "#fff",
+              padding: "20px",
+              borderRadius: "8px",
+            }}
+          >
+            <Dropzone
+              onDrop={(acceptedFiles) => dispatch(uploadImg(acceptedFiles))}
+            >
               {({ getRootProps, getInputProps }) => (
                 <div
                   {...getRootProps()}
@@ -543,19 +553,37 @@ const Addproduct = () => {
                     cursor: "pointer",
                     transition: "border-color 0.3s ease",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#3b82f6")}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#ccc")}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.borderColor = "#3b82f6")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.borderColor = "#ccc")
+                  }
                 >
                   {/* Icon ảnh + Chữ */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
                     <LuImagePlus size={24} color="#3b82f6" />
-                    <p style={{ color: "#4B5563", fontSize: "14px", margin: "0" }}>
+                    <p
+                      style={{
+                        color: "#4B5563",
+                        fontSize: "14px",
+                        margin: "0",
+                      }}
+                    >
                       Upload or drop a file right here
                     </p>
                   </div>
 
                   {/* Định dạng file */}
-                  <p style={{ color: "#9CA3AF", fontSize: "14px", margin: "0" }}>
+                  <p
+                    style={{ color: "#9CA3AF", fontSize: "14px", margin: "0" }}
+                  >
                     JPEG, PNG, GIF...
                   </p>
 
@@ -607,221 +635,277 @@ const Addproduct = () => {
           </div>
 
           <div className="p-4 border rounded shadow bg-white">
-          <h5 className="fw-semibold fs-5 mb-3">Thuộc tính sản phẩm</h5>
-                  <button className="btn btn-outline-primary mb-3" onClick={() => setIsModalVisible(true)}>
-                    ➕ Tạo thuộc tính mới
-                  </button>
-              {attributes.map((attribute) => (
-                <div key={attribute.id} className="d-flex align-items-center gap-3 mb-2 border p-3 rounded bg-light">
-                  <select
-                    className="form-select w-25"
-                    value={attribute.name}
-                    onChange={(e) => handleAttributeChange(attribute.id, "name", e.target.value)}
-                  >
-                    <option value="">Chọn thuộc tính</option>
-                    {availableAttributes.map((attr) => (   
-                      <option key={attr} value={attr} disabled={selectedAttributes.includes(attr) && attr !== attribute.name}>
-                          {attr}
-                        </option>
-                        
-                    ))}
-
-                  </select>
-                 
-
-                    {attribute.name === "color" ? (
-                      <>
-                        <div className="mt-2 ">
-                          {showColorPicker && (
-                            <div className="mb-2">
-                              <HexColorPicker color={newColor} onChange={setNewColor} />
-                            </div>
-                          )}
-                          <Button onClick={() => setShowColorPicker(!showColorPicker)}>
-                            {showColorPicker ? "Đóng" : "Thêm màu sắc"}
-                          </Button>
-                          {showColorPicker && (
-                            <Button type="primary" className="ml-2" onClick={handleAddColor}>
-                              Xác nhận
-                            </Button>
-                          )}
-                        </div>
-                        <div className="mt-2">
-                          {attribute.values.split("\n").map((color, index) => (
-                            <div key={index} style={{ display: "inline-block", marginRight: "8px", cursor: "pointer" }} onClick={() => handleRemoveColor(color)}>
-                              <span
-                                style={{
-                                  display: "inline-block",
-                                  width: "20px",
-                                  height: "20px",
-                                  backgroundColor: color,
-                                  borderRadius: "50%",
-                                  border: "1px solid #ccc",
-                                  marginRight: "5px",
-                                }}
-                              ></span>
-                              {color}
-                            </div>
-                          ))}
-                        </div>
-                      </>
-                    ) : (
-                      <textarea
-                        className="form-control form-control-sm flex-grow-1"
-                        rows="2"
-                        style={{ height: "37px" }}
-                        placeholder="Nhập từng giá trị và enter"
-                        value={attribute.values.split("\n").join(", ")}
-                        onChange={(e) =>
-                          handleAttributeChange(
-                            attribute.id,
-                            "values",
-                            e.target.value.replace(/, /g, "\n")
-                          )
-                        }
-                      />
-                    )}
-
-                  <button onClick={() => handleRemoveAttribute(attribute.id)} className="absolute top-0 right-0 btn btn-outline-danger">
-                    <DeleteOutlined size={22} />
-                  </button>
-                </div>
-              ))}
-
-
-              <button onClick={handleAddAttribute} type="button" className="btn btn-outline-secondary d-flex align-items-center gap-2">
-                <PlusOutlined />
-                Thêm thuộc tính
-              </button>
-
-                    {/* Popup Modal */}
-                    <Modal
-                      title="Thêm thuộc tính mới"
-                      open={isModalVisible}
-                      onOk={handleOk}
-                      onCancel={handleCancel}
-                      footer={[
-                        <Button key="back" onClick={handleCancel}>
-                          Hủy
-                        </Button>,
-                        <Button key="submit" type="primary" onClick={handleOk}>
-                          Lưu
-                        </Button>,
-                      ]}
+            <h5 className="fw-semibold fs-5 mb-3">Thuộc tính sản phẩm</h5>
+            <button
+              className="btn btn-outline-primary mb-3"
+              onClick={() => setIsModalVisible(true)}
+            >
+              ➕ Tạo thuộc tính mới
+            </button>
+            {attributes.map((attribute) => (
+              <div
+                key={attribute.id}
+                className="d-flex align-items-center gap-3 mb-2 border p-3 rounded bg-light"
+              >
+                <select
+                  className="form-select w-25"
+                  value={attribute.name}
+                  onChange={(e) =>
+                    handleAttributeChange(attribute.id, "name", e.target.value)
+                  }
+                >
+                  <option value="">Chọn thuộc tính</option>
+                  {availableAttributes.map((attr) => (
+                    <option
+                      key={attr}
+                      value={attr}
+                      disabled={
+                        selectedAttributes.includes(attr) &&
+                        attr !== attribute.name
+                      }
                     >
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Nhập tên thuộc tính (VD: Chất liệu, Màu sắc, Kích thước)"
-                        value={newAttributeName}
-                        onChange={(e) => setNewAttributeName(e.target.value)}
-                      />
-                    </Modal>
+                      {attr}
+                    </option>
+                  ))}
+                </select>
 
-                    
-              <h2 className="fw-semibold fs-5 mt-4 mb-3">Danh sách hàng hóa cùng loại</h2>
-              <table className="table table-bordered text-start">
-                  <thead>
-                    <tr className="table-light">
-                      <th className="p-2">Tên</th>
-                      <th className="p-2">Ảnh</th>
-                      <th className="p-2 text-center">Hành động</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.entries(colorGroups).map(([color, items]) => {
-                      return items.map((variant, index) => (
-                        <tr key={variant.id}>
-                          <td className="p-2">{variant.name}</td>
+                {attribute.name === "color" ? (
+                  <>
+                    <div className="mt-2 ">
+                      {showColorPicker && (
+                        <div className="mb-2">
+                          <HexColorPicker
+                            color={newColor}
+                            onChange={setNewColor}
+                          />
+                        </div>
+                      )}
+                      <Button
+                        onClick={() => setShowColorPicker(!showColorPicker)}
+                      >
+                        {showColorPicker ? "Đóng" : "Thêm màu sắc"}
+                      </Button>
+                      {showColorPicker && (
+                        <Button
+                          type="primary"
+                          className="ml-2"
+                          onClick={handleAddColor}
+                        >
+                          Xác nhận
+                        </Button>
+                      )}
+                    </div>
+                    <div className="mt-2">
+                      {attribute.values.split("\n").map((color, index) => (
+                        <div
+                          key={index}
+                          style={{
+                            display: "inline-block",
+                            marginRight: "8px",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleRemoveColor(color)}
+                        >
+                          <span
+                            style={{
+                              display: "inline-block",
+                              width: "20px",
+                              height: "20px",
+                              backgroundColor: color,
+                              borderRadius: "50%",
+                              border: "1px solid #ccc",
+                              marginRight: "5px",
+                            }}
+                          ></span>
+                          {color}
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <textarea
+                    className="form-control form-control-sm flex-grow-1"
+                    rows="2"
+                    style={{ height: "37px" }}
+                    placeholder="Nhập từng giá trị và enter"
+                    value={attribute.values.split("\n").join(", ")}
+                    onChange={(e) =>
+                      handleAttributeChange(
+                        attribute.id,
+                        "values",
+                        e.target.value.replace(/, /g, "\n")
+                      )
+                    }
+                  />
+                )}
 
-                          {/* Chỉ hiển thị ô upload ảnh ở dòng đầu tiên của mỗi nhóm màu */}
-                          {index === 0 && (
-                            <td className="p-22 text-center" rowSpan={items.length}>
-                              <Dropzone onDrop={(acceptedFiles) => handleUploadImage(acceptedFiles, color)}>
-                                {({ getRootProps, getInputProps }) => (
+                <button
+                  onClick={() => handleRemoveAttribute(attribute.id)}
+                  className="absolute top-0 right-0 btn btn-outline-danger"
+                >
+                  <DeleteOutlined size={22} />
+                </button>
+              </div>
+            ))}
+
+            <button
+              onClick={handleAddAttribute}
+              type="button"
+              className="btn btn-outline-secondary d-flex align-items-center gap-2"
+            >
+              <PlusOutlined />
+              Thêm thuộc tính
+            </button>
+
+            {/* Popup Modal */}
+            <Modal
+              title="Thêm thuộc tính mới"
+              open={isModalVisible}
+              onOk={handleOk}
+              onCancel={handleCancel}
+              footer={[
+                <Button key="back" onClick={handleCancel}>
+                  Hủy
+                </Button>,
+                <Button key="submit" type="primary" onClick={handleOk}>
+                  Lưu
+                </Button>,
+              ]}
+            >
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Nhập tên thuộc tính (VD: Chất liệu, Màu sắc, Kích thước)"
+                value={newAttributeName}
+                onChange={(e) => setNewAttributeName(e.target.value)}
+              />
+            </Modal>
+
+            <h2 className="fw-semibold fs-5 mt-4 mb-3">
+              Danh sách hàng hóa cùng loại
+            </h2>
+            <table className="table table-bordered text-start">
+              <thead>
+                <tr className="table-light">
+                  <th className="p-2">Tên</th>
+                  <th className="p-2">Ảnh</th>
+                  <th className="p-2 text-center">Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(colorGroups).map(([color, items]) => {
+                  return items.map((variant, index) => (
+                    <tr key={variant.id}>
+                      <td className="p-2">{variant.name}</td>
+
+                      {/* Chỉ hiển thị ô upload ảnh ở dòng đầu tiên của mỗi nhóm màu */}
+                      {index === 0 && (
+                        <td className="p-22 text-center" rowSpan={items.length}>
+                          <Dropzone
+                            onDrop={(acceptedFiles) =>
+                              handleUploadImage(acceptedFiles, color)
+                            }
+                          >
+                            {({ getRootProps, getInputProps }) => (
+                              <div
+                                {...getRootProps()}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  height: "100%",
+                                  padding: "7px",
+                                  border: "2px dashed #ccc",
+                                  borderRadius: "8px",
+                                  cursor: "pointer",
+                                  transition: "border-color 0.3s ease",
+                                }}
+                                onMouseEnter={(e) =>
+                                  (e.currentTarget.style.borderColor =
+                                    "#3b82f6")
+                                }
+                                onMouseLeave={(e) =>
+                                  (e.currentTarget.style.borderColor = "#ccc")
+                                }
+                              >
+                                <input {...getInputProps()} />
+                                {variant.image ? (
                                   <div
-                                    {...getRootProps()}
                                     style={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      height: "100%",
-                                      padding: "7px",
-                                      border: "2px dashed #ccc",
-                                      borderRadius: "8px",
-                                      cursor: "pointer",
-                                      transition: "border-color 0.3s ease",
+                                      position: "relative",
+                                      width: "80px",
+                                      height: "80px",
+                                      overflow: "hidden",
+                                      borderRadius: "10px",
+                                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                                     }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#3b82f6")}
-                                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#ccc")}
                                   >
-                                    <input {...getInputProps()} />
-                                    {variant.image ? (
-                                      <div
-                                        style={{
-                                          position: "relative",
-                                          width: "80px",
-                                          height: "80px",
-                                          overflow: "hidden",
-                                          borderRadius: "10px",
-                                          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                                        }}
-                                      >
-                                        <button
-                                          type="button"
-                                          onClick={(e) => {
-                                            e.stopPropagation(); // Ngăn chặn sự kiện nổi bọt
-                                            handleDeleteI(color);
-                                          }}
-                                          className="btn-close position-absolute bg-white rounded-circle p-1"
-                                          style={{
-                                            top: "6px",
-                                            right: "6px",
-                                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
-                                          }}
-                                        ></button>
-                                        <img
-                                          src={variant.image}
-                                          alt="Uploaded"
-                                          style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                            borderRadius: "10px",
-                                            backgroundColor: "#f8f8f8",
-                                          }}
-                                        />
-                                      </div>
-                                    ) : (
-                                      <p style={{ color: "#4B5563", fontSize: "14px", margin: "0" }}>
-                                        Upload Image
-                                      </p>
-                                    )}
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation(); // Ngăn chặn sự kiện nổi bọt
+                                        handleDeleteI(color);
+                                      }}
+                                      className="btn-close position-absolute bg-white rounded-circle p-1"
+                                      style={{
+                                        top: "6px",
+                                        right: "6px",
+                                        boxShadow:
+                                          "0 2px 4px rgba(0, 0, 0, 0.2)",
+                                      }}
+                                    ></button>
+                                    <img
+                                      src={variant.image}
+                                      alt="Uploaded"
+                                      style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                        borderRadius: "10px",
+                                        backgroundColor: "#f8f8f8",
+                                      }}
+                                    />
                                   </div>
+                                ) : (
+                                  <p
+                                    style={{
+                                      color: "#4B5563",
+                                      fontSize: "14px",
+                                      margin: "0",
+                                    }}
+                                  >
+                                    Upload Image
+                                  </p>
                                 )}
-                              </Dropzone>
-                            </td>
-                          )}
+                              </div>
+                            )}
+                          </Dropzone>
+                        </td>
+                      )}
 
-                          <td className="p-2 text-center">
-                            <button
-                              onClick={() => setVariants(variants.filter((v) => v.id !== variant.id))}
-                              className="btn btn-outline-danger"
-                            >
-                              <DeleteOutlined size={18} />
-                            </button>
-                          </td>
-                        </tr>
-                      ));
-                    })}
-                  </tbody>
-                </table>
+                      <td className="p-2 text-center">
+                        <button
+                          onClick={() =>
+                            setVariants(
+                              variants.filter((v) => v.id !== variant.id)
+                            )
+                          }
+                          className="btn btn-outline-danger"
+                        >
+                          <DeleteOutlined size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ));
+                })}
+              </tbody>
+            </table>
 
-              <p className="mt-2 text-muted small text-end fs-6">Danh sách bao gồm {variants.length} hàng hóa cùng loại</p>
-            </div>
+            <p className="mt-2 text-muted small text-end fs-6">
+              Danh sách bao gồm {variants.length} hàng hóa cùng loại
+            </p>
+          </div>
 
-
-          
           <div className="text-center">
             <button className="btn btn-success btn-lg mx-3" type="submit">
               {getProductId !== undefined ? (

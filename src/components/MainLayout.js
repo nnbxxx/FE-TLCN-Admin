@@ -28,7 +28,6 @@ const { Header, Sider, Content } = Layout;
 
 const MainLayout = () => {
   const authState = useSelector((state) => state?.auth?.user);
-  console.log("🚀 ~ MainLayout ~ authState:", authState);
 
   const [collapsed, setCollapsed] = useState(false);
   const {

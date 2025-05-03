@@ -17,4 +17,9 @@ export function convertISOToDate(isoString) {
 
 // Sử dụng hàm
 const isoString = "2024-12-22T14:30:00.000Z";
-console.log(convertISOToDate(isoString)); // Kết quả: 22/12/2024
+
+export function getUniqueLines(inputStr) {
+  const lines = inputStr.split("\n").filter((line) => line.trim() !== "");
+  const unique = Array.from(new Set(lines));
+  return unique.join("\n");
+}
