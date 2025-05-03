@@ -119,8 +119,37 @@ const AddWareHouse = () => {
         </div>
       ),
     },
-    { title: "Số lượng", dataIndex: "quantity" },
-    { title: "Giá", dataIndex: "price" },
+    {
+      title: 'Số lượng tồn',
+      dataIndex: 'inventory',
+      key: 'inventory',
+      width: 120,
+      render: (inventory) => inventory?.totalQuantity ?? 0
+    },
+    
+    {
+      title: 'Giá bán',
+      dataIndex: 'inventory',
+      key: 'price',
+      width: 150,
+      render: (inventory) => {
+        if (!inventory?.productVariants?.length) return '0₫';
+    
+        const prices = inventory.productVariants
+          .map(v => v.sellPrice)
+          .filter(p => typeof p === 'number');
+    
+        if (prices.length === 0) return '0₫';
+    
+        const min = Math.min(...prices);
+        const max = Math.max(...prices);
+    
+        return min === max
+          ? `${min.toLocaleString()} ₫`
+          : `${min.toLocaleString()} ₫ - ${max.toLocaleString()} ₫`;
+      }
+    }
+    
   ];
 
   const selectedColumns = [
@@ -280,11 +309,12 @@ const AddWareHouse = () => {
         },
       ];
       
-  
+      const matchedItem = selectedProducts.find((p) => p._id === record._id);
+      
       return (
         <Table
           columns={noVariantColumns}
-          dataSource={[record]} // Bọc lại thành mảng
+          dataSource={matchedItem ? [matchedItem] : []}
           pagination={false}
           rowKey="_id"
         />
@@ -398,8 +428,6 @@ const AddWareHouse = () => {
   };
   
   
-  
-
   const [accessTime, setAccessTime] = useState(moment().format("HH:mm:ss DD/MM/YYYY"));
 
   useEffect(() => {

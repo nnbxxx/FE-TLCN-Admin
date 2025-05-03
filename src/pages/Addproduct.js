@@ -70,6 +70,7 @@ const Addproduct = () => {
     productVariants,
   } = newProduct;
 
+  
 
   useEffect(() => {
     if (getProductId !== undefined) {
@@ -428,6 +429,8 @@ const Addproduct = () => {
       setVariants(loadedVariants);
     }
   }, [productFeatures, productVariants]);
+  
+
   
 
   return (
