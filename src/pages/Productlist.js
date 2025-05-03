@@ -155,14 +155,29 @@ const Productlist = () => {
     },
     
     {
-      title: "Quantity",
-      dataIndex: "quantity",
+      title: 'Quantity',
+      dataIndex: 'inventory',
+      key: 'quantity',
+      render: (inventory) => {
+        if (!inventory || !inventory.productVariants) return 0;
+        const total = inventory.productVariants.reduce((sum, v) => sum + (v.stock || 0), 0);
+        return total;
+      }
     },
     {
-      title: "Price",
-      dataIndex: "price",
-      sorter: (a, b) => a.price - b.price,
-    },
+      title: 'Price',
+      dataIndex: 'inventory',
+      key: 'price',
+      render: (inventory) => {
+        if (!inventory || !inventory.productVariants || inventory.productVariants.length === 0) return 'N/A';
+        const prices = inventory.productVariants.map(v => v.sellPrice).filter(p => typeof p === 'number');
+        if (prices.length === 0) return 'N/A';
+        const min = Math.min(...prices);
+        const max = Math.max(...prices);
+        return min === max ? `${min.toLocaleString()} đ` : `${min.toLocaleString()} - ${max.toLocaleString()} đ`;
+      }
+    },    
+    
     {
       title: "Action",
       dataIndex: "action",
@@ -367,6 +382,74 @@ const latestProduct = products.length > 0
               ))}
             </div>
           )}
+          {selectedProduct?.inventory?.productVariants &&
+            Array.isArray(selectedProduct.inventory.productVariants) &&
+            selectedProduct.inventory.productVariants.length > 0 && (
+              <div style={{ marginTop: "20px" }}>
+                <h4>Biến thể sản phẩm</h4>
+
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ backgroundColor: "#f5f5f5" }}>
+                      {selectedProduct.inventory.productVariants.some(
+                        (v) => v.attributes?.color || v.attributes?.size
+                      ) && (
+                        <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                          Biến thể
+                        </th>
+                      )}
+                      <th style={{ border: "1px solid #ddd", padding: "8px" }}>Số lượng</th>
+                      <th style={{ border: "1px solid #ddd", padding: "8px" }}>Giá bán</th>
+                      <th style={{ border: "1px solid #ddd", padding: "8px" }}>Giảm giá</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedProduct.inventory.productVariants.map((variant, index) => {
+                      const hasAttributes =
+                        variant.attributes?.color || variant.attributes?.size;
+
+                      return (
+                        <tr key={index}>
+                          {selectedProduct.inventory.productVariants.some(
+                            (v) => v.attributes?.color || v.attributes?.size
+                          ) && (
+                          <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                              {variant.attributes?.color && (
+                                <div
+                                  title={variant.attributes.color}
+                                  style={{
+                                    width: "16px",
+                                    height: "16px",
+                                    backgroundColor: variant.attributes.color,
+                                    border: "1px solid #ccc",
+                                    borderRadius: "50%", // Hình tròn
+                                  }}
+                                />
+                              )}
+                              {variant.attributes?.size && <span>{variant.attributes.size}</span>}
+                            </div>
+                          </td>
+                          )}
+                          <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                            {variant.stock ?? 0}
+                          </td>
+                          <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                            {(variant.sellPrice ?? 0).toLocaleString()} đ
+                          </td>
+                          <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                            {variant.discount ?? 0}%
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+          )}
+
+
+
         </div>
       </div>
     )}
