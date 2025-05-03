@@ -236,7 +236,7 @@ const Orders = () => {
       <div>{
         <Table columns={columns} 
           // dataSource={sortedOrders} 
-          dataSource={filteredoder || []}
+          dataSource={(filteredoder || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))}
           rowKey={(record) => record._id || record.key}
           pagination={{
           pageSize,

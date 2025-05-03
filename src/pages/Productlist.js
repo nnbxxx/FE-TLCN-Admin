@@ -10,6 +10,7 @@ import { DeleteOutlined, EditFilled, PlusOutlined } from "@ant-design/icons";
 import moment from "moment/moment";
 import { FaSyncAlt } from "react-icons/fa";
 import pCategoryService from "../features/pcategory/pcategoryService"; // Đường dẫn đúng đến API categories
+import { getInventoryProducts } from "../features/warehouse/warehouseSlice";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -32,6 +33,7 @@ const Productlist = () => {
 
   useEffect(() => {
     dispatch(getProducts());
+    dispatch(getInventoryProducts());
   }, [dispatch]);
 
   useEffect(() => {
@@ -51,7 +53,7 @@ const Productlist = () => {
 
   
 
-  
+  const inventoryProducts = useSelector(state => state.warehouse?.warehouses || []);
   const productState = useSelector((state) => state?.product?.products);
 
   // Xử lý chọn checkbox

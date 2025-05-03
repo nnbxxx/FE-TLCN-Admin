@@ -111,21 +111,21 @@ export const productSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.productName = action.payload.data.name;
-        state.productDesc = action.payload.data.description;
-        state.productPrice = action.payload.data.price;
-        state.productBrand = action.payload.data.brand;
-        state.productCategory = action.payload.data.category;
-        state.productTag = action.payload.data.tags;
-        state.productColors = action.payload.data.colors;
+        state.productName = action.payload.data.product.name;
+        state.productDesc = action.payload.data.product.description;
+        state.productPrice = action.payload.data.product.price;
+        state.productBrand = action.payload.data.product.brand;
+        state.productCategory = action.payload.data.product.category;
+        state.productTag = action.payload.data.product.tags;
+        state.productColors = action.payload.data.product.colors;
         // console.log(
         //   "🚀 ~ .addCase ~ action.payload.data.colors:",
         //   action.payload.data
         // );
-        state.productQuantity = action.payload.data.quantity;
-        state.productImages = action.payload.data.images;
-        state.productFeatures = action.payload.data.features;
-        state.productVariants = action.payload.data.variants;
+        state.productQuantity = action.payload.data.product.quantity;
+        state.productImages = action.payload.data.product.images;
+        state.productFeatures = action.payload.data.product.features;
+        state.productVariants = action.payload.data.product.variants;
       })
       .addCase(getAProduct.rejected, (state, action) => {
         state.isLoading = false;
