@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { MenuFoldOutlined, MenuUnfoldOutlined, WechatOutlined } from "@ant-design/icons";
 import {
   AiOutlineDashboard,
   AiOutlineShoppingCart,
@@ -81,6 +81,11 @@ const MainLayout = () => {
               key: "customers",
               icon: <AiOutlineUser className="fs-4" />,
               label: "Customers",
+            },
+            {
+              key: "messages",
+              icon: <WechatOutlined className="fs-4" />,
+              label: "Messages",
             },
             {
               key: "Catalog",
