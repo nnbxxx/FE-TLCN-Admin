@@ -5,43 +5,14 @@ import { useLocation } from "react-router-dom";
 import { getaOrder } from "../features/auth/authSlice";
 
 const columns = [
+  { title: "SNo", dataIndex: "key" },
   {
-    title: "SNo",
-    dataIndex: "key",
-    //width: 50,
+    title: "Tên sản phẩm",
+    dataIndex: "productInfo",
   },
-  {
-    title: "Product Name",
-    dataIndex: "name",
-   // width: 200,
-  },
-  {
-    title: "Brand",
-    dataIndex: "brand",
-    //width: 150,
-  },
-  {
-    title: "Count",
-    dataIndex: "count",
-    //width: 100,
-   // align: "center",
-  },
-  {
-    title: "Color",
-    dataIndex: "color",
-   // width: 100,
-  },
-  {
-    title: "Amount",
-    dataIndex: "amount",
-    //width: 100,
-    //align: "center",
-  },
-  {
-    title: "Image",
-    dataIndex: "image",
-    //width: 150,
-  },
+  { title: "Thương hiệu", dataIndex: "brand" },
+  { title: "Số lượng", dataIndex: "count" },
+  { title: "Tổng tiền", dataIndex: "amount" },
 ];
 
 const ViewOrder = () => {
@@ -60,29 +31,47 @@ const ViewOrder = () => {
     for (let i = 0; i < orderState.items.length; i++) {
       data1.push({
         key: i + 1,
-        name: orderState.items[i]?.product?.name,
+        productInfo: (
+          <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+            <img
+              src={orderState.items[i]?.product?.images[0]}
+              alt="product"
+              style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 8 }}
+            />
+            <div>
+              <div style={{ fontWeight: "bold" }}>
+                {orderState.items[i]?.product?.name}
+              </div>
+              {orderState.items[i]?.size && (
+                <div style={{ fontSize: "0.85rem" }}>
+                  Size: {orderState.items[i].size}
+                </div>
+              )}
+              {orderState.items[i]?.color && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: 16,
+                      height: 16,
+                      borderRadius: "50%",
+                      backgroundColor: orderState.items[i].color,
+                      border: "1px solid #ccc",
+                    }}
+                  ></span>
+                  <span style={{ fontSize: "0.85rem" }}>
+                    {orderState.items[i].color}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        ),
         brand: orderState.items[i]?.product?.brand,
         count: orderState.items[i]?.quantity,
         amount: `${orderState.items[i]?.price.toLocaleString()} đ`,
-        color: (
-          <div
-            style={{
-              width: "20px",
-              height: "20px",
-              borderRadius: "50%",
-              backgroundColor: orderState.items[i]?.color?.color,
-              margin: "auto",
-            }}
-          ></div>
-        ),
-        image: (
-          <img
-            src={orderState.items[i]?.product?.images[0]}
-            alt="product"
-            style={{ width: "80px", height: "80px", objectFit: "cover" }}
-          />
-        ),
       });
+      
     }
   }
 

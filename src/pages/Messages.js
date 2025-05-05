@@ -1,24 +1,21 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { SendOutlined } from '@ant-design/icons';
 import {
+  Button,
+  Divider,
+  Input,
   Layout,
   List,
-  Avatar,
-  Typography,
-  Button,
-  Input,
-  Divider,
   Tooltip,
+  Typography,
 } from 'antd';
-import { FaSyncAlt } from 'react-icons/fa';
-import { SendOutlined, PaperClipOutlined } from '@ant-design/icons';
-import moment from 'moment';
-import styled from 'styled-components';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { io } from 'socket.io-client';
-import { MessageService } from '../features/message/messageService';
 import { toast } from 'react-toastify';
-import { formatMessageTime } from '../utils/dayUltils';
+import { io } from 'socket.io-client';
+import styled from 'styled-components';
 import IconButtonUpload from '../components/IconButtonUpload';
+import { MessageService } from '../features/message/messageService';
+import { formatMessageTime } from '../utils/dayUltils';
 
 const { Sider, Content } = Layout;
 const { Title } = Typography;
