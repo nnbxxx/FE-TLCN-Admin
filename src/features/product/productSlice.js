@@ -117,6 +117,7 @@ export const productSlice = createSlice({
         state.productBrand = action.payload.data.product.brand;
         state.productCategory = action.payload.data.product.category;
         state.productTag = action.payload.data.product.tags;
+        state.productCode = action.payload.data.product.code;
         state.productColors = action.payload.data.product.colors;
         // console.log(
         //   "🚀 ~ .addCase ~ action.payload.data.colors:",

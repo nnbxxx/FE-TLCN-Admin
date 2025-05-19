@@ -11,6 +11,8 @@ import moment from "moment/moment";
 import { FaSyncAlt } from "react-icons/fa";
 import pCategoryService from "../features/pcategory/pcategoryService"; // Đường dẫn đúng đến API categories
 import { getInventoryProducts } from "../features/warehouse/warehouseSlice";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -121,12 +123,12 @@ const Productlist = () => {
   // Cấu hình cột bảng
   const columns = [
     {
-      title: "Id",
-      dataIndex: "_id",
+      title: "Mã SP",
+      dataIndex: "code",
       width: 100,
     },
     {
-      title: "Name",
+      title: "Tên sản phẩm",
       dataIndex: "name",
       sorter: (a, b) => a.name.length - b.name.length,
       render: (text, record) => (
@@ -147,12 +149,12 @@ const Productlist = () => {
     },
 
     {
-      title: "Brand",
+      title: "Thương hiệu",
       dataIndex: "brand",
       sorter: (a, b) => a.brand.length - b.brand.length,
     },
     {
-      title: "Category",
+      title: "Danh mục",
       dataIndex: "category",
       render: (categoryId) => {
         // Kiểm tra categoriess trước khi tìm kiếm
@@ -164,7 +166,7 @@ const Productlist = () => {
     },
 
     {
-      title: "Quantity",
+      title: "Tổng số lượng",
       dataIndex: "inventory",
       key: "quantity",
       render: (inventory) => {
@@ -177,7 +179,7 @@ const Productlist = () => {
       },
     },
     {
-      title: "Price",
+      title: "Giá bán",
       dataIndex: "inventory",
       key: "price",
       render: (inventory) => {
@@ -200,7 +202,7 @@ const Productlist = () => {
     },
 
     {
-      title: "Action",
+      title: "",
       dataIndex: "action",
       render: (_, item) => (
         <>
@@ -228,6 +230,65 @@ const Productlist = () => {
         )
       : null;
 
+
+      //-------------------------------Import/Export Excel---------------------
+      const handleExportMongoStyle = () => {
+        const exportData = filteredProducts.map((item) => ({
+          _id: item._id,
+          name: item.name,
+          category: item.category,
+          brand: item.brand,
+          description: item.description,
+          images: item.images,
+          rating: item.rating,
+          tags: item.tags,
+          features: item.features,
+          variants: item.inventory?.productVariants?.map((variant) => ({
+            attributes: {
+              color: variant.attributes?.color
+                ? { name: variant.attributes.color, desc: "" }
+                : undefined,
+              size: variant.attributes?.size
+                ? { name: variant.attributes.size }
+                : undefined,
+            },
+            isDeleted: false,
+            deletedAt: null,
+          })),
+          createdBy: item.createdBy || { _id: "", email: "" },
+          isDeleted: item.isDeleted || false,
+          deletedAt: null,
+          createdAt: new Date(item.createdAt).toISOString(),
+          updatedAt: new Date(item.updatedAt).toISOString(),
+          __v: 0,
+        }));
+      
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "products");
+      
+        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+        const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+        saveAs(data, "mongo_style_export.xlsx");
+      };
+      
+
+      const handleImportExcel = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+      
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, { type: "array" });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(sheet);
+          console.log("Dữ liệu import:", jsonData);
+          // TODO: gọi API để lưu vào DB hoặc xử lý nội bộ
+        };
+        reader.readAsArrayBuffer(file);
+      };
+      
   return (
     <div>
       <div className="bg-white p-3 rounded shadow-sm mb-4">
@@ -248,8 +309,28 @@ const Productlist = () => {
         </div>
       </div>
 
-      {/* Nút thêm mới sản phẩm */}
-      <div style={{ display: "flex", justifyContent: "end", marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "end", gap: "10px", marginBottom: 16 }}>
+        {/* Nút Import Excel */}
+        <input
+          type="file"
+          accept=".xlsx, .xls"
+          onChange={(e) => handleImportExcel(e)}
+          style={{
+            display: "inline-block",
+            padding: "6px 12px",
+            border: "1px solid #d9d9d9",
+            borderRadius: "6px",
+            cursor: "pointer",
+            backgroundColor: "#fafafa",
+          }}
+        />
+
+        {/* Nút Export Excel */}
+        <Button type="default" onClick={handleExportMongoStyle}>
+          Export Excel
+        </Button>
+
+        {/* Nút Thêm mới */}
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -258,6 +339,7 @@ const Productlist = () => {
           Thêm mới
         </Button>
       </div>
+
 
       {/* Bộ lọc và tìm kiếm */}
       <div

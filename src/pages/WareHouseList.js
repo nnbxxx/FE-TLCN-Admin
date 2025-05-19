@@ -54,7 +54,7 @@ const WareHouseList = () => {
       action: history.action,
       userId: history.userId,
       date: new Date(history.date).toLocaleString(), // chuyển date cho dễ đọc
-      variants: history.variants,
+      variants: Array.isArray(history.variants) ? history.variants : [],
       totalQuantity: product.totalQuantity,
       importPrice: product.importPrice,  
       exportPrice: product.exportPrice,  

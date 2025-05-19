@@ -35,6 +35,7 @@ let schema = yup.object().shape({
   brand: yup.string().required("Thương hiệu không được để trống"),
   category: yup.string().required("Danh mục không được để trống"),
   tags: yup.string().required("Thẻ không được để trống"),
+  code: yup.string().required("Mã sản phẩm không được để trống"),
 });
 
 const Addproduct = () => {
@@ -69,6 +70,7 @@ const Addproduct = () => {
     productImages,
     productFeatures,
     productVariants,
+    productCode,
   } = newProduct;
 
   useEffect(() => {
@@ -125,6 +127,7 @@ const Addproduct = () => {
       brand: productBrand || "",
       category: productCategory || "",
       tags: productTag || "",
+      code: productCode || "",
       images: productImages || [],
       features: productFeatures || [],
       variants: productVariants || [],
@@ -134,7 +137,8 @@ const Addproduct = () => {
       const formattedVariants = variants.map((variant) => {
         // Regex linh hoạt để tìm mã màu và kích thước
         const colorMatch = variant.name.match(/#([0-9a-fA-F]{6})/); // Tìm mã màu dạng #604848
-        const sizeMatch = variant.name.match(/-(\w)(?!#)/); // Tìm ký tự size nhưng không chứa mã màu
+        const sizeMatch = variant.name.match(/-([^-#]+)/); // Tìm ký tự size nhưng không chứa mã màu
+        console.log("Biến thể khi submit:", variants);
 
         // Xử lý mã màu và size
         const colorCode = colorMatch ? `#${colorMatch[1]}` : ""; // Nếu có mã màu
@@ -160,6 +164,7 @@ const Addproduct = () => {
         description: values.description,
         images: values.images,
         tags: values.tags,
+        code: values.code,
         features: attributes.map((attr) => attr.name),
         variants: formattedVariants,
       };
@@ -175,6 +180,7 @@ const Addproduct = () => {
           description: values.description,
           images: values.images,
           tags: values.tags,
+          code: values.code,
           features: attributes.map((attr) => attr.name),
           variants: formattedVariants,
         };
@@ -190,6 +196,7 @@ const Addproduct = () => {
             description: values.description,
             images: values.images,
             tags: values.tags,
+            code: values.code,
             features: attributes.map((attr) => attr.name),
             variants: formattedVariants,
           })
@@ -449,6 +456,17 @@ const Addproduct = () => {
           onSubmit={formik.handleSubmit}
           className="d-flex gap-3 flex-column"
         >
+          <CustomInput
+            type="text"
+            label="Nhập mã sản phẩm"
+            name="code"
+            onChng={formik.handleChange("code")}
+            onBlr={formik.handleBlur("code")}
+            val={formik.values.code}
+          />
+          <div className="error">
+            {formik.touched.code && formik.errors.code}
+          </div>
           <CustomInput
             type="text"
             label="Nhập tiêu đề sản phẩm"
