@@ -1,0 +1,58 @@
+/* Header row with gradient background and hover effect */
+.custom-table .ant-table-thead > tr > th {
+  background: linear-gradient(0deg, rgba(0, 82, 72, 1) 0%, rgba(0, 46, 39, 1) 58%, rgba(5, 0, 0, 1) 100%);
+  color: white;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover effect for header cells */
+.custom-table .ant-table-thead > tr:hover > th {
+background: linear-gradient(0deg, rgba(0, 82, 72, 1) 0%, rgba(0, 46, 39, 1) 58%, rgba(5, 0, 0, 1) 100%) !important; /* xanh đậm hơn */
+  cursor: default;
+}
+
+/* Zebra striping */
+.custom-table .ant-table-tbody > tr:nth-child(odd) {
+  background-color: #f5f5f5;
+}
+.custom-table .ant-table-tbody > tr:nth-child(even) {
+  background-color: white;
+}
+
+/* Hover effect for data rows */
+.custom-table .ant-table-tbody > tr:hover > td {
+  background-color: rgba(0, 82, 72, 0.1) !important; /* xanh nhạt */
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+/* Đổi màu mũi tên sort (cả 2 chiều) thành trắng */
+.custom-table .ant-table-column-sorter-up,
+.custom-table .ant-table-column-sorter-down {
+  color: white !important;
+}
+
+/* Khi đang được sort, Ant Design sẽ tô đậm màu icon — ta giữ màu trắng luôn */
+.custom-table .ant-table-column-sorter-up.active,
+.custom-table .ant-table-column-sorter-down.active {
+  color: white !important;
+}
+
+/* Chỉ giữ màu nền gradient cho ô tiêu đề đang được sort */
+.custom-table .ant-table-thead .ant-table-column-sort {
+  background: linear-gradient(
+    0deg,
+    rgba(0, 82, 72, 1) 0%,
+    rgba(0, 46, 39, 1) 58%,
+    rgba(5, 0, 0, 1) 100%
+  ) !important;
+}
+
+
+.compact-table .ant-table-tbody > tr > td {
+  padding: 5px 8px !important;
+ 
+}
+
+

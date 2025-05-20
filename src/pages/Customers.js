@@ -11,6 +11,7 @@ import styled from "styled-components";
 import { EditOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import moment from "moment/moment";
 import { FaSyncAlt } from "react-icons/fa";
+import "../Css/CssCustomers.css"
 
 const { Search } = Input;
 
@@ -33,7 +34,7 @@ const columns = (editUser, handleBlock, handleUnblock) => [
     dataIndex: "_id",
   },
   {
-    title: "Name",
+    title: "Họ và tên",
     dataIndex: "name",
     sorter: (a, b) => a.name.length - b.name.length,
     render: (text, record) => (
@@ -57,7 +58,7 @@ const columns = (editUser, handleBlock, handleUnblock) => [
   //   dataIndex: "mobile",
   // },
   {
-    title: "Role",
+    title: "Vai trò",
     dataIndex: "role",
     render: (role) => {
       let color = "";
@@ -74,11 +75,11 @@ const columns = (editUser, handleBlock, handleUnblock) => [
     },
   },
   {
-    title: "Actions",
+    title: "",
     render: (text, record) => (
       <div style={{ display: "flex", gap: "10px" }}>
         <EditOutlined
-          style={{ color: "#1890ff", cursor: "pointer", fontSize: "20px" }}
+          style={{ color: "green", cursor: "pointer", fontSize: "20px" }}
           onClick={() => editUser(record)}
         />
         {record.isBlocked ? (
@@ -206,12 +207,19 @@ const Customers = () => {
       .some((value) => value?.toString().toLowerCase().includes(searchText.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
+  const authState = useSelector((state) => state?.auth?.user);
 
   return (
     <div>
-          <div className="bg-white p-3 rounded shadow-sm mb-4">
+          <div className="bg-white rounded shadow-sm mb-4">
             <div className="d-flex justify-content-between align-items-center mx-4 py-3">
-              <h3 className="m-0">Người dùng</h3>
+             <div>
+                <h3 className="m-0">Người dùng</h3>
+                <div className="text-muted mt-1" style={{ fontSize: "14px" }}>
+                  Chào {authState?.name || "bạn"}, chào mừng bạn quay trở lại trang quản trị của Sắc
+                </div>
+              </div>
+
               {latestcustomers && (
                 <span className="text-muted fs-6 d-flex align-items-center">
                   Dữ liệu mới nhất
@@ -268,6 +276,8 @@ const Customers = () => {
 
       <div>
         <Table
+          className="compact-table"
+          style={{ border: "1px solid #d9d9d9", borderRadius: 4 }}
           columns={columns(handleEditUser, handleBlockUser, handleUnblockUser)}
           // dataSource={data1}
           dataSource={filteredUser || []}
