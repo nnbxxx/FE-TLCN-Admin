@@ -150,14 +150,20 @@ const generateCouponCode = () => {
   return numericPart + letterPart;
 };
 
+const authState = useSelector((state) => state?.auth?.user);
 
   return (
     <div>
-          <div className="bg-white p-3 rounded shadow-sm mb-4">
+          <div className="bg-white rounded shadow-sm mb-4">
             <div className="d-flex justify-content-between align-items-center mx-4 py-3">
-              <h3 className="m-0">
-              {getCouponId !== undefined ? "Sửa" : "Thêm"} giảm giá
-              </h3>
+              <div>
+                <h3 className="m-0">
+                  {getCouponId !== undefined ? "Sửa" : "Thêm"} giảm giá
+                </h3>
+                <div className="text-muted mt-1" style={{ fontSize: "14px" }}>
+                  Chào {authState?.name || "bạn"}, chào mừng bạn quay trở lại trang quản trị của Sắc
+                </div>
+              </div>
               {accessTime && (
                 <span className="text-muted fs-6 d-flex align-items-center">
                   Thời gian truy cập

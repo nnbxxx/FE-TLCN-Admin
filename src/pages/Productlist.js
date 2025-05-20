@@ -13,7 +13,7 @@ import pCategoryService from "../features/pcategory/pcategoryService"; // Đư�
 import { getInventoryProducts } from "../features/warehouse/warehouseSlice";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-
+import "../Css/CssCustomers.css"
 const { Search } = Input;
 const { Option } = Select;
 
@@ -202,7 +202,7 @@ const Productlist = () => {
     },
 
     {
-      title: "",
+      title: "Action",
       dataIndex: "action",
       render: (_, item) => (
         <>
@@ -288,12 +288,18 @@ const Productlist = () => {
         };
         reader.readAsArrayBuffer(file);
       };
+      const authState = useSelector((state) => state?.auth?.user);
       
   return (
     <div>
-      <div className="bg-white p-3 rounded shadow-sm mb-4">
+      <div className="bg-white rounded shadow-sm mb-4">
         <div className="d-flex justify-content-between align-items-center mx-4 py-3">
-          <h3 className="m-0">Danh sách sản phẩm</h3>
+          <div>
+            <h3 className="m-0">Danh sách sản phẩm</h3>
+            <div className="text-muted mt-1" style={{ fontSize: "14px" }}>
+              Chào {authState?.name || "bạn"}, chào mừng bạn quay trở lại trang quản trị của Sắc
+            </div>
+          </div>
           {latestProduct && (
             <span className="text-muted fs-6 d-flex align-items-center">
               Dữ liệu mới nhất
@@ -311,19 +317,7 @@ const Productlist = () => {
 
       <div style={{ display: "flex", justifyContent: "end", gap: "10px", marginBottom: 16 }}>
         {/* Nút Import Excel */}
-        <input
-          type="file"
-          accept=".xlsx, .xls"
-          onChange={(e) => handleImportExcel(e)}
-          style={{
-            display: "inline-block",
-            padding: "6px 12px",
-            border: "1px solid #d9d9d9",
-            borderRadius: "6px",
-            cursor: "pointer",
-            backgroundColor: "#fafafa",
-          }}
-        />
+        
 
         {/* Nút Export Excel */}
         <Button type="default" onClick={handleExportMongoStyle}>
@@ -367,17 +361,19 @@ const Productlist = () => {
         {/* Phần danh mục và tìm kiếm nằm bên phải */}
         <div style={{ display: "flex", gap: "10px" }}>
           <Select
-            placeholder="Lọc theo danh mục"
-            allowClear
-            style={{ width: "170px" }}
-            onChange={(value) => setSelectedCategory(value)}
-          >
-            {categories.map((category) => (
-              <Option key={category} value={category}>
-                {category}
-              </Option>
-            ))}
-          </Select>
+  placeholder="Lọc theo danh mục"
+  allowClear
+  style={{ width: "170px" }}
+  onChange={(value) => setSelectedCategory(value)}
+  value={selectedCategory}
+>
+  {categoriess.map((category) => (
+    <Option key={category._id} value={category._id}>
+      {category.name}
+    </Option>
+  ))}
+</Select>
+
 
           <Search
             placeholder="Tìm kiếm..."
@@ -414,6 +410,8 @@ const Productlist = () => {
 
       {/* Bảng danh sách sản phẩm */}
       <Table
+        className="compact-table"
+        style={{ border: "1px solid #d9d9d9", borderRadius: 4 }}
         rowSelection={rowSelection}
         columns={columns}
         dataSource={filteredProducts || []}

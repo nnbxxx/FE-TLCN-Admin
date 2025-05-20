@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Button, Input, Select, Table } from "antd";
+import { Button, Input, Select, Table, Tooltip } from "antd";
 import { BiEdit } from "react-icons/bi";
 import { AiFillDelete } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteABlog, getBlogs, resetState } from "../features/blogs/blogSlice";
 import CustomModal from "../components/CustomModal";
+import "../Css/CssCustomers.css";
 import { delImg } from "../features/upload/uploadSlice";
 import { FaSyncAlt } from "react-icons/fa";
 import moment from "moment/moment";
@@ -24,40 +25,80 @@ const Bloglist = () => {
     setOpen(true);
     setblogId(e);
   };
-  const columns = [
-    {
-      title: "Id",
-      dataIndex: "_id",
-      width: 100,
+const columns = [
+  {
+    title: "Id",
+    dataIndex: "_id",
+    width: 100,
+    render: (id) => `${id.slice(0, 8)}...`, // Cắt ID
+  },
+  {
+    title: 'Ảnh đại diện',
+    dataIndex: 'images',
+    key: 'images',
+    render: (images) => (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <img
+          src={images?.[0]}
+          alt="Ảnh"
+          style={{ width: 50, height: 60, objectFit: 'cover', borderRadius: 8 }}
+        />
+      </div>
+    ),
+    align: 'center',
+  },
+  {
+    title: "Tiêu đề",
+    dataIndex: "title",
+    render: (title) =>
+    <Tooltip title={title}>
+        {title.length > 30 ? `${title.slice(0, 30)}...` : title}
+      </Tooltip>  },
+  {
+    title: "Danh mục",
+    dataIndex: "category",
+  },
+  {
+    title: 'Tác giả',
+    dataIndex: 'createdBy',
+    key: 'createdBy',
+    render: (user: { email: string}) => user.email,
+  },
+  {
+    title: 'Ngày tạo',
+    dataIndex: 'createdAt',
+    key: 'createdAt',
+    render: (date) =>
+      new Date(date).toLocaleString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      }), // Thêm giờ phút giây
+  },
+  {
+    title: "Action",
+    dataIndex: "action",
+    render: (index, item) => {
+      return (
+        <>
+          <Link to={`/admin/blog/${item._id}`} className="fs-3 text-success">
+            <BiEdit />
+          </Link>
+          <button
+            className="ms-3 fs-3 text-danger bg-transparent border-0"
+            onClick={() => showModal(item._id)}
+          >
+            <AiFillDelete />
+          </button>
+        </>
+      );
     },
-    {
-      title: "Title",
-      dataIndex: "title",
-    },
-    {
-      title: "Category",
-      dataIndex: "category",
-    },
-    {
-      title: "Action",
-      dataIndex: "action",
-      render: (index, item) => {
-        return (
-          <>
-            <Link to={`/admin/blog/${item._id}`} className=" fs-3 text-danger">
-              <BiEdit />
-            </Link>
-            <button
-              className="ms-3 fs-3 text-danger bg-transparent border-0"
-              onClick={() => showModal(item._id)}
-            >
-              <AiFillDelete />
-            </button>
-          </>
-        );
-      },
-    },
-  ];
+  },
+];
+
 
   const hideModal = () => {
     setOpen(false);
@@ -107,13 +148,19 @@ const filteredblogs = blogs?.filter((blog) => {
   return matchesCategory && matchesSearch;
 });
 
-
+const authState = useSelector((state) => state?.auth?.user);
 
   return (
     <div>
-                 <div className="bg-white p-3 rounded shadow-sm mb-4">
+                 <div className="bg-white rounded shadow-sm mb-4">
                     <div className="d-flex justify-content-between align-items-center mx-4 py-3">
-                      <h3 className="m-0">Danh sách bài viết</h3>
+                      
+                      <div>
+                        <h3 className="m-0">Danh sách bài viết</h3>
+                        <div className="text-muted mt-1" style={{ fontSize: "14px" }}>
+                          Chào {authState?.name || "bạn"}, chào mừng bạn quay trở lại trang quản trị của Sắc
+                        </div>
+                      </div>
                       {latestblogs && (
                         <span className="text-muted fs-6 d-flex align-items-center">
                           Dữ liệu mới nhất
@@ -177,7 +224,10 @@ const filteredblogs = blogs?.filter((blog) => {
       </div>               
     
       <div>
-        <Table columns={columns} 
+        <Table 
+        className="compact-table"
+        style={{ border: "1px solid #d9d9d9", borderRadius: 4 }}
+        columns={columns} 
         // dataSource={getBlogState} 
         dataSource={filteredblogs || []}
         rowKey={(record) => record._id || record.key}

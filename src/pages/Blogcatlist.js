@@ -12,6 +12,7 @@ import {
 import CustomModal from "../components/CustomModal";
 import moment from "moment/moment";
 import { FaSyncAlt } from "react-icons/fa";
+import "../Css/CssCustomers.css"
 import { DeleteOutlined, EditFilled, PlusOutlined } from "@ant-design/icons";
 const { Search } = Input;
 const { Option } = Select;
@@ -44,7 +45,7 @@ const Blogcatlist = () => {
       width: 100,
     },
     {
-      title: "Subject",
+      title: "Danh mục",
       dataIndex: "subject",
       sorter: (a, b) => a.subject.length - b.subject.length,
     },
@@ -57,7 +58,7 @@ const Blogcatlist = () => {
           <>
             <Link
               to={`/admin/blog-category/${item._id}`}
-              className=" fs-3 text-danger"
+              className=" fs-3 text-success"
             >
               <BiEdit />
             </Link>
@@ -99,22 +100,30 @@ const Blogcatlist = () => {
    return matchesCategory && matchesSearch;
  });
 
+ const authState = useSelector((state) => state?.auth?.user);
+
   return (
     <div>
-    <div className="bg-white p-3 rounded shadow-sm mb-4">
-                    <div className="d-flex justify-content-between align-items-center mx-4 py-3">
-                      <h3 className="m-0">Danh sách danh mục bài viết</h3>
-                      {latestcategorys && (
-                        <span className="text-muted fs-6 d-flex align-items-center">
-                          Dữ liệu mới nhất
-                          <FaSyncAlt className="ms-2 text-primary" style={{ cursor: "pointer" }} />
-                          <span className="ms-2 border px-2 py-1 rounded">
-                            {moment(latestcategorys.createdAt).format("HH:mm:ss DD/MM/YYYY")}
-                          </span>
-                        </span>
-                      )}
-                    </div>
-                  </div>
+      <div className="bg-white  rounded shadow-sm mb-4">
+        <div className="d-flex justify-content-between align-items-center mx-4 py-3"> 
+          <div>
+            <h3 className="m-0">Danh sách danh mục bài viết</h3>
+            <div className="text-muted mt-1" style={{ fontSize: "14px" }}>
+              Chào {authState?.name || "bạn"}, chào mừng bạn quay trở lại trang quản trị của Sắc
+            </div>
+          </div>
+          {latestcategorys && (
+          <span className="text-muted fs-6 d-flex align-items-center">
+            Dữ liệu mới nhất
+            <FaSyncAlt className="ms-2 text-primary" style={{ cursor: "pointer" }} />
+            <span className="ms-2 border px-2 py-1 rounded">
+              {moment(latestcategorys.createdAt).format("HH:mm:ss DD/MM/YYYY")}
+            </span>
+          </span>
+          )}
+        </div>
+      </div>
+                    
        {/* Nút thêm mới sản phẩm */}
        <div style={{ display: "flex", justifyContent: "end", marginBottom: 16 }}>
                   <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("/admin/blog-category")}>
@@ -152,6 +161,8 @@ const Blogcatlist = () => {
                                 </div> 
       <div>
         <Table columns={columns} 
+        className="compact-table"
+        style={{ border: "1px solid #d9d9d9", borderRadius: 4 }}
         dataSource={filteredcategory || []}
          rowKey={(record) => record._id || record.key}
           pagination={{

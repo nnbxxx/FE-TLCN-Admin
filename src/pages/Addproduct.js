@@ -29,6 +29,8 @@ import {
   updateAProduct,
 } from "../features/product/productSlice";
 import { getUniqueLines } from "../utils/dayUltils";
+import { FaSyncAlt } from "react-icons/fa";
+import moment from "moment";
 let schema = yup.object().shape({
   title: yup.string().required("Tiêu đề không được để trống"),
   description: yup.string().required("Mô tả không được để trống"),
@@ -446,16 +448,39 @@ const Addproduct = () => {
     }
   }, [productFeatures, productVariants, getProductId]);
 
+  const authState = useSelector((state) => state?.auth?.user);
+
+  const [accessTime, setAccessTime] = useState(moment().format("HH:mm:ss DD/MM/YYYY"));
   return (
     <div>
-      <h3 className="mb-4 title">
-        {getProductId !== undefined ? "Sửa" : "Thêm"} sản phẩm
-      </h3>
+          <div className="bg-white rounded shadow-sm mb-4">
+            <div className="d-flex justify-content-between align-items-center mx-4 py-3">
+              <div>
+                <h3 className="m-0">
+                  {getProductId !== undefined ? "Sửa" : "Thêm"} sản phẩm
+                </h3>
+                <div className="text-muted mt-1" style={{ fontSize: "14px" }}>
+                  Chào {authState?.name || "bạn"}, chào mừng bạn quay trở lại trang quản trị của Sắc
+                </div>
+              </div>
+              {accessTime && (
+                <span className="text-muted fs-6 d-flex align-items-center">
+                  Thời gian truy cập
+                  <FaSyncAlt className="ms-2 text-primary" style={{ cursor: "pointer" }} />
+                  <span className="ms-2 border px-2 py-1 rounded">{accessTime}</span>
+                </span>
+              )}
+            </div>
+          </div>
+      
       <div>
         <form
           onSubmit={formik.handleSubmit}
-          className="d-flex gap-3 flex-column"
+          className="d-flex flex-column"
         >
+          <label htmlFor="name" className="form-label fw-semibold mb-0">
+            Mã sản phẩm <span className="text-danger">*</span>
+          </label>
           <CustomInput
             type="text"
             label="Nhập mã sản phẩm"
@@ -467,6 +492,10 @@ const Addproduct = () => {
           <div className="error">
             {formik.touched.code && formik.errors.code}
           </div>
+
+          <label htmlFor="name" className="form-label fw-semibold mb-0 mt-3">
+            Tiêu đề sản phẩm <span className="text-danger">*</span>
+          </label>
           <CustomInput
             type="text"
             label="Nhập tiêu đề sản phẩm"
@@ -478,6 +507,9 @@ const Addproduct = () => {
           <div className="error">
             {formik.touched.title && formik.errors.title}
           </div>
+          <label htmlFor="name" className="form-label fw-semibold mb-2 mt-3">
+            Mô tả <span className="text-danger">*</span>
+          </label>
           <div className="">
             <ReactQuill
               theme="snow"
@@ -489,6 +521,9 @@ const Addproduct = () => {
           <div className="error">
             {formik.touched.description && formik.errors.description}
           </div>
+          <label htmlFor="name" className="form-label fw-semibold mb-2 mt-3">
+            Thương hiệu <span className="text-danger">*</span>
+          </label>
           <select
             name="brand"
             onChange={formik.handleChange("brand")}
@@ -509,6 +544,10 @@ const Addproduct = () => {
           <div className="error">
             {formik.touched.brand && formik.errors.brand}
           </div>
+
+          <label htmlFor="name" className="form-label fw-semibold mb-2 mt-2">
+            Danh mục sản phẩm<span className="text-danger">*</span>
+          </label>
           <select
             name="category"
             onChange={formik.handleChange("category")}
@@ -529,6 +568,10 @@ const Addproduct = () => {
           <div className="error">
             {formik.touched.category && formik.errors.category}
           </div>
+
+          <label htmlFor="name" className="form-label fw-semibold mb-2 mt-2">
+            Danh mục <span className="text-danger">*</span>
+          </label>
           <select
             name="tags"
             onChange={formik.handleChange("tags")}
@@ -553,6 +596,7 @@ const Addproduct = () => {
               backgroundColor: "#fff",
               padding: "20px",
               borderRadius: "8px",
+              marginBottom: "20px",
             }}
           >
             <Dropzone
@@ -570,6 +614,7 @@ const Addproduct = () => {
                     borderRadius: "8px",
                     cursor: "pointer",
                     transition: "border-color 0.3s ease",
+                    
                   }}
                   onMouseEnter={(e) =>
                     (e.currentTarget.style.borderColor = "#3b82f6")
