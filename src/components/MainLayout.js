@@ -19,10 +19,11 @@ import { BiCategoryAlt } from "react-icons/bi";
 import { Layout, Menu, theme } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import logo from "../assets/LogoS.jpg";
+import logo from "../assets/LogoS.png";
 import instance from "../../src/utils/axios-customize";
 import { TbBuildingWarehouse, TbTruckDelivery } from "react-icons/tb";
 import { VscGraphLine } from "react-icons/vsc";
+import "../App.css";
 
 const { Header, Sider, Content } = Layout;
 
@@ -46,20 +47,31 @@ const MainLayout = () => {
   return (
     <Layout>
       <Sider trigger={null} collapsible collapsed={collapsed}>
+       <div
+        className="logo"
+        style={{
+          backgroundColor: "rgb(0, 21, 41)", // Màu nền logo
+          padding: "10px 0",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column"
+        }}
+      >
+        <img
+          src={logo}
+          alt="Logo"
+          style={{ width: "80px", height: "auto" }}
+        />
         <div
-          className="logo"
           style={{
-            backgroundColor: "#000000FF", // Màu nền logo
+            width: "80%",
+            borderBottom: "1px solid white",
+            marginTop: "10px"
           }}
-        >
-          <h2 className="text-white fs-5 text-center py-0 mb-0">
-            <img
-              src={logo}
-              alt="Logo"
-              style={{ width: "80px", height: "auto" }}
-            />
-          </h2>
-        </div>
+        ></div>
+      </div>
+
         <Menu
           theme="dark"
           mode="inline"
@@ -142,22 +154,22 @@ const MainLayout = () => {
                 {
                   key: "stock-inventory",
                   icon: <VscGraphLine className="fs-4" />,
-                  label: "Thống kê hàng tồn kho ",
+                  label: "Inventory Statistics",
                 },
                 {
                   key: "warehouse",
                   icon: <ImBlog className="fs-4" />,
-                  label: "Nhập thêm hàng",
+                  label: "Import Products",
                 },
                 {
                   key: "warehouse-list",
                   icon: <TbBuildingWarehouse  className="fs-4" />,
-                  label: "Lịch sử nhập hàng",
+                  label: "Inbound History",
                 },
                 {
                   key: "history-delivery",
                   icon: <TbTruckDelivery  className="fs-4" />,
-                  label: "Lịch sử xuất hàng",
+                  label: "Outbound History",
                 },
               ],
             },

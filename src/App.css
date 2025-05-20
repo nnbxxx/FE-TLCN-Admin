@@ -6,6 +6,7 @@
   --color-828599: #828599;
   --color-3d464d: #ed464d;
   --color-c3d4da: #ced4da;
+  
 }
 
 .green {
@@ -41,4 +42,34 @@
   font: 14px;
   font-family: Roboto !important;
   color: var(--color-828599);
+}
+
+/* Đảm bảo ghi đè tất cả các trạng thái với !important */
+.ant-menu-dark .ant-menu-item,
+.ant-menu-dark .ant-menu-item-selected,
+.ant-menu-dark .ant-menu-item:hover {
+  transition: none !important; /* Tắt animation nếu không cần */
+  background-image: none !important;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* Khi selected */
+.ant-menu-dark .ant-menu-item-selected {
+  background-image: radial-gradient(circle, rgba(0,82,72,1) 0%, rgba(0,46,39,1) 58%, rgba(5,0,0,1) 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid white !important;
+  border-radius: 4px;
+}
+
+/* Khi hover */
+.ant-menu-dark .ant-menu-item:hover {
+  background-image: radial-gradient(circle, rgba(0,82,72,0.8) 0%, rgba(0,46,39,0.8) 58%, rgba(5,0,0,0.8) 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid white !important;
+  border-radius: 4px;
+}
+
+.ant-menu-dark .ant-menu-item {
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out !important;
 }
