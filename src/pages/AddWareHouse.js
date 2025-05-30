@@ -1,13 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Button, Input, Select, Table, Modal, Checkbox, notification } from "antd";
+import { Button, Input, Select, Table, Modal, Checkbox, notification, Upload, message } from "antd";
 import { AiFillDelete, AiFillSave } from "react-icons/ai";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getProducts } from "../features/product/productSlice";
+import { createProducts, getProducts } from "../features/product/productSlice";
 import moment from "moment";
 import { FaCheck, FaSyncAlt } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { inventoryProduct, getInventoryProducts } from "../features/warehouse/warehouseSlice";
+import * as XLSX from "xlsx";
+import { UploadOutlined } from "@ant-design/icons";
+import { store } from "../app/store";
+
 
 const AddWareHouse = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -487,12 +491,95 @@ const AddWareHouse = () => {
   
   const authState = useSelector((state) => state?.auth?.user);
   
+const handleImportExcel = async (file) => {
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+
+    const sanPhamSheet = XLSX.utils.sheet_to_json(workbook.Sheets["SanPham"]);
+    const khoHangSheet = XLSX.utils.sheet_to_json(workbook.Sheets["KhoHang"]);
+
+    // Tải danh sách sản phẩm hiện có từ API
+    await dispatch(getProducts());
+    const currentProducts = store.getState().product.products; // ✅ cập nhật mới nhất
+
+    const productCodeToIdMap = {};
+
+    for (let item of sanPhamSheet) {
+      const existingProduct = currentProducts.find(p => p.code === item["Mã SP"]);
+
+      if (existingProduct) {
+        productCodeToIdMap[item["Mã SP"]] = existingProduct._id;
+      } else {
+        const payload = {
+          name: item["Tên SP"],
+          description: item["Mô tả"],
+          brand: item["Thương hiệu"],
+          category: item["Danh mục"],
+          tags: item["Tags"],
+          code: item["Mã SP"],
+          features: ["color", "size"],
+          variants: [
+            {
+              attributes: {
+                color: { name: item["Màu"], desc: item["Ảnh"] },
+                size: { name: item["Kích thước"] },
+              },
+            },
+          ],
+          images: [item["Ảnh"]],
+        };
+
+        const result = await dispatch(createProducts(payload));
+        const newId = result?.payload?._id;
+        if (newId) productCodeToIdMap[item["Mã SP"]] = newId;
+      }
+    }
+
+    // Gọi lại getProducts để lấy cả sản phẩm mới tạo (nếu có)
+    await dispatch(getProducts());
+    const allProducts = store.getState().product.products;
+
+    for (let wh of khoHangSheet) {
+      const productId = productCodeToIdMap[wh["Mã SP"]] ||
+        allProducts.find(p => p.code === wh["Mã SP"])?._id;
+
+      if (!productId) {
+        console.warn("Không tìm thấy productId cho", wh["Mã SP"]);
+        continue;
+      }
+
+      const warehousePayload = {
+        productId,
+        variants: [
+          {
+            color: wh["Màu"],
+            size: wh["Kích thước"],
+            quantity: Number(wh["Số lượng"]),
+            importPrice: Number(wh["Giá nhập"]),
+            exportPrice: Number(wh["Lợi nhuận (%)"]),
+            discount: Number(wh["Giảm giá (%)"]),
+          },
+        ],
+      };
+
+      await dispatch(inventoryProduct(warehousePayload));
+    }
+
+    message.success("Import sản phẩm & kho hàng thành công!");
+  };
+
+  reader.readAsArrayBuffer(file);
+};
+
+
+
 
   return (
     <div>
       <div className="bg-white rounded shadow-sm mb-4">
         <div className="d-flex justify-content-between align-items-center mx-4 py-3">
-          
               <div>
                 <h3 className="m-0">Nhập thêm hàng</h3>
                 <div className="text-muted mt-1" style={{ fontSize: "14px" }}>
@@ -509,7 +596,20 @@ const AddWareHouse = () => {
         </div>
       </div>
 
-      <div style={{ display: "flex", justifyContent: "end", marginBottom: 16 }}>
+      
+
+      <div style={{ display: "flex", justifyContent: "end", gap: 10, marginBottom: 16 }}>
+        <Upload
+        accept=".xlsx, .xls"
+        showUploadList={false}
+        beforeUpload={(file) => {
+          handleImportExcel(file);
+          return false;
+        }}
+      >
+        <Button icon={<UploadOutlined />}>Import từ Excel</Button>
+      </Upload>
+
         <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
           Thêm mới
         </Button>
@@ -528,14 +628,18 @@ const AddWareHouse = () => {
 
       <Table
         columns={selectedColumns}
+        
         dataSource={selectedProductsWithWarehouseData}
         rowKey="_id"
         expandable={{ expandedRowRender }}
         pagination={{
           pageSize,
           showSizeChanger: false,
-          showTotal: (total, range) => `${range[0]}-${range[1]} trong tổng số ${total} danh mục nhập hàng`,
-        }}
+          showTotal: (total, range) => (
+            <span style={{ color: "white" }}>
+              {range[0]}-{range[1]} trong tổng số {total} danh mục sản phẩm
+            </span>
+          )        }}
       />
     </div>
   );

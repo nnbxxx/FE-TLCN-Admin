@@ -124,7 +124,7 @@ const AddBlog = () => {
 
   return (
     <div>
-      <h3 className="mb-4 title">
+      <h3 className="mb-4 title text-white">
         {getBlogId !== undefined ? "Sửa" : "Thêm"} bài viết
       </h3>
       <div className="">

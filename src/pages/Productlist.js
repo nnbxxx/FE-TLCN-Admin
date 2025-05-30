@@ -345,7 +345,7 @@ const Productlist = () => {
       >
         {/* Phần "Hiển thị" nằm bên trái */}
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{ marginRight: 8 }}>Hiển thị:</span>
+          <span style={{ marginRight: 8, color:"white" }}>Hiển thị:</span>
           <Select
             defaultValue={10}
             style={{ width: 60 }}
@@ -392,7 +392,8 @@ const Productlist = () => {
           marginBottom: 16,
         }}
       >
-        <span>Chức năng:</span>
+        <span style={{ color: "white" }}>Chức năng:</span>
+
 
         {selectedRowKeys.length > 0 && (
           <Button
@@ -411,7 +412,7 @@ const Productlist = () => {
       {/* Bảng danh sách sản phẩm */}
       <Table
         className="compact-table"
-        style={{ border: "1px solid #d9d9d9", borderRadius: 4 }}
+        style={{  borderRadius: 4 }}
         rowSelection={rowSelection}
         columns={columns}
         dataSource={filteredProducts || []}
@@ -419,8 +420,12 @@ const Productlist = () => {
         pagination={{
           pageSize,
           showSizeChanger: false,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} trong tổng số ${total} sản phẩm`,
+          showTotal: (total, range) => (
+            <span style={{ color: "white" }}>
+              {range[0]}-{range[1]} trong tổng số {total} sản phẩm
+            </span>
+          )
+            
         }}
         onRow={(record) => ({
           onClick: () => {

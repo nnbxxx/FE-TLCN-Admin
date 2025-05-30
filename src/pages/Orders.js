@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Input, Select, Table } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { getOrders, updateAOrder } from "../features/auth/authSlice";
+import { confirmPayments, getOrders, updateAOrder } from "../features/auth/authSlice";
 import { FaSyncAlt } from "react-icons/fa";
 import moment from "moment/moment";
 const { Search } = Input;
@@ -143,6 +143,10 @@ const Orders = () => {
         statusSupplier: status,
       })
     );
+
+    if (status === "DELIVERED") {
+    dispatch(confirmPayments({ id: orderId }));
+  }
   };
 
  const oders = useSelector((state) => state.auth?.orders);
@@ -196,7 +200,7 @@ const Orders = () => {
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
               {/* Phần "Hiển thị" nằm bên trái */}
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span style={{ marginRight: 8 }}>Hiển thị:</span>
+                <span style={{ marginRight: 8, color: "white" }}>Hiển thị:</span>
                 <Select
                         defaultValue={10}
                         style={{ width: 60 }}
@@ -235,13 +239,19 @@ const Orders = () => {
 
       <div>{
         <Table columns={columns} 
+        className="compact-table"
           // dataSource={sortedOrders} 
           dataSource={(filteredoder || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))}
           rowKey={(record) => record._id || record.key}
           pagination={{
           pageSize,
           showSizeChanger: false,
-          showTotal: (total, range) => `${range[0]}-${range[1]} trong tổng số ${total} đơn hàng`,
+          showTotal: (total, range) => (
+            <span style={{ color: "white" }}>
+              {range[0]}-{range[1]} trong tổng số {total} đơn hàng
+            </span>
+          )
+
         }}
 
       />}</div>

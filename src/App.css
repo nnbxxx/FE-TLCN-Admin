@@ -73,3 +73,88 @@
 .ant-menu-dark .ant-menu-item {
   transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out !important;
 }
+
+
+/* Ẩn thanh cuộn trên tất cả trình duyệt phổ biến */
+.hide-scrollbar {
+  scrollbar-width: none;           /* Firefox */
+  -ms-overflow-style: none;        /* Internet Explorer 10+ */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;                   /* Chrome, Safari, Opera */
+}
+
+
+
+.custom-admin-menu {
+  background: transparent; /* Để nền từ Sider hiển thị */
+  color: white;
+}
+
+/* .custom-admin-menu .ant-menu-item {
+  background-color: transparent !important;
+  color: white !important;
+  transition: all 0.3s;
+} */
+
+/* .custom-admin-menu .ant-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffd700 !important; 
+} */
+
+/* .custom-admin-menu .ant-menu-item-selected {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: #00ffd5 !important; 
+} */
+
+/* .custom-admin-menu .ant-menu-submenu-title {
+  color: white !important;
+} */
+
+.custom-admin-menu .ant-menu-submenu-arrow::before,
+.custom-admin-menu .ant-menu-submenu-arrow::after {
+  background-color: white !important;
+}
+
+
+/* Màu mũi tên (icon trong nút prev, next) */
+.compact-table .ant-pagination-prev .ant-pagination-item-link,
+.compact-table .ant-pagination-next .ant-pagination-item-link {
+  color: white !important;
+  border-color: white !important;
+}
+
+/* Màu số trang chưa chọn */
+.compact-table .ant-pagination-item {
+  color: white !important;
+  background-color: transparent !important; /* hoặc màu nền bạn muốn */
+  border-color: transparent !important;
+}
+
+/* Màu số trang đang chọn */
+.compact-table .ant-pagination-item-active {
+  background-color: #059200 !important; /* màu xanh dương AntD mặc định */
+  border-color: #059200 !important;
+  color: white !important;
+}
+
+/* Rút gọn chiều cao & chiều rộng cell */
+.compact-table .ant-table-thead > tr > th,
+.compact-table .ant-table-tbody > tr > td {
+  padding: 6px 10px !important; /* giảm cả chiều cao và chiều rộng */
+  font-size: 13px !important;   /* chữ nhỏ hơn một chút */
+  line-height: 1.2;             /* giảm chiều cao dòng */
+  white-space: nowrap;          /* không cho text xuống dòng */
+}
+
+/* Giảm kích thước biểu tượng trong cột hành động */
+.compact-table .anticon {
+  font-size: 16px !important;
+}
+
+.compact-table .ant-table-tbody > tr:hover > td {
+  background-color: #f0f0f0 !important;
+}
+
+

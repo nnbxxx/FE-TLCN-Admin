@@ -82,6 +82,34 @@ const Addproduct = () => {
       dispatch(resetState());
     }
   }, [getProductId]);
+
+  useEffect(() => {
+  if (getProductId && productName) {
+    formik.setValues({
+      title: productName || "",
+      description: productDesc || "",
+      brand: productBrand || "",
+      category: productCategory || "",
+      tags: productTag || "",
+      code: productCode || "",
+      images: productImages || [],
+      features: productFeatures || [],
+      variants: productVariants || [],
+    });
+  }
+}, [
+  getProductId,
+  productName,
+  productDesc,
+  productBrand,
+  productCategory,
+  productTag,
+  productCode,
+  productImages,
+  productFeatures,
+  productVariants,
+]);
+
   useEffect(() => {
     if (isSuccess && createdProduct) {
       toast.success("Product Added Successfullly!");
@@ -280,11 +308,17 @@ const Addproduct = () => {
       [""]
     );
 
-    setVariants(
-      combinations
-        .filter((item) => item !== "")
-        .map((variant, index) => ({ name: variant }))
-    );
+    const newVariants = combinations
+    .filter((item) => item !== "")
+    .map((variantName) => {
+      const existingVariant = variants.find((v) => v.name === variantName);
+      return existingVariant
+        ? { ...existingVariant }
+        : { name: variantName, id: Date.now() + Math.random() };
+    });
+
+setVariants(newVariants);
+
   };
 
   const selectedAttributes = attributes.map((attr) => attr.name);
@@ -456,7 +490,7 @@ const Addproduct = () => {
           <div className="bg-white rounded shadow-sm mb-4">
             <div className="d-flex justify-content-between align-items-center mx-4 py-3">
               <div>
-                <h3 className="m-0">
+                <h3 className="m-0 text-black">
                   {getProductId !== undefined ? "Sửa" : "Thêm"} sản phẩm
                 </h3>
                 <div className="text-muted mt-1" style={{ fontSize: "14px" }}>
@@ -478,7 +512,7 @@ const Addproduct = () => {
           onSubmit={formik.handleSubmit}
           className="d-flex flex-column"
         >
-          <label htmlFor="name" className="form-label fw-semibold mb-0">
+          <label htmlFor="name" className="form-label fw-semibold mb-0 text-white">
             Mã sản phẩm <span className="text-danger">*</span>
           </label>
           <CustomInput
@@ -488,12 +522,13 @@ const Addproduct = () => {
             onChng={formik.handleChange("code")}
             onBlr={formik.handleBlur("code")}
             val={formik.values.code}
+            style={{ color: "#6b7280" }}
           />
           <div className="error">
             {formik.touched.code && formik.errors.code}
           </div>
 
-          <label htmlFor="name" className="form-label fw-semibold mb-0 mt-3">
+          <label htmlFor="name" className="form-label fw-semibold mb-0 mt-3 text-white">
             Tiêu đề sản phẩm <span className="text-danger">*</span>
           </label>
           <CustomInput
@@ -503,11 +538,12 @@ const Addproduct = () => {
             onChng={formik.handleChange("title")}
             onBlr={formik.handleBlur("title")}
             val={formik.values.title}
+            style={{ color: "#6b7280" }}
           />
           <div className="error">
             {formik.touched.title && formik.errors.title}
           </div>
-          <label htmlFor="name" className="form-label fw-semibold mb-2 mt-3">
+          <label htmlFor="name" className="form-label fw-semibold mb-2 mt-3 text-white">
             Mô tả <span className="text-danger">*</span>
           </label>
           <div className="">
@@ -521,7 +557,7 @@ const Addproduct = () => {
           <div className="error">
             {formik.touched.description && formik.errors.description}
           </div>
-          <label htmlFor="name" className="form-label fw-semibold mb-2 mt-3">
+          <label htmlFor="name" className="form-label fw-semibold mb-2 mt-3 text-white">
             Thương hiệu <span className="text-danger">*</span>
           </label>
           <select
@@ -545,7 +581,7 @@ const Addproduct = () => {
             {formik.touched.brand && formik.errors.brand}
           </div>
 
-          <label htmlFor="name" className="form-label fw-semibold mb-2 mt-2">
+          <label htmlFor="name" className="form-label fw-semibold mb-2 mt-2 text-white">
             Danh mục sản phẩm<span className="text-danger">*</span>
           </label>
           <select
@@ -569,7 +605,7 @@ const Addproduct = () => {
             {formik.touched.category && formik.errors.category}
           </div>
 
-          <label htmlFor="name" className="form-label fw-semibold mb-2 mt-2">
+          <label htmlFor="name" className="form-label fw-semibold mb-2 mt-2 text-white">
             Danh mục <span className="text-danger">*</span>
           </label>
           <select
@@ -698,7 +734,7 @@ const Addproduct = () => {
           </div>
 
           <div className="p-4 border rounded shadow bg-white">
-            <h5 className="fw-semibold fs-5 mb-3">Thuộc tính sản phẩm</h5>
+            <h5 className="fw-semibold fs-5 mb-3 text-black">Thuộc tính sản phẩm</h5>
             <button
               className="btn btn-outline-primary mb-3"
               onClick={() => setIsModalVisible(true)}
@@ -758,7 +794,7 @@ const Addproduct = () => {
                         </Button>
                       )}
                     </div>
-                    <div className="mt-2">
+                    <div className="mt-2 text-black">
                       {attribute.values.split("\n").map((color, index) => (
                         <div
                           key={index}
@@ -844,7 +880,7 @@ const Addproduct = () => {
               />
             </Modal>
 
-            <h2 className="fw-semibold fs-5 mt-4 mb-3">
+            <h2 className="fw-semibold fs-5 mt-4 mb-3 text-black">
               Danh sách hàng hóa cùng loại
             </h2>
             <table className="table table-bordered text-start">

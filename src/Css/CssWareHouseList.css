@@ -1,0 +1,4 @@
+.compact-table .ant-table-cell {
+  padding: 8px 12px; /* Giảm padding */
+  font-size: 13px;   /* Nhỏ gọn chữ hơn */
+}

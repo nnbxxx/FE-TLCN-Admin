@@ -244,7 +244,7 @@ const HistoryDelivery = () => {
 
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{ marginRight: 8 }}>Hiển thị:</span>
+          <span style={{ marginRight: 8, color: "white" }}>Hiển thị:</span>
           <Select defaultValue={10} style={{ width: 60 }} onChange={(value) => setPageSize(value)}>
             <Option value={5}>5</Option>
             <Option value={10}>10</Option>
@@ -277,14 +277,19 @@ const HistoryDelivery = () => {
       </div>
 
       <Table
+        className="compact-table"
         columns={columns}
         dataSource={filteredOrders || []}
         rowKey={(record) => record._id || record.key}
         pagination={{
           pageSize,
           showSizeChanger: false,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} trong tổng số ${total} đơn hàng`,
+         showTotal: (total, range) => (
+            <span style={{ color: "white" }}>
+              {range[0]}-{range[1]} trong tổng số {total} đơn hàng
+            </span>
+          )
+
         }}
       />
     </div>

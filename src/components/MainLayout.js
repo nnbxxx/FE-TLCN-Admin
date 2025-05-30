@@ -46,11 +46,14 @@ const MainLayout = () => {
   };
   return (
     <Layout>
-      <Sider trigger={null} collapsible collapsed={collapsed}>
+      <Sider trigger={null} collapsible collapsed={collapsed} 
+      style={{
+        background: 'radial-gradient(circle, rgba(0,82,72,1) 0%, rgba(0,46,41,1) 66%, rgba(0,0,0,1) 100%)',
+      }}>
        <div
         className="logo"
         style={{
-          backgroundColor: "rgb(0, 21, 41)", // Màu nền logo
+        background: 'radial-gradient(circle, rgba(0,82,72,1) 0%, rgba(0,46,41,1) 66%, rgba(0,0,0,1) 100%)',
           padding: "10px 0",
           display: "flex",
           justifyContent: "center",
@@ -75,6 +78,7 @@ const MainLayout = () => {
         <Menu
           theme="dark"
           mode="inline"
+          className="custom-admin-menu"
           defaultSelectedKeys={[""]}
           onClick={({ key }) => {
             if (key === "signout") {
@@ -183,11 +187,7 @@ const MainLayout = () => {
               icon: <RiCouponLine className="fs-4" />,
               label: "Marketing",
               children: [
-                {
-                  key: "voucher-list",
-                  icon: <RiCoupon3Line  className="fs-4" />,
-                  label: "Giảm giá sản phẩm",
-                },
+                
                 {
                   key: "coupon",
                   icon: <ImBlog className="fs-4" />,
@@ -280,11 +280,12 @@ const MainLayout = () => {
         </Header>
         <Content
           style={{
-            margin: "24px 16px",
-            padding: 24,
+            // margin: "24px 16px",
+            padding: 40,
             minHeight: 280,
-            background: colorBgContainer,
-          }}
+            background: "radial-gradient(circle, rgba(0,82,72,1) 0%, rgba(0,46,41,1) 66%, rgba(0,0,0,1) 100%)",
+           backgroundClip: "padding-box",
+             }}
         >
           <ToastContainer
             position="top-right"

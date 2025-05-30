@@ -82,6 +82,18 @@ export const getYearlyData = createAsyncThunk(
   }
 );
 
+export const confirmPayments = createAsyncThunk(
+  "product/create-products",
+  async (data, thunkAPI) => {
+    const re = await authService.confirmPayment(data);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
+    }
+  }
+);
+
 export const authSlice = createSlice({
   name: "auth",
   initialState: initialState,
@@ -121,6 +133,21 @@ export const authSlice = createSlice({
         if (state.isError === true) {
           toast.error(action.payload.message);
         }
+      })
+      .addCase(confirmPayments.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(confirmPayments.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.createdProduct = action.payload;
+      })
+      .addCase(confirmPayments.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.error;
       })
       .addCase(getOrders.pending, (state) => {
         state.isLoading = true;

@@ -81,7 +81,7 @@ const Addbrand = () => {
 
   return (
     <div>
-      <h3 className="mb-4 title">
+      <h3 className="mb-4 title text-white">
         {getBrandId !== undefined ? "Sửa" : "Thêm"} thương hiệu
       </h3>
       <div>

@@ -39,6 +39,12 @@ const getYearlyStats = async (data) => {
   return response;
 };
 
+const confirmPayment = async (data) => {
+  const response = await instance.post(`receipts/confirmPayment`, data);
+
+  return response;
+};
+
 const authService = {
   login,
   getOrders,
@@ -46,6 +52,7 @@ const authService = {
   updateOrder,
   getMonthlyOrders,
   getYearlyStats,
+  confirmPayment,
 };
 
 export default authService;

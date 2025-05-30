@@ -103,10 +103,10 @@ const getFilterLabel = (filter) => {
   return (
     <div style={{ padding: 24 }}>
       <PageHeader
-        title="Quản lý kho hàng"
+        title={<span style={{ color: "white" }}>Quản lý kho hàng</span>}
         extra={[
           <Space key="filter">
-            <span>Lọc theo:</span>
+            <span style={{ color: "white" }}>Lọc theo:</span>
             <Select value={filter} onChange={setFilter} style={{ width: 120 }}>
               <Option value="week">Tuần</Option>
               <Option value="month">Tháng</Option>

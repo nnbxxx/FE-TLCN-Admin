@@ -11,7 +11,7 @@ import { getProducts } from "../features/product/productSlice";
 import { Row, Col, Card, Statistic } from "antd";
 import { DollarOutlined, ShopOutlined, InboxOutlined } from "@ant-design/icons";
 import { HiArrowTrendingDown, HiArrowTrendingUp } from "react-icons/hi2";
-
+import "../Css/CssWareHouseList.css"
 
 const { Search } = Input;
 const { Option } = Select;
@@ -76,42 +76,88 @@ const WareHouseList = () => {
       title: "ID sản phẩm",
       dataIndex: "productId",
       key: "productId",
+      width: 120,
+      ellipsis: {
+        showTitle: true,
+      },
     },
-    {
+
+   {
       title: "Tên sản phẩm",
       dataIndex: "productName",
       key: "productName",
+      width: 250,
       render: (text, record) => (
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           {record.productImage && (
-            <img src={record.productImage} alt="product" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 4 }} />
+            <img
+              src={record.productImage}
+              alt="product"
+              style={{ width: 40, height: 40, objectFit: "cover", borderRadius: 4 }}
+            />
           )}
-          <span>{text}</span>
+          <span
+            title={text} // Tooltip hiện full tên khi hover
+            style={{
+              maxWidth: 160,         // Giới hạn chiều rộng phần tên
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "inline-block",
+            }}
+          >
+            {text}
+          </span>
         </div>
-      )
+      ),
     },
     
     {
       title: "Người tạo",
       dataIndex: "email",
       key: "email",
+      width: 150,
     },
     {
       title: "Tổng tồn kho",
       dataIndex: "totalQuantity",
       key: "totalQuantity",
+       width: 100,
     },
     {
       title: "Thời gian",
       dataIndex: "date",
       key: "date",
+      width: 150,
     },
     {
       title: "Hành động",
       dataIndex: "action",
       key: "action",
-      render: (text) => text === "import" ? "Nhập hàng" : text
-    },
+      width: 120,
+      render: (text) => {
+        const action = text?.toLowerCase(); // chuyển về chữ thường để so sánh
+        const isImport = action === "import";
+
+        const styles = {
+          padding: "4px 8px",
+          borderRadius: "8px",
+          fontWeight: "500",
+          fontSize: "13px",
+          display: "inline-block",
+          color: isImport ? "#389e0d" : "#d46b08",                // xanh lá / cam
+          backgroundColor: isImport ? "#f6ffed" : "#fff7e6",     // nền nhạt
+          border: `1px solid ${isImport ? "#b7eb8f" : "#ffd591"}` // viền
+        };
+
+        return (
+          <span style={styles}>
+            {isImport ? "Nhập hàng" : "Xuất hàng"}
+          </span>
+        );
+      },
+    }
+
   ];
 
   
@@ -270,7 +316,7 @@ const getFilterLabel = (type) => {
 
             <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
               
-            <span style={{ marginRight: 8, lineHeight: "32px" }}>Lọc theo:</span>
+            <span style={{ marginRight: 8, lineHeight: "32px", color: "white"}}>Lọc theo:</span>
             <Select
                 defaultValue="all"
                 value={filterType}
@@ -397,7 +443,7 @@ const getFilterLabel = (type) => {
 
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span>Hiển thị:</span>
+          <span style={{ color: "white" }} >Hiển thị:</span>
           <Select defaultValue={10} style={{ width: 70 }} onChange={(value) => setPageSize(value)}>
             <Option value={5}>5</Option>
             <Option value={10}>10</Option>
@@ -415,14 +461,20 @@ const getFilterLabel = (type) => {
       </div>
 
       <Table
+        className="compact-table"
         columns={columns}
         dataSource={filteredData}
         rowKey={(record) => record.key}
+        scroll={{ x: "max-content" }}
         pagination={{
           pageSize,
           showSizeChanger: false,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} trong tổng số ${total} bản ghi`,
+          showTotal: (total, range) => (
+            <span style={{ color: "white" }}>
+              {range[0]}-{range[1]} trong tổng số {total} lịch sử
+            </span>
+          )
+
         }}
         expandable={{
          expandedRowRender: (record) => (

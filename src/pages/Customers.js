@@ -236,7 +236,7 @@ const Customers = () => {
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
         {/* Phần "Hiển thị" nằm bên trái */}
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{ marginRight: 8 }}>Hiển thị:</span>
+          <span style={{ marginRight: 8, color: "white" }}>Hiển thị:</span>
           <Select
                   defaultValue={10}
                   style={{ width: 60 }}
@@ -277,7 +277,7 @@ const Customers = () => {
       <div>
         <Table
           className="compact-table"
-          style={{ border: "1px solid #d9d9d9", borderRadius: 4 }}
+          style={{  borderRadius: 4,  color: "white", }}
           columns={columns(handleEditUser, handleBlockUser, handleUnblockUser)}
           // dataSource={data1}
           dataSource={filteredUser || []}
@@ -285,7 +285,11 @@ const Customers = () => {
           pagination={{
           pageSize,
           showSizeChanger: false,
-          showTotal: (total, range) => `${range[0]}-${range[1]} trong tổng số ${total} người dùng`,
+          showTotal: (total, range) => (
+            <span style={{ color: "white" }}>
+              {range[0]}-{range[1]} trong tổng số {total} người dùng
+            </span>
+          )
         }}
         />
       </div>

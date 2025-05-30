@@ -54,7 +54,7 @@ const Brandlist = () => {
       render: (index, item) => {
         return (
           <>
-            <Link to={`/admin/brand/${item._id}`} className=" fs-3 text-danger">
+            <Link to={`/admin/brand/${item._id}`} className=" fs-3 text-success">
               <BiEdit />
             </Link>
             <button
@@ -124,7 +124,7 @@ const Brandlist = () => {
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
         {/* Phần "Hiển thị" nằm bên trái */}
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{ marginRight: 8 }}>Hiển thị:</span>
+          <span style={{ marginRight: 8, color: "white" }}>Hiển thị:</span>
           <Select
                   defaultValue={10}
                   style={{ width: 60 }}
@@ -152,12 +152,17 @@ const Brandlist = () => {
 
       <div>
         <Table columns={columns}
+        className="compact-table"
          dataSource={filteredbrand || []}
          rowKey={(record) => record._id || record.key}
           pagination={{
           pageSize,
           showSizeChanger: false,
-          showTotal: (total, range) => `${range[0]}-${range[1]} trong tổng số ${total} thương hiệu`,
+          showTotal: (total, range) => (
+            <span style={{ color: "white" }}>
+              {range[0]}-{range[1]} trong tổng số {total} thương hiệu
+            </span>
+          )
         }}
         />
       </div>

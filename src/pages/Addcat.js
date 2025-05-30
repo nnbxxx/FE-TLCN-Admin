@@ -79,7 +79,7 @@ const Addcat = () => {
   });
   return (
     <div>
-      <h3 className="mb-4  title">
+      <h3 className="mb-4  title text-white">
         {getPCatId !== undefined ? "Sửa" : "Thêm"} danh mục sản phẩm
       </h3>
       <div>
