@@ -1,5 +1,6 @@
 import { SendOutlined } from '@ant-design/icons';
 import {
+  Avatar,
   Button,
   Divider,
   Input,
@@ -24,6 +25,7 @@ const Messages = () => {
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [chatRooms, setChatRooms] = useState([]);
+  console.log(chatRooms);
   const [selectedChatRoom, setSelectedChatRoom] = useState(null);
   const [message, setMessage] = useState('');
 
@@ -35,7 +37,6 @@ const Messages = () => {
       return;
     }
 
-    // fetch chat rooms
     const fetchChatRooms = async () => {
       const chatRoomsRes = await MessageService.getAllChatRooms();
       if (chatRoomsRes.error) {
@@ -51,7 +52,7 @@ const Messages = () => {
       process.env.REACT_APP_SOCKET_URL || 'http://localhost:3006',
       {
         extraHeaders: {
-          Authorization: `Bearer ${token}`, // Send token in the Authorization header
+          Authorization: `Bearer ${token}`,
         },
       },
     );
@@ -67,7 +68,7 @@ const Messages = () => {
     });
 
     return () => {
-      newSocket.disconnect(); // Disconnect the socket on unmount
+      newSocket.disconnect();
     };
   }, [token]);
 
@@ -132,13 +133,8 @@ const Messages = () => {
       messageType: 'text',
       fileUrl: [],
     });
-    setMessage(''); // Clear the input field
+    setMessage('');
   }, [message, selectedChatRoom]);
-
-  const handleUploadFile = () => {
-    console.log('Upload file clicked!');
-    // Implement file upload functionality here
-  };
 
   const renderMessages = () => {
     if (!selectedChatRoom) {
@@ -159,59 +155,53 @@ const Messages = () => {
               isCurrentUser={isCurrentUser}
               isSystem={isSystem}
             >
-              <MessageBubble isCurrentUser={isCurrentUser} isSystem={isSystem}>
-                <MessageSender>
-                  <p className="my-1">
-                    <strong>
-                      {isSystem
-                        ? 'Hệ thống'
-                        : isCurrentUser
-                        ? 'Bạn'
-                        : msg.sender?.name}
-                    </strong>
-                  </p>
-                  <p className="my-1 ms-2">
-                    {formatMessageTime(msg.createdAt)}
-                  </p>
-                </MessageSender>
-                {msg.messageType === 'file' && (
-                  <a
-                    href={msg.fileUrl[0]}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ display: 'block' }} // Make the link fill the container
-                    className="mb-3"
-                  >
-                    <img
-                      src={msg.fileUrl}
-                      style={{
-                        maxWidth: '200px',
-                        height: 'auto',
-                        borderRadius: '5px',
-                      }}
-                    />
-                  </a>
-                )}
-                {msg.messageType === 'text' && (
-                  <MessageText isSystem={isSystem}>{msg.content}</MessageText>
-                )}
-              </MessageBubble>
+              <Tooltip
+                placement={isCurrentUser ? 'left' : 'right'}
+                title={formatMessageTime(msg.createdAt)}
+              >
+                <MessageBubble
+                  isCurrentUser={isCurrentUser}
+                  isSystem={isSystem}
+                >
+                  {msg.messageType === 'file' && (
+                    <a
+                      href={msg.fileUrl[0]}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ display: 'block' }}
+                      className="mb-3"
+                    >
+                      <img
+                        src={msg.fileUrl}
+                        style={{
+                          maxWidth: '200px',
+                          height: 'auto',
+                          borderRadius: '5px',
+                        }}
+                      />
+                    </a>
+                  )}
+
+                  {msg.messageType === 'text' && (
+                    <MessageText isSystem={isSystem}>{msg.content}</MessageText>
+                  )}
+                </MessageBubble>
+              </Tooltip>
             </MessageWrapper>
           );
         })}
-        <div ref={messagesEndRef} /> {/* This is where the scroll will land */}
+        <div ref={messagesEndRef} />
       </MessagesContainer>
     );
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ flex: 1, height: '100%', minHeight: 'unset', padding: 0 }}>
       <StyledSider
-        // width={400}
         style={{
           background: '#fff',
           padding: '10px',
-          boxShadow: '2px 0px 15px rgba(0,0,0,0.1)',
+          boxShadow: '2px 0px 15px rgba(0,0,0,0.2)',
           overflowY: 'auto',
         }}
       >
@@ -229,56 +219,72 @@ const Messages = () => {
                 transition: 'background 0.3s',
               }}
               onClick={() => handleSelectChatRoom(chatRoom)}
-              hoverable
             >
               <List.Item.Meta
+                avatar={
+                  <Avatar
+                    style={{
+                      backgroundColor: '#1677ff',
+                      verticalAlign: 'middle',
+                    }}
+                  >
+                    {chatRoom.roomName?.charAt(0).toUpperCase() || '?'}
+                  </Avatar>
+                }
                 title={chatRoom.roomName}
                 description={chatRoom.lastMessage?.content || ''}
               />
             </List.Item>
           )}
-          style={{ maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}
         />
       </StyledSider>
 
-      <Layout style={{ padding: '0 24px 24px', flex: 1 }}>
+      <Layout style={{ flex: 1, height: '100%', minHeight: 'unset' }}>
         <Content
           style={{
-            padding: 24,
+            paddingLeft: '20px',
             margin: 0,
-            minHeight: 280,
             background: '#fff',
             display: 'flex',
             flexDirection: 'column',
+            padding: 0,
           }}
         >
           {selectedChatRoom ? (
             <>
               <div
                 style={{
-                  marginBottom: '20px',
                   fontSize: '20px',
                   fontWeight: 'bold',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0px 10px 10px 10px',
                 }}
               >
-                {selectedChatRoom.roomName}
+                <Avatar
+                  src={selectedChatRoom.avatarUrl}
+                  style={{ marginRight: 8 }}
+                />
+                <span>{selectedChatRoom.roomName}</span>
               </div>
-              <Divider />
 
+              <Divider style={{ margin: 0 }} />
               {renderMessages()}
-
               <Divider />
 
               <MessageInput>
+                <ActionIcons>
+                  <IconButtonUpload onChange={handleImageUpload} />
+                </ActionIcons>
                 <Input
+                  type="text"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   onPressEnter={handleSendMessage}
                   placeholder="Type a message..."
-                  style={{ width: '70%' }}
+                  style={{ width: '90%', padding: '10px' }}
                 />
                 <ActionIcons>
-                  <IconButtonUpload onChange={handleImageUpload} />
                   <Tooltip title="Send message">
                     <SendButton
                       icon={<SendOutlined />}
@@ -289,7 +295,19 @@ const Messages = () => {
               </MessageInput>
             </>
           ) : (
-            <div>Please select a group to view messages.</div>
+            <div
+              style={{
+                textAlign: 'center',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
+              }}
+            >
+              Please select a group to view messages.
+            </div>
           )}
         </Content>
       </Layout>
@@ -300,19 +318,16 @@ const Messages = () => {
 // Styled Components
 const StyledSider = styled(Sider)`
   width: 400px !important;
-  max-height: calc(100vh - 250px);
-  background: linear-gradient(
-    135deg,
-    #e0f7fa 0%,
-    #c2e9f2 100%
-  ); /* Soft gradient background */
-  padding: 25px;
-  box-shadow: 5px 0px 20px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
-  overflow-y: auto;
-  border-right: 1px solid #b0bec5; /* Subtle right border */
+  height: 100%;
+  background: linear-gradient(135deg, #e0f7fa 0%, #c2e9f2 100%);
+  box-shadow: 5px 0px 20px rgba(0, 0, 0, 0.1);
+  border-right: 1px solid #b0bec5;
+
+  display: flex;
+  flex-direction: column;
 
   .ant-typography-title {
-    color: #263238; /* Darker, more prominent title */
+    color: #263238;
     margin-bottom: 25px;
     font-size: 1.8em;
     font-weight: 600;
@@ -325,17 +340,17 @@ const StyledSider = styled(Sider)`
   .ant-list-item {
     cursor: pointer;
     padding: 18px 22px;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smoother transition */
-    border-radius: 12px; /* More rounded corners */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-radius: 12px;
     margin-bottom: 12px;
-    background-color: #fff; /* White background for list items */
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08); /* Subtle shadow on items */
+    background-color: #fff;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
     border: none;
 
     &:hover {
-      transform: translateY(-2px); /* Slight lift on hover */
-      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.12); /* Enhanced hover shadow */
-      background-color: #f0f4c3; /* Light yellow/green on hover */
+      transform: translateY(-2px);
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.12);
+      background-color: #f0f4c3;
     }
 
     .ant-list-item-meta {
@@ -347,19 +362,19 @@ const StyledSider = styled(Sider)`
     }
 
     .ant-avatar {
-      background-color: #64b5f6 !important; /* Brighter avatar background */
+      background-color: #64b5f6 !important;
       color: #fff !important;
       font-size: 1.2em;
     }
 
     .ant-list-item-meta-title {
-      color: #37474f; /* Darker title in list item */
+      color: #37474f;
       font-weight: 500;
       margin-bottom: 8px;
     }
 
     .ant-list-item-meta-description {
-      color: #546e7a; /* More distinct description text */
+      color: #546e7a;
       font-size: 0.95em;
       overflow: hidden;
       white-space: nowrap;
@@ -368,13 +383,12 @@ const StyledSider = styled(Sider)`
   }
 
   .ant-list-container {
-    max-height: calc(100vh - 170px); /* Adjust max-height */
+    flex: 1;
     overflow-y: auto;
-    padding-right: 5px; /* Add a little space for the scrollbar */
-    scrollbar-width: thin; /* For Firefox */
-    scrollbar-color: #b0bec5 #f5f5f5; /* For Firefox */
+    padding-right: 5px;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(12, 47, 65) #f5f5f5;
 
-    /* For Chrome, Edge, and Safari */
     &::-webkit-scrollbar {
       width: 8px;
     }
@@ -392,9 +406,8 @@ const StyledSider = styled(Sider)`
 `;
 
 const MessagesContainer = styled.div`
-  max-height: calc(100vh - 350px);
+  height: calc(100vh - 260px);
   overflow-y: auto;
-  padding-right: 10px;
 `;
 
 const MessageWrapper = styled.div`
@@ -405,13 +418,13 @@ const MessageWrapper = styled.div`
       : props.isCurrentUser
       ? 'flex-end'
       : 'flex-start'};
-  padding: 10px;
+  padding: 0;
 `;
 
 const MessageBubble = styled.div`
   max-width: 60%;
-  padding: 12px;
-  border-radius: 20px;
+  padding: 10px 20px;
+  border-radius: 10px;
   background-color: ${(props) =>
     props.isSystem ? '#f8f8f8' : props.isCurrentUser ? '#d1f7c4' : '#f0f0f0'};
   border: ${(props) => (props.isSystem ? '1px solid #eee' : '1px solid #ddd')};
@@ -423,28 +436,28 @@ const MessageBubble = styled.div`
   font-style: ${(props) => (props.isSystem ? 'italic' : 'normal')};
 `;
 
-const MessageSender = styled.div`
-  font-size: 12px;
-  color: #888;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
+// const MessageSender = styled.div`
+//   font-size: 12px;
+//   color: #888;
+//   display: flex;
+//   justify-content: space-between;
+//   margin-bottom: 5px;
 
-  span {
-    font-size: 11px;
-  }
-`;
+//   span {
+//     font-size: 11px;
+//   }
+// `;
 
 const MessageText = styled.div`
   font-size: ${(props) => (props.isSystem ? '0.75em' : '1em')};
-  line-height: 1.4;
+  line-height: 1.2;
 `;
 
 const MessageInput = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 5px 10px;
 `;
 
 const ActionIcons = styled.div`
@@ -460,15 +473,6 @@ const SendButton = styled(Button)`
     border-color: #45a049;
   }
   margin-left: 8px;
-`;
-
-const FileUploadButton = styled(Button)`
-  background-color: #f0f0f0;
-  border-color: #d9d9d9;
-  :hover {
-    background-color: #f4f4f4;
-    border-color: #bdbdbd;
-  }
 `;
 
 export default Messages;

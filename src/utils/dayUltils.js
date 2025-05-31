@@ -37,16 +37,14 @@ export function formatMessageTime(datetimeString) {
   };
 
   if (isSameDay(messageDate, today)) {
-    // Show only the time (HH:MM)
     return messageDate.toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit',
     });
   } else {
-    // Show detailed date and time (e.g., May 1, 10:52 AM)
     return (
-      messageDate.toLocaleDateString([], { month: 'short', day: 'numeric' }) +
-      ', ' +
+      // messageDate.toLocaleDateString([], { month: 'short', day: 'numeric' }) +
+      // ', ' +
       messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     );
   }
