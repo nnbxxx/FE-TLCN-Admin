@@ -1,9 +1,9 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import authService from "./authServices";
-import { toast } from "react-toastify";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import authService from './authServices';
+import { toast } from 'react-toastify';
 
-const getUserfromLocalStorage = localStorage.getItem("user")
-  ? JSON.parse(localStorage.getItem("user"))
+const getUserfromLocalStorage = localStorage.getItem('user')
+  ? JSON.parse(localStorage.getItem('user'))
   : null;
 const initialState = {
   user: getUserfromLocalStorage,
@@ -11,22 +11,23 @@ const initialState = {
   isError: false,
   isLoading: false,
   isSuccess: false,
-  message: "",
+  message: '',
 };
 export const login = createAsyncThunk(
-  "auth/login",
+  'auth/login',
   async (userData, thunkAPI) => {
     const re = await authService.login(userData);
+    console.log(re);
     if (re && re.data) {
       return re;
     } else {
       return thunkAPI.rejectWithValue(re);
     }
-  }
+  },
 );
 
 export const getOrders = createAsyncThunk(
-  "order/get-orders",
+  'order/get-orders',
   async (data, thunkAPI) => {
     const re = await authService.getOrders(data);
     if (re && re.data) {
@@ -34,10 +35,10 @@ export const getOrders = createAsyncThunk(
     } else {
       return thunkAPI.rejectWithValue(re);
     }
-  }
+  },
 );
 export const getaOrder = createAsyncThunk(
-  "order/get-order",
+  'order/get-order',
   async (id, thunkAPI) => {
     const re = await authService.getOrder(id);
     if (re && re.data) {
@@ -45,11 +46,11 @@ export const getaOrder = createAsyncThunk(
     } else {
       return thunkAPI.rejectWithValue(re);
     }
-  }
+  },
 );
 
 export const updateAOrder = createAsyncThunk(
-  "order/update-order",
+  'order/update-order',
   async (data, thunkAPI) => {
     const re = await authService.updateOrder(data);
     if (re && re.data) {
@@ -57,33 +58,33 @@ export const updateAOrder = createAsyncThunk(
     } else {
       return thunkAPI.rejectWithValue(re);
     }
-  }
+  },
 );
 
 export const getMonthlyData = createAsyncThunk(
-  "orders/monlthdata",
+  'orders/monlthdata',
   async (data, thunkAPI) => {
     try {
       return await authService.getMonthlyOrders(data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
-  }
+  },
 );
 
 export const getYearlyData = createAsyncThunk(
-  "orders/yearlydata",
+  'orders/yearlydata',
   async (data, thunkAPI) => {
     try {
       return await authService.getYearlyStats(data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
-  }
+  },
 );
 
 export const confirmPayments = createAsyncThunk(
-  "product/create-products",
+  'product/create-products',
   async (data, thunkAPI) => {
     const re = await authService.confirmPayment(data);
     if (re && re.data) {
@@ -91,11 +92,11 @@ export const confirmPayments = createAsyncThunk(
     } else {
       return thunkAPI.rejectWithValue(re);
     }
-  }
+  },
 );
 
 export const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState: initialState,
   reducers: {},
   extraReducers: (buildeer) => {
@@ -107,21 +108,21 @@ export const authSlice = createSlice({
         state.isError = false;
         state.isLoading = false;
 
-        state.message = "success";
-        if (action.payload.data.user.role === "admin") {
+        state.message = 'success';
+        if (action.payload.data.user.role === 'admin') {
           state.isSuccess = true;
           localStorage.setItem(
-            "access_token",
-            action.payload.data.access_token
+            'access_token',
+            action.payload.data.access_token,
           );
           localStorage.setItem(
-            "user",
-            JSON.stringify(action.payload.data.user)
+            'user',
+            JSON.stringify(action.payload.data.user),
           );
           state.user = action.payload.data.user;
-          toast.success("Login Successfully !");
+          toast.success('Login Successfully !');
         } else {
-          toast.error("User không thể đăng nhập");
+          toast.error('User không thể đăng nhập');
           state.isSuccess = false;
         }
       })
@@ -157,7 +158,7 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.orders = action.payload.data.result;
-        state.message = "success";
+        state.message = 'success';
       })
       .addCase(getOrders.rejected, (state, action) => {
         state.isError = true;
@@ -174,7 +175,7 @@ export const authSlice = createSlice({
         state.isSuccess = true;
         state.updateorder = action.payload;
         if (state.isSuccess === true) {
-          toast.success("Order Status Changed");
+          toast.success('Order Status Changed');
         }
       })
       .addCase(updateAOrder.rejected, (state, action) => {
@@ -191,7 +192,7 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.singleorder = action.payload.data;
-        state.message = "success";
+        state.message = 'success';
       })
       .addCase(getaOrder.rejected, (state, action) => {
         state.isError = true;
@@ -207,7 +208,7 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.monthlyData = action.payload;
-        state.message = "success";
+        state.message = 'success';
       })
       .addCase(getMonthlyData.rejected, (state, action) => {
         state.isError = true;
@@ -223,7 +224,7 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.yearlyData = action.payload;
-        state.message = "success";
+        state.message = 'success';
       })
       .addCase(getYearlyData.rejected, (state, action) => {
         state.isError = true;

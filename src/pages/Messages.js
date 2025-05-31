@@ -21,11 +21,19 @@ import { formatMessageTime } from '../utils/dayUltils';
 const { Sider, Content } = Layout;
 const { Title } = Typography;
 
+function moveToFirst(arr, inputId) {
+  const index = arr.findIndex((obj) => obj._id === inputId);
+  if (index > -1) {
+    const [item] = arr.splice(index, 1); // remove the item from current position
+    arr.unshift(item);
+  }
+  return arr;
+}
+
 const Messages = () => {
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [chatRooms, setChatRooms] = useState([]);
-  console.log(chatRooms);
   const [selectedChatRoom, setSelectedChatRoom] = useState(null);
   const [message, setMessage] = useState('');
 
@@ -44,10 +52,10 @@ const Messages = () => {
         return;
       }
 
-      setChatRooms(chatRoomsRes.data.result);
+      const chatRooms = chatRoomsRes.data.result;
+      setChatRooms(chatRooms);
     };
     fetchChatRooms();
-
     const newSocket = io(
       process.env.REACT_APP_SOCKET_URL || 'http://localhost:3006',
       {
@@ -58,11 +66,6 @@ const Messages = () => {
     );
 
     setSocket(newSocket);
-
-    newSocket.on('connect', () => {
-      console.log('Connected to server with token');
-    });
-
     newSocket.on('disconnect', () => {
       console.log('Disconnected from server');
     });
@@ -71,6 +74,34 @@ const Messages = () => {
       newSocket.disconnect();
     };
   }, [token]);
+
+  useEffect(() => {
+    socket?.off();
+
+    socket?.on('new-chat-room', (newChatRoom) => {
+      setChatRooms([newChatRoom, ...chatRooms]);
+    });
+
+    chatRooms.forEach((chatRoom) => {
+      const chatRoomId = chatRoom._id;
+      socket.on(`chat-rooms/${chatRoomId}`, (newMsg) => {
+        console.log('new msg', newMsg);
+        console.log('selectedChatRoomID', selectedChatRoom?._id);
+
+        const newChatRooms = moveToFirst(chatRooms, newMsg.chatRoom);
+        if (selectedChatRoom?._id === newMsg.chatRoom) {
+          setMessages((messages) => [...messages, newMsg]);
+        } else {
+          newChatRooms[0].lastMessage = { ...newMsg, isNew: true };
+        }
+
+        console.log('new chat roms', newChatRooms);
+        setChatRooms([...newChatRooms]);
+      });
+    });
+  }, [chatRooms, selectedChatRoom?._id, socket, token]);
+
+  console.log('chatRoom', selectedChatRoom);
 
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
@@ -115,15 +146,32 @@ const Messages = () => {
 
       setSelectedChatRoom(newChatRoom);
 
-      if (selectedChatRoom) {
-        socket.off(`chat-rooms/${selectedChatRoom._id}`);
+      const index = chatRooms.findIndex((e) => (e._id = newChatRoom._id));
+
+      if (index >= 0 && chatRooms[index].lastMessage?.isNew) {
+        // Create a new lastMessage object with isNew set to false
+        const updatedLastMessage = {
+          ...chatRooms[index].lastMessage,
+          isNew: false,
+        };
+
+        // Create a new chatRoom object with the updated lastMessage
+        const updatedChatRoom = {
+          ...chatRooms[index],
+          lastMessage: updatedLastMessage,
+        };
+
+        // Create a new array with the updated chatRoom at the specific index
+        const newChatRooms = [
+          ...chatRooms.slice(0, index), // Elements before the updated one
+          updatedChatRoom, // The updated chatRoom
+          ...chatRooms.slice(index + 1), // Elements after the updated one
+        ];
+
+        setChatRooms(newChatRooms);
       }
-      socket.on(`chat-rooms/${newChatRoom._id}`, (newMsg) => {
-        console.log('new msg', newMsg);
-        setMessages((messages) => [...messages, newMsg]);
-      });
     },
-    [selectedChatRoom, socket],
+    [chatRooms],
   );
 
   const handleSendMessage = useCallback(async () => {
@@ -217,6 +265,11 @@ const Messages = () => {
                 cursor: 'pointer',
                 padding: '12px',
                 transition: 'background 0.3s',
+                // Apply a different background if this chat room is selected
+                backgroundColor:
+                  selectedChatRoom?._id === chatRoom._id
+                    ? '#e6f7ff'
+                    : 'transparent',
               }}
               onClick={() => handleSelectChatRoom(chatRoom)}
             >
@@ -227,12 +280,21 @@ const Messages = () => {
                       backgroundColor: '#1677ff',
                       verticalAlign: 'middle',
                     }}
+                    src={
+                      chatRoom.members.find((e) => e.role === 'user')?.avatar
+                    }
                   >
                     {chatRoom.roomName?.charAt(0).toUpperCase() || '?'}
                   </Avatar>
                 }
                 title={chatRoom.roomName}
-                description={chatRoom.lastMessage?.content || ''}
+                description={
+                  chatRoom.lastMessage?.isNew === true ? (
+                    <strong>{chatRoom.lastMessage?.content || ''}</strong>
+                  ) : (
+                    chatRoom.lastMessage?.content || ''
+                  )
+                }
               />
             </List.Item>
           )}
@@ -262,7 +324,10 @@ const Messages = () => {
                 }}
               >
                 <Avatar
-                  src={selectedChatRoom.avatarUrl}
+                  src={
+                    selectedChatRoom.members.find((e) => e.role === 'user')
+                      ?.avatar
+                  }
                   style={{ marginRight: 8 }}
                 />
                 <span>{selectedChatRoom.roomName}</span>

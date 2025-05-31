@@ -1,19 +1,19 @@
-import React, { useEffect } from "react";
-import CustomInput from "../components/CustomInput";
-import * as yup from "yup";
-import { useFormik } from "formik";
-import { useDispatch, useSelector } from "react-redux";
-import { login } from "../features/auth/authSlice";
-import logo from "../assets/Logo_Sac.png"; // Adjust the path as needed
-import { ToastContainer } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from 'react';
+import CustomInput from '../components/CustomInput';
+import * as yup from 'yup';
+import { useFormik } from 'formik';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../features/auth/authSlice';
+import logo from '../assets/Logo_Sac.png'; // Adjust the path as needed
+import { ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 let schema = yup.object().shape({
   email: yup
     .string()
-    .email("Email should be valid")
-    .required("Email is Required"),
-  password: yup.string().required("Password is Required"),
+    .email('Email should be valid')
+    .required('Email is Required'),
+  password: yup.string().required('Password is Required'),
 });
 
 const Login = () => {
@@ -21,8 +21,8 @@ const Login = () => {
   const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
     validationSchema: schema,
     onSubmit: (values) => {
@@ -30,17 +30,18 @@ const Login = () => {
         login({
           username: values.email,
           password: values.password,
-        })
+        }),
       );
     },
   });
   const authState = useSelector((state) => state);
+  console.log(authState);
 
   const { user, isError, isSuccess, isLoading, message } = authState.auth;
 
   useEffect(() => {
     if (isSuccess) {
-      window.location.href = "/admin";
+      window.location.href = '/admin';
     }
   }, [user, isError, isSuccess, isLoading]);
 
@@ -68,8 +69,8 @@ const Login = () => {
                 label="email"
                 id="email"
                 name="email"
-                onChng={formik.handleChange("email")}
-                onBlr={formik.handleBlur("email")}
+                onChng={formik.handleChange('email')}
+                onBlr={formik.handleBlur('email')}
                 val={formik.values.email}
               />
               <div style={styles.error}>
@@ -80,8 +81,8 @@ const Login = () => {
                 label="password"
                 id="pass"
                 name="password"
-                onChng={formik.handleChange("password")}
-                onBlr={formik.handleBlur("password")}
+                onChng={formik.handleChange('password')}
+                onBlr={formik.handleBlur('password')}
                 val={formik.values.password}
               />
               <div style={styles.error}>
@@ -104,79 +105,79 @@ const Login = () => {
 
 const styles = {
   container: {
-    display: "flex",
-    minHeight: "100vh",
+    display: 'flex',
+    minHeight: '100vh',
     fontFamily: "'Arial', sans-serif",
   },
   leftPanel: {
     flex: 1,
-    backgroundColor: "#4CA2CD",
-    color: "#fff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#4CA2CD',
+    color: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   leftContent: {
-    textAlign: "center",
+    textAlign: 'center',
   },
   rightPanel: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#F5F5F5',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   loginFormContainer: {
-    width: "80%",
-    maxWidth: "500px",
-    padding: "20px",
-    backgroundColor: "#fff",
-    borderRadius: "8px",
-    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-    textAlign: "center", // Center content
+    width: '80%',
+    maxWidth: '500px',
+    padding: '20px',
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+    textAlign: 'center', // Center content
   },
   logo: {
-    width: "150px", // Adjust the size as needed
-    marginBottom: "20px", // Space between logo and title
+    width: '150px', // Adjust the size as needed
+    marginBottom: '20px', // Space between logo and title
   },
   loginTitle: {
-    fontSize: "24px",
-    marginBottom: "10px",
+    fontSize: '24px',
+    marginBottom: '10px',
   },
   error: {
-    marginTop: "10px",
-    color: "red",
+    marginTop: '10px',
+    color: 'red',
   },
   rememberMe: {
-    display: "flex",
-    alignItems: "center",
-    marginTop: "10px",
-    justifyContent: "center", // Center checkbox and label
+    display: 'flex',
+    alignItems: 'center',
+    marginTop: '10px',
+    justifyContent: 'center', // Center checkbox and label
   },
   loginButton: {
-    width: "100%",
-    backgroundColor: "#4CA2CD",
-    color: "#fff",
-    border: "none",
-    padding: "10px",
-    borderRadius: "4px",
-    fontSize: "16px",
-    cursor: "pointer",
-    transition: "background 0.3s",
+    width: '100%',
+    backgroundColor: '#4CA2CD',
+    color: '#fff',
+    border: 'none',
+    padding: '10px',
+    borderRadius: '4px',
+    fontSize: '16px',
+    cursor: 'pointer',
+    transition: 'background 0.3s',
   },
   registerLink: {
-    textAlign: "center",
-    marginTop: "20px",
+    textAlign: 'center',
+    marginTop: '20px',
   },
   formlabels: {
-    fontSize: "14px",
-    fontWeight: "bold",
-    marginBottom: "-11px",
+    fontSize: '14px',
+    fontWeight: 'bold',
+    marginBottom: '-11px',
   },
 
   required: {
-    color: "red",
-    fontSize: "14px",
+    color: 'red',
+    fontSize: '14px',
   },
 };
 
