@@ -23,10 +23,10 @@ body {
   min-height: 100vh;
 }
 .ant-layout-sider {
-  flex: 0 0 300px !important;
-  max-width: 300px !important;
-  min-width: 300px !important;
-  width: 300px !important;
+  flex: 0 0 250px !important;
+  max-width: 250px !important;
+  min-width: 250px !important;
+  width: 250px !important;
 }
 .ant-layout-sider-collapsed {
   flex: 0 0 80px !important;
