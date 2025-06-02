@@ -20,7 +20,7 @@ body {
   background: rgba(255, 255, 255, 0.3);
 }
 .ant-layout {
-  height: 100vh;
+  min-height: 100vh;
 }
 .ant-layout-sider {
   flex: 0 0 300px !important;
@@ -50,7 +50,7 @@ body {
   height: 64px;
 }
 main {
-  height: calc(100vh - 64px);
+  height: 85vh;
   overflow-y: scroll;
   background-color: transparent !important;
 }
