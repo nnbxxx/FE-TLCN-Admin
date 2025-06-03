@@ -17,6 +17,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { getDashboardInfo, getInfoByTime, postDashboardRevenue } from "../features/dashboard/dashboardSlice";
 import '../App.css';
 import { getOrders } from "../features/auth/authSlice";
+import { getBestSellingProducts } from "../features/warehouse/warehouseSlice";
+import { getAProduct } from "../features/product/productSlice";
 
 
 
@@ -65,6 +67,45 @@ const calculateChange = (from, to) => {
   if (from === 0) return 0;
   return Math.round(((to - from) / from) * 100);
 };
+
+const bestSellingProducts = useSelector(state => state.warehouse.bestSellingProducts);
+
+useEffect(() => {
+  dispatch(getBestSellingProducts());
+}, []);
+const [productNames, setProductNames] = useState({});
+
+const bestSellingProductData = bestSellingProducts.map((item) => ({
+  key: item._id,
+  name: productNames[item.productId] || "Đang tải...",
+  price: item.productVariants?.[0]?.sellPrice || 0,
+  sold: item.totalQuantitySell,
+  remaining: item.totalQuantity,
+}));
+
+
+
+useEffect(() => {
+  const fetchProductNames = async () => {
+    for (const item of bestSellingProducts) {
+      const id = item.productId;
+      if (!productNames[id]) {
+        try {
+          const res = await dispatch(getAProduct(id)).unwrap();
+          const name = res.data?.product?.name || `SP #${item._id.slice(-4)}`;
+          setProductNames((prev) => ({ ...prev, [id]: name }));
+        } catch (error) {
+          console.error("❌ Lỗi lấy tên sản phẩm:", error);
+        }
+      }
+    }
+  };
+
+  if (bestSellingProducts?.length > 0) {
+    fetchProductNames();
+  }
+}, [bestSellingProducts]);
+
 
 const data = dashboards ? {
   totalIncome: {
@@ -512,30 +553,30 @@ const formatCurrencyShort = (value) => {
         }
       ].map((item, index) => (
       <Col xs={24} sm={12} md={12} lg={8} xl={6} key={index}>
-<Card>
-  <Statistic
-    title={
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ fontSize: 13 }}>{item.title}</span>
-        <MiniProgressCircle percent={Math.abs(item.change)} />
-      </div>
-    }
-    value={item.value}
-    prefix={item.icon}
-    valueStyle={{
-      color: item.change >= 0 ? "#3f8600" : "#cf1322",
-      fontSize: 18,
-    }}
-    formatter={(value) =>
-      ["Tổng doanh thu", "Tổng giá trị kho hàng", "Tiền lời ước tính", "Tổng nhập hàng"].includes(item.title)
-        ? formatCurrencyShort(value)
-        : value.toLocaleString("vi-VN", { minimumFractionDigits: 0 })
-    }
-  />
-  <div style={{ fontSize: 12 }}>
-    <ChangeIndicator change={item.change} label={getFilterLabel(filter)} />
-  </div>
-</Card>
+      <Card>
+        <Statistic
+          title={
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: 13 }}>{item.title}</span>
+              <MiniProgressCircle percent={Math.abs(item.change)} />
+            </div>
+          }
+          value={item.value}
+          prefix={item.icon}
+          valueStyle={{
+            color: item.change >= 0 ? "#3f8600" : "#cf1322",
+            fontSize: 18,
+          }}
+          formatter={(value) =>
+            ["Tổng doanh thu", "Tổng giá trị kho hàng", "Tiền lời ước tính", "Tổng nhập hàng"].includes(item.title)
+              ? formatCurrencyShort(value)
+              : value.toLocaleString("vi-VN", { minimumFractionDigits: 0 })
+          }
+        />
+        <div style={{ fontSize: 12 }}>
+          <ChangeIndicator change={item.change} label={getFilterLabel(filter)} />
+        </div>
+      </Card>
 
       </Col>
 
@@ -872,6 +913,7 @@ const formatCurrencyShort = (value) => {
               pagination={false}
               rowKey="_id"
               locale={{ emptyText: "Không có đơn hàng cần xuất kho" }}
+              
             />
           </Card>
 
@@ -880,40 +922,25 @@ const formatCurrencyShort = (value) => {
         <Col xs={24} sm={24} md={24} lg={24} xl={12}>
         <Card title="Sản phẩm bán chạy" extra={<a href="/admin/orders">Xem thêm</a>}>
           <Table
-          columns={[
-               {
-               title: "Tên sản phẩm",
-               dataIndex: "name",
-               key: "name",
-               },
-               {
-               title: "Giá",
-               dataIndex: "price",
-               key: "price",
-               render: (value) =>
-                    value.toLocaleString("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                    }),
-               },
-               {
-               title: "Đã bán",
-               dataIndex: "sold",
-               key: "sold",
-               },
-               {
-               title: "Còn lại",
-               dataIndex: "remaining",
-               key: "remaining",
-               },
-          ]}
-          dataSource={topProducts}
-          pagination={false}
-          rowKey="key"
-          locale={{
-               emptyText: "Không có dữ liệu",
-          }}
+            columns={[
+              { title: "Tên sản phẩm", dataIndex: "name", key: "name" },
+              {
+                title: "Giá",
+                dataIndex: "price",
+                key: "price",
+                render: (value) => value.toLocaleString("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }),
+              },
+              { title: "Đã bán", dataIndex: "sold", key: "sold" },
+              { title: "Còn lại", dataIndex: "remaining", key: "remaining" },
+            ]}
+            dataSource={bestSellingProductData}
+            pagination={false}
+            rowKey="key"
           />
+
      </Card>
 
         </Col>
@@ -926,33 +953,32 @@ const exportOrderColumns = [
   {
     title: "Mã đơn hàng",
     dataIndex: "_id",
+    ellipsis: true,
+    width: 120,
   },
   {
     title: "Ngày tạo",
     dataIndex: "createdAt",
-    render: (text) => new Date(text).toLocaleString(),
+    width: 100,
+    render: (text) => new Date(text).toLocaleString("vi-VN"),
   },
-  {
-    title: "Sản phẩm",
-    dataIndex: "items",
-    render: (items) => {
-      const productName = items?.[0]?.product?.name || "Không rõ";
-      return productName.length > 20 ? productName.slice(0, 20) + "..." : productName;
-    },
-  },
+  
   {
     title: "Số lượng",
     dataIndex: "items",
+    width: 100,
     render: (items) => items?.[0]?.quantity || 0,
   },
   {
     title: "Trạng thái",
     dataIndex: "statusSupplier",
+    width: 120,
     render: (status) => (
-      <span style={{ color: "orange", fontWeight: "bold" }}>{status}</span>
+      <Tag color="orange" style={{ fontWeight: "bold" }}>{status}</Tag>
     ),
   },
 ];
+
 
 
 export default Dashboard;

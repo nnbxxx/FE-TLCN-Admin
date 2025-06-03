@@ -27,10 +27,28 @@ export const getInventoryProducts = createAsyncThunk(
   }
 );
 
+export const getBestSellingProducts = createAsyncThunk(
+  "warehouse/get-best-selling-products",
+  async (thunkAPI) => {
+    const re = await warehouseService.getBestSellingProducts();
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
+    }
+  }
+);
+
+
+
+
+
+
 export const resetState = createAction("Reset_all");
 
 const initialState = {
   warehouses: [],
+  bestSellingProducts: [],
   isError: false,
   isLoading: false,
   isSuccess: false,
@@ -73,6 +91,22 @@ export const warehouseSlice = createSlice({
         state.isSuccess = false;
         state.message = action.error;
       })
+      .addCase(getBestSellingProducts.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getBestSellingProducts.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.bestSellingProducts = action.payload.data.result;
+      })
+      .addCase(getBestSellingProducts.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.error;
+      })
+
     
      
       .addCase(resetState, () => initialState);
