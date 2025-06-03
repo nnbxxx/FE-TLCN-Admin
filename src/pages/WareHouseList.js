@@ -195,7 +195,7 @@ const filterByTime = (data) => {
 const filteredStockHistory = filterByTime(stockHistoryList);
 
 // Tổng số lần nhập hàng
-const totalImports = filteredStockHistory.filter(item => item.action === "import").length;
+const totalImports = filteredStockHistory.filter(item => item.action === "IMPORT").length;
 
 // Tổng số sản phẩm trong kho (cộng dồn số lượng từ các biến thể)
 const totalStock = filteredStockHistory.reduce((sum, item) => {
