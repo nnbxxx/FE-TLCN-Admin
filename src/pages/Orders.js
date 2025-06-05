@@ -136,18 +136,24 @@ const Orders = () => {
     },
   ];
 
-  const updateOrderStatus = (orderId, status) => {
-    dispatch(
+const updateOrderStatus = async (orderId, status) => {
+  try {
+    const result = await dispatch(
       updateAOrder({
         _id: orderId,
         statusSupplier: status,
       })
-    );
+    ).unwrap();
 
+    // Chỉ gọi confirmPayments sau khi update thành công
     if (status === "DELIVERED") {
-    dispatch(confirmPayments({ id: orderId }));
+      await dispatch(confirmPayments({ id: orderId })).unwrap();
+    }
+  } catch (err) {
+    console.error("Lỗi khi cập nhật hoặc xác nhận thanh toán:", err);
   }
-  };
+};
+
 
  const oders = useSelector((state) => state.auth?.orders);
   const latestoders = oders.length > 0 

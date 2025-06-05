@@ -1,48 +1,110 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PageHeader } from "@ant-design/pro-layout";
 import { Row, Col, Select, Card, Statistic, Table, Typography, Space, Tag, Divider,} from "antd";
 import { ShoppingCartOutlined, DollarOutlined, ShopOutlined, HourglassOutlined, TrophyOutlined,} from "@ant-design/icons";
 import { HiArrowTrendingUp, HiArrowTrendingDown } from "react-icons/hi2";
 
+import { useDispatch, useSelector } from "react-redux";
+import { getDashboardInfo, getInfoByTime } from "../features/dashboard/dashboardSlice";
+import { getBestSellingProducts } from "../features/warehouse/warehouseSlice";
+import { getAProduct } from "../features/product/productSlice";
+
+
 const { Option } = Select;
 const { Title } = Typography;
 
 const StockInventory = () => {
-  const [filter, setFilter] = useState("week");
+  const [filter, setFilter] = useState("ngày");
+  const dispatch = useDispatch();
 
-  // Mock dữ liệu
-  const data = {
-    totalIncome: { value: 30000000, change: 12 },
-    totalExpense: { value: 15000000, change: -5 },
-    estimatedProfit: { value: 15000000, change: 18 },
-    totalProductInventory: 520,
-    totalPriceProductInventory: 42000000,
-    waitingToShip: 42,
+useEffect(() => {
+  dispatch(getInfoByTime(filter));
+}, [filter]);
+
+useEffect(() => {
+  dispatch(getDashboardInfo());
+  dispatch(getBestSellingProducts());
+}, []);
+
+const dashboards = useSelector((state) => state.dashboard?.dashboards);
+const dashboardInfo = useSelector((state) => state.dashboard.dashboardInfo?.data);
+const bestSellingProducts = useSelector(state => state.warehouse.bestSellingProducts);
+const orders = useSelector((state) => state.auth?.orders);
+const preparingOrders = orders?.filter(order => order.statusSupplier === "PREPARE");
+const waitingToExportCount = preparingOrders?.reduce((total, order) => {
+  const orderTotal = order.items?.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  return total + orderTotal;
+}, 0);
+
+
+const calculateChange = (from, to) => {
+  if (from === 0 && to > 0) return 100;
+  if (from === 0) return 0;
+  return Math.round(((to - from) / from) * 100);
+};
+
+const data = dashboards ? {
+  totalIncome: {
+    value: dashboards.inforRevenue?.toCount || 0,
+    change: calculateChange(dashboards.inforRevenue?.fromCount, dashboards.inforRevenue?.toCount),
+  },
+  totalExpense: {
+    value: dashboards.inforProductImport?.toCount || 0,
+    change: calculateChange(dashboards.inforProductImport?.fromCount, dashboards.inforProductImport?.toCount),
+  },
+  estimatedProfit: {
+    value:
+      (dashboards.inforRevenue?.toCount || 0) - (dashboards.inforProductImport?.toCount || 0),
+    change: calculateChange(
+      (dashboards.inforRevenue?.fromCount || 0) - (dashboards.inforProductImport?.fromCount || 0),
+      (dashboards.inforRevenue?.toCount || 0) - (dashboards.inforProductImport?.toCount || 0)
+    ),
+  },
+  totalProductInventory: dashboardInfo?.inforInventoryProduct?.totalStock || 0,
+  totalPriceProductInventory: dashboardInfo?.inforInventoryProduct?.totalValue || 0,
+  waitingToShip: waitingToExportCount || 0,
+} : {
+  totalIncome: { value: 0, change: 0 },
+  totalExpense: { value: 0, change: 0 },
+  estimatedProfit: { value: 0, change: 0 },
+  totalProductInventory: 0,
+  totalPriceProductInventory: 0,
+  waitingToShip: 0,
+};
+
+const [productNames, setProductNames] = useState({});
+
+useEffect(() => {
+  const fetchProductNames = async () => {
+    for (const item of bestSellingProducts) {
+      const id = item.productId;
+      if (!productNames[id]) {
+        try {
+          const res = await dispatch(getAProduct(id)).unwrap();
+          const name = res.data?.product?.name || `SP #${item._id.slice(-4)}`;
+          setProductNames((prev) => ({ ...prev, [id]: name }));
+        } catch (error) {
+          console.error("Lỗi lấy tên sản phẩm:", error);
+        }
+      }
+    }
   };
 
-  const topProducts = [
-     {
-       key: 1,
-       name: "Áo sơ mi trắng",
-       price: 250000,
-       sold: 120,
-       remaining: 30,
-     },
-     {
-       key: 2,
-       name: "Quần jeans",
-       price: 320000,
-       sold: 90,
-       remaining: 12,
-     },
-     {
-       key: 3,
-       name: "Váy xòe",
-       price: 450000,
-       sold: 85,
-       remaining: 8,
-     },
-   ];
+  if (bestSellingProducts?.length > 0) {
+    fetchProductNames();
+  }
+}, [bestSellingProducts]);
+
+
+
+const topProducts = bestSellingProducts.map((item) => ({
+  key: item._id,
+  name: productNames[item.productId] || "Đang tải...",
+  price: item.productVariants?.[0]?.sellPrice || 0,
+  sold: item.totalQuantitySell,
+  remaining: item.totalQuantity,
+}));
+
    
 
   const orderColumns = [
@@ -98,7 +160,8 @@ const getFilterLabel = (filter) => {
          return "";
      }
    };
-   
+
+
 
   return (
     <div style={{ padding: 24 }}>
@@ -108,6 +171,7 @@ const getFilterLabel = (filter) => {
           <Space key="filter">
             <span style={{ color: "white" }}>Lọc theo:</span>
             <Select value={filter} onChange={setFilter} style={{ width: 120 }}>
+              <Option value="week">Ngày</Option>
               <Option value="week">Tuần</Option>
               <Option value="month">Tháng</Option>
               <Option value="year">Năm</Option>

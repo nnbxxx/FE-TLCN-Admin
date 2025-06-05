@@ -169,7 +169,7 @@ const Messages = () => {
 
       setSelectedChatRoom(newChatRoom);
 
-      const index = chatRooms.findIndex((e) => (e._id = newChatRoom._id));
+      const index = chatRooms.findIndex((e) => e._id === newChatRoom._id);
 
       if (index >= 0 && chatRooms[index].lastMessage?.isNew) {
         // Create a new lastMessage object with isNew set to false

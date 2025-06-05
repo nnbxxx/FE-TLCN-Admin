@@ -419,6 +419,20 @@ const AddWareHouse = () => {
           />
         ),
       },
+       {
+    title: "Giá tạm tính",
+    dataIndex: "tempPrice",
+    width: 150,
+    render: (_, variant) => {
+      const importPrice = Number(variant.importPrice || 0);
+      const exportPercent = Number(variant.exportPrice || 0);
+      const discountPercent = Number(variant.discount || 0);
+
+      const tempPrice = importPrice * (1 + exportPercent / 100) * (1 - discountPercent / 100);
+
+      return `${Math.round(tempPrice).toLocaleString()} ₫`;
+    },
+  },
     ];
   
     return (

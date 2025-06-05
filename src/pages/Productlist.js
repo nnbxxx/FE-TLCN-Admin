@@ -232,45 +232,55 @@ const Productlist = () => {
 
 
       //-------------------------------Import/Export Excel---------------------
-      const handleExportMongoStyle = () => {
-        const exportData = filteredProducts.map((item) => ({
-          _id: item._id,
-          name: item.name,
-          category: item.category,
-          brand: item.brand,
-          description: item.description,
-          images: item.images,
-          rating: item.rating,
-          tags: item.tags,
-          features: item.features,
-          variants: item.inventory?.productVariants?.map((variant) => ({
-            attributes: {
-              color: variant.attributes?.color
-                ? { name: variant.attributes.color, desc: "" }
-                : undefined,
-              size: variant.attributes?.size
-                ? { name: variant.attributes.size }
-                : undefined,
-            },
-            isDeleted: false,
-            deletedAt: null,
-          })),
-          createdBy: item.createdBy || { _id: "", email: "" },
-          isDeleted: item.isDeleted || false,
-          deletedAt: null,
-          createdAt: new Date(item.createdAt).toISOString(),
-          updatedAt: new Date(item.updatedAt).toISOString(),
-          __v: 0,
-        }));
-      
-        const worksheet = XLSX.utils.json_to_sheet(exportData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "products");
-      
-        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-        const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-        saveAs(data, "mongo_style_export.xlsx");
-      };
+const handleExportMongoStyle = () => {
+  const sanPhamData = [];
+
+  filteredProducts.forEach((product) => {
+    const baseInfo = {
+      "Mã SP": product.code || "",
+      "Tên SP": product.name || "",
+      "Mô tả": product.description || "",
+      "Thương hiệu": product.brand || "",
+      "Danh mục": product.category || "",
+      "Tags": product.tags || "",
+      "Ảnh (đại diện SP)": product.images?.[0] || "",
+    };
+
+    const variants = product.inventory?.productVariants || [];
+
+    if (variants.length === 0) {
+      sanPhamData.push({
+        ...baseInfo,
+        "Màu": "",
+        "Ảnh (của màu)": "",
+        "Kích thước": "",
+      });
+    } else {
+      variants.forEach((variant) => {
+        const colorAttr = variant.attributes?.color;
+        const sizeAttr = variant.attributes?.size;
+
+        sanPhamData.push({
+          ...baseInfo,
+          "Màu": colorAttr?.name || colorAttr || "",
+          "Ảnh (của màu)": colorAttr?.desc || "", // ✅ LẤY ẢNH TỪ DB
+          "Kích thước": sizeAttr?.name || sizeAttr || "",
+        });
+      });
+    }
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(sanPhamData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "SanPham");
+
+  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+  saveAs(data, "sanpham_export.xlsx");
+};
+
+
+
       
 
       const handleImportExcel = (e) => {

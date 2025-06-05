@@ -10,10 +10,17 @@ const createWarehouse = async (warehouse) => {
 
   return response;
 };
+const getBestSellingProducts = async () => {
+  const response = await instance.get(
+    "inventory-product?current=1&pageSize=5&sort=-totalQuantitySell"
+  );
+  return response;
+};
 
 const warehouseService = {
   getInventoryProduct,
-  createWarehouse
+  createWarehouse,
+  getBestSellingProducts
 };
 
 export default warehouseService;
