@@ -21,10 +21,16 @@ import { formatMessageTime } from '../utils/dayUltils';
 const { Sider, Content } = Layout;
 const { Title } = Typography;
 
+const answers = [
+  { id: 1, answer: 'Câu trả lời 1' },
+  { id: 2, answer: 'Câu trả lời 2' },
+  { id: 3, answer: 'Câu trả lời 3' },
+];
+
 function moveToFirst(arr, inputId) {
   const index = arr.findIndex((obj) => obj._id === inputId);
   if (index > -1) {
-    const [item] = arr.splice(index, 1); // remove the item from current position
+    const [item] = arr.splice(index, 1);
     arr.unshift(item);
   }
   return arr;
@@ -85,9 +91,6 @@ const Messages = () => {
     chatRooms.forEach((chatRoom) => {
       const chatRoomId = chatRoom._id;
       socket.on(`chat-rooms/${chatRoomId}`, (newMsg) => {
-        console.log('new msg', newMsg);
-        console.log('selectedChatRoomID', selectedChatRoom?._id);
-
         const newChatRooms = moveToFirst(chatRooms, newMsg.chatRoom);
         if (selectedChatRoom?._id === newMsg.chatRoom) {
           setMessages((messages) => [...messages, newMsg]);
@@ -97,11 +100,32 @@ const Messages = () => {
 
         console.log('new chat roms', newChatRooms);
         setChatRooms([...newChatRooms]);
+        if (newMsg.questionId) {
+          const found = answers.find(
+            (answer) => answer.id === newMsg.questionId,
+          );
+          if (found) {
+            const autoReply = {
+              content: found.answer,
+              chatRoom: newMsg.chatRoom,
+              messageType: 'text',
+              fileUrl: [],
+              createdAt: new Date().toISOString(),
+            };
+            setTimeout(async () => {
+              setMessages((prev) => [...prev, autoReply]);
+              await MessageService.sendMessage({
+                content: found.answer,
+                chatRoom: newMsg.chatRoom,
+                messageType: 'text',
+                fileUrl: [],
+              });
+            }, 1000);
+          }
+        }
       });
     });
   }, [chatRooms, selectedChatRoom?._id, socket, token]);
-
-  console.log('chatRoom', selectedChatRoom);
 
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
@@ -119,7 +143,6 @@ const Messages = () => {
 
   const handleImageUpload = async ({ file }) => {
     if (file.status === 'done') {
-      console.log(file);
       await MessageService.sendMessage({
         content: '',
         chatRoom: selectedChatRoom._id,
@@ -155,17 +178,15 @@ const Messages = () => {
           isNew: false,
         };
 
-        // Create a new chatRoom object with the updated lastMessage
         const updatedChatRoom = {
           ...chatRooms[index],
           lastMessage: updatedLastMessage,
         };
 
-        // Create a new array with the updated chatRoom at the specific index
         const newChatRooms = [
-          ...chatRooms.slice(0, index), // Elements before the updated one
-          updatedChatRoom, // The updated chatRoom
-          ...chatRooms.slice(index + 1), // Elements after the updated one
+          ...chatRooms.slice(0, index),
+          updatedChatRoom,
+          ...chatRooms.slice(index + 1),
         ];
 
         setChatRooms(newChatRooms);
