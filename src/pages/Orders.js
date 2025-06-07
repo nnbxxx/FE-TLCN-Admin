@@ -29,6 +29,24 @@ useEffect(() => {
   const sortedOrders = orderState?.slice()?.sort((a, b) => {
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
+const translateStatus = (status) => {
+  switch (status) {
+    case "CONFIRMED":
+      return "Đã xác nhận";
+    case "DELIVERED":
+      return "Đã giao";
+    case "CANCEL":
+      return "Đã hủy";
+    case "ON_DELIVERY":
+      return "Đang giao";
+    case "PREPARE":
+      return "Đang chuẩn bị";
+    case "UNCONFIRMED":
+      return "Chưa xác nhận";
+    default:
+      return "Không xác định";
+  }
+};
 
   const columns = [
     {
@@ -60,7 +78,7 @@ useEffect(() => {
       dataIndex: "product",
       sorter: (a, b) => a.amount - b.amount,
       render: (index, item) => {
-        return <Link to={`/admin/order/${item?._id}`}>View Orders</Link>;
+        return <Link to={`/admin/order/${item?._id}`}>Xem chi tiết</Link>;
       },
     },
     {
@@ -83,6 +101,7 @@ useEffect(() => {
       title: "Order Status",
       dataIndex: "statusUser",
       sorter: (a, b) => a.statusUser.localeCompare(b.statusUser),
+      align: "center",
       render: (status) => {
         let color = "";
         switch (status) {
@@ -104,14 +123,23 @@ useEffect(() => {
           default:
             color = "gray";
         }
+        const fixedWidth = 120;
         return (
           <span
             style={{
               color,
               fontWeight: "bold",
+              border: `1px solid ${color}`, 
+              borderRadius: "6px",
+              padding: "4px 0",          
+              padding: "2px 6px",           
+              display: "inline-block",  
+              width: fixedWidth, 
+              textAlign: "center",   
+              boxSizing: "border-box",
             }}
           >
-            {status}
+            {translateStatus(status)}
           </span>
         );
       },
@@ -129,12 +157,13 @@ useEffect(() => {
               className="form-control form-select"
               id=""
             >
-              <option value="CONFIRMED">CONFIRMED</option>
-              <option value="UNCONFIRMED">UNCONFIRMED</option>
-              <option value="PREPARE">PREPARE</option>
-              <option value="ON_DELIVERY">ON_DELIVERY</option>
-              <option value="DELIVERED">DELIVERED</option>
-              <option value="CANCEL">CANCEL</option>
+              <option value="CONFIRMED">Đã xác nhận</option>
+              <option value="UNCONFIRMED">Chưa xác nhận</option>
+              <option value="PREPARE">Đang chuẩn bị</option>
+              <option value="ON_DELIVERY">Đang giao</option>
+              <option value="DELIVERED">Đã giao</option>
+              <option value="CANCEL">Đã hủy</option>
+
             </select>
           </>
         );
