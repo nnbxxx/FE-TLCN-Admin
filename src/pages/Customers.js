@@ -130,12 +130,12 @@ const Customers = () => {
     dispatch(blockUser(Id))
       .unwrap()
       .then(() => {
-        message.success("User blocked successfully");
+        message.success("Chặn người dùng thành công");
         dispatch(getUsers());
       })
       .catch((error) => {
-        console.error("Failed to block user:", error);
-        message.error(`Failed to block user: ${error}`);
+        console.error("Chặn người dùng thất bại:", error);
+        message.error(`Chặn người dùng thất bại: ${error}`);
       });
   };
 
@@ -143,12 +143,12 @@ const Customers = () => {
     dispatch(unblockUser(Id))
       .unwrap()
       .then(() => {
-        message.success("User unblocked successfully");
+        message.success("Đã bỏ chặn người dùng thành công");
         dispatch(getUsers());
       })
       .catch((error) => {
-        console.error("Failed to unblock user:", error);
-        message.error(`Failed to unblock user: ${error}`);
+        console.error("Chặn người dùng thất bại:", error);
+        message.error(`Chặn người dùng thất bại: ${error}`);
       });
   };
 
@@ -159,14 +159,14 @@ const Customers = () => {
         dispatch(updateUser({ _id: currentUser._id, role: values.role }))
           .unwrap()
           .then(() => {
-            message.success("User updated successfully");
+            message.success("Cập nhật người dùng thành công");
             setIsModalVisible(false);
             dispatch(getUsers());
             setCurrentUser(null);
           })
           .catch((error) => {
-            console.error("Failed to update user:", error);
-            message.error(`Failed to update user: ${error}`);
+            console.error("Cập nhật người dùng thất bại:", error);
+            message.error(`Cập nhật người dùng thất bại: ${error}`);
           });
       })
       .catch((info) => {});

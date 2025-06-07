@@ -13,9 +13,15 @@ const Orders = () => {
   const [pageSize, setPageSize] = useState(10);
     const [selectedCategory, setSelectedCategory] = useState("");
     const [searchText, setSearchText] = useState("");
-  useEffect(() => {
+useEffect(() => {
+  dispatch(getOrders());
+  const intervalId = setInterval(() => {
     dispatch(getOrders());
-  }, [dispatch]);
+  }, 10000); 
+
+  return () => clearInterval(intervalId); // Clear interval khi component unmount
+}, [dispatch]);
+
 
   const orderState = useSelector((state) => state?.auth?.orders);
 
@@ -149,6 +155,7 @@ const updateOrderStatus = async (orderId, status) => {
     if (status === "DELIVERED") {
       await dispatch(confirmPayments({ id: orderId })).unwrap();
     }
+    dispatch(getOrders());
   } catch (err) {
     console.error("Lỗi khi cập nhật hoặc xác nhận thanh toán:", err);
   }

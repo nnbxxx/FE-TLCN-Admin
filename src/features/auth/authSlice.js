@@ -120,7 +120,7 @@ export const authSlice = createSlice({
             JSON.stringify(action.payload.data.user),
           );
           state.user = action.payload.data.user;
-          toast.success('Login Successfully !');
+          toast.success('Đăng nhập thành công!');
         } else {
           toast.error('User không thể đăng nhập');
           state.isSuccess = false;
@@ -175,7 +175,7 @@ export const authSlice = createSlice({
         state.isSuccess = true;
         state.updateorder = action.payload;
         if (state.isSuccess === true) {
-          toast.success('Order Status Changed');
+          toast.success('Đã thay đổi trạng thái đơn hàng');
         }
       })
       .addCase(updateAOrder.rejected, (state, action) => {
