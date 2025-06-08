@@ -62,14 +62,11 @@ const Messages = () => {
       setChatRooms(chatRooms);
     };
     fetchChatRooms();
-    const newSocket = io(
-      process.env.REACT_APP_SOCKET_URL || 'http://localhost:3006',
-      {
-        extraHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
+    const newSocket = io('https://demo-deploy-be.onrender.com', {
+      extraHeaders: {
+        Authorization: `Bearer ${token}`,
       },
-    );
+    });
 
     setSocket(newSocket);
     newSocket.on('disconnect', () => {
@@ -91,6 +88,7 @@ const Messages = () => {
     chatRooms.forEach((chatRoom) => {
       const chatRoomId = chatRoom._id;
       socket.on(`chat-rooms/${chatRoomId}`, (newMsg) => {
+        console.log('new message', newMsg);
         const newChatRooms = moveToFirst(chatRooms, newMsg.chatRoom);
         if (selectedChatRoom?._id === newMsg.chatRoom) {
           setMessages((messages) => [...messages, newMsg]);
