@@ -1,11 +1,14 @@
-# XÂY DỰNG ỨNG DỤNG THƯƠNG MẠI VỀ THỜI TRANG
+# XÂY DỰNG WEBSITE KINH DOANH VỀ LĨNH VỰC THỜI TRANG
 
 Nhận thấy tầm quan trọng và ý nghĩa văn hóa của cổ phục Việt Nam, nhóm chúng em quyết định xây dựng một Ứng dụng Shop bán cổ phục Việt Nam. Ứng dụng không chỉ hướng đến việc cung cấp trải nghiệm mua sắm đơn giản, tiết kiệm thời gian cho người tiêu dùng mà còn giúp các cửa hàng kinh doanh cổ phục dễ dàng quản lý, lưu trữ thông tin và phát triển bền vững. Hơn nữa, ứng dụng còn góp phần lan tỏa và bảo tồn giá trị truyền thống thông qua việc đưa các sản phẩm cổ phục đến gần hơn với đông đảo người tiêu dùng hiện đại một cách tiện lợi trên thiết bị di động.
 
 ## Nhóm phát triển
 
-- **Ngô Nguyên Bảo** - 21119170
-- **Lê Minh Quang** - 21110270
+| Tên                | MSSV     |
+| ------------------ | -------- |
+| Lê Minh Quang      | 21110279 |
+| Ngô Nguyên Bảo     | 21119170 |
+| Võ Trường Vỹ       | 20110606 |
 
 # Getting Started with Create React App
 
