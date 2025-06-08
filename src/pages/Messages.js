@@ -107,6 +107,7 @@ const Messages = () => {
               content: found.answer,
               chatRoom: newMsg.chatRoom,
               messageType: 'text',
+              isCurrentUser: true,
               fileUrl: [],
               createdAt: new Date().toISOString(),
             };

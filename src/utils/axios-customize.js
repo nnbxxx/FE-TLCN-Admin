@@ -1,17 +1,17 @@
-import axios from "axios";
+import axios from 'axios';
 /* eslint-disable */
 const handleRefreshToken = async () => {
-  const res = await instance.get("/auth/refresh");
+  const res = await instance.get('/auth/refresh');
   if (res && res.data) return res.data.access_token;
   else null;
 };
 
 const instance = axios.create({
   // baseURL: 'https://be-tlcn.onrender.com/api/v1/',
-  baseURL: "http://localhost:8800/api/v1/",
+  baseURL: 'https://demo-deploy-be.onrender.com/api/v1/',
   headers: {
-    Accept: "application/json",
-    "Content-Type": "application/json",
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
   },
   withCredentials: true,
 });
@@ -22,7 +22,7 @@ const instance = axios.create({
 instance.interceptors.request.use(
   async (config) => {
     // Do something before request is sent
-    const access_token = localStorage.getItem("access_token");
+    const access_token = localStorage.getItem('access_token');
     if (access_token) {
       config.headers.Authorization = `Bearer ${access_token}`;
     }
@@ -31,9 +31,9 @@ instance.interceptors.request.use(
   (error) => {
     // Do something with request error
     return Promise.reject(error);
-  }
+  },
 );
-const NO_RETRY_HEADER = "x-no-retry";
+const NO_RETRY_HEADER = 'x-no-retry';
 // Add a response interceptor
 instance.interceptors.response.use(
   function (response) {
@@ -52,17 +52,17 @@ instance.interceptors.response.use(
       !error.config.headers[NO_RETRY_HEADER]
     ) {
       const access_token = await handleRefreshToken();
-      error.config.headers[NO_RETRY_HEADER] = "true";
+      error.config.headers[NO_RETRY_HEADER] = 'true';
       if (access_token) {
-        error.config.headers["Authorization"] = `Bearer ${access_token}`;
-        localStorage.setItem("access_token", access_token);
+        error.config.headers['Authorization'] = `Bearer ${access_token}`;
+        localStorage.setItem('access_token', access_token);
         return instance.request(error.config);
       }
     }
 
     if (error.response && error.response.data) return error.response.data;
     return Promise.reject(error);
-  }
+  },
 );
 
 export default instance;
