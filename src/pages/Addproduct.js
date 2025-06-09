@@ -76,6 +76,7 @@ const Addproduct = () => {
   } = newProduct;
 
   useEffect(() => {
+    dispatch(resetState());
     if (getProductId !== undefined) {
       dispatch(getAProduct(getProductId));
     } else {

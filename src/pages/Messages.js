@@ -307,7 +307,7 @@ const Messages = () => {
                     {chatRoom.roomName?.charAt(0).toUpperCase() || '?'}
                   </Avatar>
                 }
-                title={chatRoom.roomName}
+                title={chatRoom.roomName.replace('Group of ', '')}
                 description={
                   chatRoom.lastMessage?.isNew === true ? (
                     <strong>{chatRoom.lastMessage?.content || ''}</strong>
@@ -350,7 +350,8 @@ const Messages = () => {
                   }
                   style={{ marginRight: 8 }}
                 />
-                <span>{selectedChatRoom.roomName}</span>
+                <span>{selectedChatRoom.roomName.replace('Group of ', '')}</span>
+
               </div>
 
               <Divider style={{ margin: 0 }} />

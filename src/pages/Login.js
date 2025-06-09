@@ -7,6 +7,8 @@ import { login } from '../features/auth/authSlice';
 import logo from '../assets/Logo_Sac.png'; // Adjust the path as needed
 import { ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import './../Css/Login.css'
+import { FaEnvelope, FaEye, FaEyeSlash, FaLock } from 'react-icons/fa';
 
 let schema = yup.object().shape({
   email: yup
@@ -45,6 +47,8 @@ const Login = () => {
     }
   }, [user, isError, isSuccess, isLoading]);
 
+  const [showPassword, setShowPassword] = React.useState(false);
+
   return (
     <>
       <ToastContainer
@@ -58,127 +62,84 @@ const Login = () => {
         draggable
         theme="light"
       />
-      <div style={styles.container}>
-        <div style={styles.rightPanel}>
-          <div style={styles.loginFormContainer}>
-            <img src={logo} alt="Sac Logo" style={styles.logo} />
-            <h3 style={styles.loginTitle}>Chào mừng bạn đến với Sắc</h3>
-            <form onSubmit={formik.handleSubmit}>
-              <CustomInput
+      <div className="login-container">
+      {/* <div className="login-image-wrapper">
+          <img
+            src="https://res.cloudinary.com/dy7jzx0wn/image/upload/v1749462206/Kho%CC%82ng_Co%CC%81_Tie%CC%82u_%C4%90e%CC%82%CC%8018_20250609163901_tbpcbf.png"
+            alt="Decor"
+            className="login-side-image"
+          />
+        </div> */}
+        <div className="login-box">
+        <img
+          src="https://res.cloudinary.com/dy7jzx0wn/image/upload/v1749462206/Kho%CC%82ng_Co%CC%81_Tie%CC%82u_%C4%90e%CC%82%CC%8018_20250609163901_tbpcbf.png"
+          alt="Decor"
+          className="login-side-image-inside"
+        />
+        <img
+          src="https://res.cloudinary.com/dy7jzx0wn/image/upload/v1749464942/Photoroom_20250609_172744_qtpgpn.png"
+          alt="Decor Right"
+          className="login-side-image-right"
+        />
+
+          <img src={logo} alt="Sac Logo" className="login-logo" />
+          <h3 className="login-title">Chào mừng bạn đến với Sắc</h3>
+          <form onSubmit={formik.handleSubmit}>
+            <div className="input-icon-wrapper">
+              <FaEnvelope className="input-icon" />
+              <input
                 type="text"
-                label="email"
                 id="email"
                 name="email"
-                onChng={formik.handleChange('email')}
-                onBlr={formik.handleBlur('email')}
-                val={formik.values.email}
+                className="form-control"
+                placeholder="Email"
+                onChange={formik.handleChange('email')}
+                onBlur={formik.handleBlur('email')}
+                value={formik.values.email}
               />
-              <div style={styles.error}>
-                {formik.touched.email && formik.errors.email}
-              </div>
-              <CustomInput
-                type="password"
-                label="password"
+            </div>
+            <div className="login-error">
+              {formik.touched.email && formik.errors.email}
+            </div>
+            <div className="input-icon-wrapper">
+              <FaLock className="input-icon" />
+              <input
+                type={showPassword ? "text" : "password"}
                 id="pass"
                 name="password"
-                onChng={formik.handleChange('password')}
-                onBlr={formik.handleBlur('password')}
-                val={formik.values.password}
+                className="form-control"
+                placeholder="Mật khẩu"
+                onChange={formik.handleChange("password")}
+                onBlur={formik.handleBlur("password")}
+                value={formik.values.password}
               />
-              <div style={styles.error}>
-                {formik.touched.password && formik.errors.password}
-              </div>
-              <div style={styles.rememberMe}>
-                <input type="checkbox" id="rememberMe" name="rememberMe" />
-                <label htmlFor="rememberMe">Ghi nhớ tôi</label>
-              </div>
-              <button style={styles.loginButton} type="submit">
-                Đăng Nhập
-              </button>
-            </form>
-          </div>
+              <span
+                className="toggle-password-icon"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
+            <div className="login-error">
+              {formik.touched.password && formik.errors.password}
+            </div>
+
+            <div className="remember-me">
+              <input type="checkbox" id="rememberMe" name="rememberMe" />
+              <label htmlFor="rememberMe" className="ms-2">Ghi nhớ tôi</label>
+            </div>
+
+            <button className="custom-login-button" type="submit">
+              Đăng Nhập
+            </button>
+          </form>
         </div>
       </div>
+
     </>
   );
 };
 
-const styles = {
-  container: {
-    display: 'flex',
-    minHeight: '100vh',
-    fontFamily: "'Arial', sans-serif",
-  },
-  leftPanel: {
-    flex: 1,
-    backgroundColor: '#4CA2CD',
-    color: '#fff',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  leftContent: {
-    textAlign: 'center',
-  },
-  rightPanel: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loginFormContainer: {
-    width: '80%',
-    maxWidth: '500px',
-    padding: '20px',
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-    textAlign: 'center', // Center content
-  },
-  logo: {
-    width: '150px', // Adjust the size as needed
-    marginBottom: '20px', // Space between logo and title
-  },
-  loginTitle: {
-    fontSize: '24px',
-    marginBottom: '10px',
-  },
-  error: {
-    marginTop: '10px',
-    color: 'red',
-  },
-  rememberMe: {
-    display: 'flex',
-    alignItems: 'center',
-    marginTop: '10px',
-    justifyContent: 'center', // Center checkbox and label
-  },
-  loginButton: {
-    width: '100%',
-    backgroundColor: '#4CA2CD',
-    color: '#fff',
-    border: 'none',
-    padding: '10px',
-    borderRadius: '4px',
-    fontSize: '16px',
-    cursor: 'pointer',
-    transition: 'background 0.3s',
-  },
-  registerLink: {
-    textAlign: 'center',
-    marginTop: '20px',
-  },
-  formlabels: {
-    fontSize: '14px',
-    fontWeight: 'bold',
-    marginBottom: '-11px',
-  },
 
-  required: {
-    color: 'red',
-    fontSize: '14px',
-  },
-};
 
 export default Login;

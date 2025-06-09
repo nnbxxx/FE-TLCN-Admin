@@ -1,0 +1,161 @@
+/* Container */
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f0f4f8;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+
+/* Image wrapper */
+.login-image-wrapper {
+  flex: 1;
+  max-width: 40%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Login image */
+.login-side-image {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Login box */
+.login-box {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  padding: 40px 32px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.login-side-image-inside {
+  position: absolute;
+  top: -101px;
+  left: -266px;
+  width: 415px;
+  height: auto;
+  object-fit: contain;
+  z-index: 1;
+  pointer-events: none;
+}
+
+
+/* Logo */
+.login-logo {
+  width: 140px;
+  margin-bottom: 24px;
+}
+
+/* Title */
+.login-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+/* Error */
+.login-error {
+  margin-top: 8px;
+  color: red;
+  font-size: 14px;
+}
+
+/* Remember me */
+.remember-me {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 12px 0;
+  font-size: 14px;
+}
+
+/* Custom login button */
+.custom-login-button {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  color: #111;
+  border: 2px solid #002E29;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.custom-login-button:hover {
+  background-color: #002E29;
+  color: white;
+  border-color: #002E29;
+}
+
+/* Input with icon */
+.input-icon-wrapper {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.input-icon-wrapper input.form-control {
+  padding-left: 36px;
+  padding-right: 36px;
+  height: 40px;
+  font-size: 15px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 16px;
+}
+
+.toggle-password-icon {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .login-side-image-inside,
+  .login-side-image-right {
+    display: none;
+  }
+
+  .login-box {
+    padding: 24px;
+  }
+}
+
+
+
+.login-side-image-right {
+  position: absolute;
+  bottom: -114px;
+  right: -279px;
+  width: 352px;
+  height: auto;
+  object-fit: contain;
+  z-index: 1;
+  pointer-events: none;
+}
