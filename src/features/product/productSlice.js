@@ -59,6 +59,19 @@ export const updateAProduct = createAsyncThunk(
     }
   }
 );
+
+export const fileAI = createAsyncThunk(
+  "product/fileAI",
+  async (file, thunkAPI) => {
+    const re = await productService.fileAI(file);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
+    }
+  }
+);
+
 export const resetState = createAction("Reset_all");
 
 const initialState = {
@@ -99,6 +112,22 @@ export const productSlice = createSlice({
         state.createdProduct = action.payload;
       })
       .addCase(createProducts.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.error;
+      })
+
+      .addCase(fileAI.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fileAI.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.createdProduct = action.payload;
+      })
+      .addCase(fileAI.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;

@@ -28,12 +28,30 @@ const deleteproduct = async (id) => {
   return response;
 };
 
+const fileAI = async (formData) => {
+  const token = localStorage.getItem("access_token");
+  const response = await instance.post(
+    `chat-ai/documents`,
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response;
+};
+
+
+
 const productService = {
   getProducts,
   createProduct,
   deleteproduct,
   updateProduct,
   getProduct,
+  fileAI,
 };
 
 export default productService;
