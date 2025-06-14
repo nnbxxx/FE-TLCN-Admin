@@ -62,13 +62,15 @@ const WareHouseList = () => {
     }))
   );
 
-  const filteredData = stockHistoryList
-  .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sắp xếp theo thời gian mới nhất
+const filteredData = stockHistoryList
+  .filter(item => item.action?.toLowerCase() === "import") // chỉ lấy nhập hàng
+  .sort((a, b) => new Date(b.date) - new Date(a.date)) // sắp xếp mới -> cũ
   .filter((item) =>
     Object.values(item).some((val) =>
       val?.toString().toLowerCase().includes(searchText.toLowerCase())
     )
   );
+
 
 
   const columns = [
@@ -82,11 +84,12 @@ const WareHouseList = () => {
       },
     },
 
-   {
+    {
       title: "Tên sản phẩm",
       dataIndex: "productName",
       key: "productName",
       width: 250,
+      sorter: (a, b) => a.productName.localeCompare(b.productName),
       render: (text, record) => (
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           {record.productImage && (
@@ -97,9 +100,9 @@ const WareHouseList = () => {
             />
           )}
           <span
-            title={text} // Tooltip hiện full tên khi hover
+            title={text}
             style={{
-              maxWidth: 160,         // Giới hạn chiều rộng phần tên
+              maxWidth: 160,
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -111,6 +114,7 @@ const WareHouseList = () => {
         </div>
       ),
     },
+
     
     {
       title: "Người tạo",
@@ -122,14 +126,18 @@ const WareHouseList = () => {
       title: "Tổng tồn kho",
       dataIndex: "totalQuantity",
       key: "totalQuantity",
-       width: 100,
+      width: 100,
+      sorter: (a, b) => a.totalQuantity - b.totalQuantity,
     },
+
     {
       title: "Thời gian",
       dataIndex: "date",
       key: "date",
       width: 150,
+      sorter: (a, b) => new Date(a.date) - new Date(b.date),
     },
+
     {
       title: "Hành động",
       dataIndex: "action",

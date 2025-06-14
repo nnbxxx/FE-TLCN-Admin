@@ -126,6 +126,7 @@ const Productlist = () => {
       title: "Mã SP",
       dataIndex: "code",
       width: 100,
+      sorter: (a, b) => (a.code || "").localeCompare(b.code || ""),
     },
     {
       title: "Tên sản phẩm",
@@ -156,39 +157,47 @@ const Productlist = () => {
     {
       title: "Danh mục",
       dataIndex: "category",
+      sorter: (a, b) => {
+        const nameA =
+          categoriess.find((cat) => cat._id === a.category)?.name || "";
+        const nameB =
+          categoriess.find((cat) => cat._id === b.category)?.name || "";
+        return nameA.localeCompare(nameB);
+      },
       render: (categoryId) => {
-        // Kiểm tra categoriess trước khi tìm kiếm
-        if (!categoriess || categoriess.length === 0) return "Đang tải...";
-
         const category = categoriess.find((item) => item._id === categoryId);
         return category ? category.name : "Không xác định";
       },
     },
 
+
     {
       title: "Tổng số lượng",
       dataIndex: "inventory",
       key: "quantity",
+      sorter: (a, b) => {
+        const sumA = a.inventory?.productVariants?.reduce((sum, v) => sum + (v.stock || 0), 0) || 0;
+        const sumB = b.inventory?.productVariants?.reduce((sum, v) => sum + (v.stock || 0), 0) || 0;
+        return sumA - sumB;
+      },
       render: (inventory) => {
-        if (!inventory || !inventory.productVariants) return 0;
-        const total = inventory.productVariants.reduce(
-          (sum, v) => sum + (v.stock || 0),
-          0
-        );
+        const total = inventory?.productVariants?.reduce((sum, v) => sum + (v.stock || 0), 0) || 0;
         return total;
       },
     },
+
     {
       title: "Giá bán",
       dataIndex: "inventory",
       key: "price",
+      sorter: (a, b) => {
+        const getMinPrice = (inv) =>
+          Math.min(...(inv?.productVariants?.map((v) => v.sellPrice).filter((p) => typeof p === "number") || [0]));
+
+        return getMinPrice(a.inventory) - getMinPrice(b.inventory);
+      },
       render: (inventory) => {
-        if (
-          !inventory ||
-          !inventory.productVariants ||
-          inventory.productVariants.length === 0
-        )
-          return "N/A";
+        if (!inventory?.productVariants?.length) return "N/A";
         const prices = inventory.productVariants
           .map((v) => v.sellPrice)
           .filter((p) => typeof p === "number");
