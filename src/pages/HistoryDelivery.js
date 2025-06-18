@@ -113,25 +113,15 @@ const HistoryDelivery = () => {
      },
    },
    {
-     title: "Color",
-     dataIndex: "items",
-     render: (items) => {
-       const firstItem = items?.[0];
-       const colorId = firstItem?.color?._id || "#000000"; // Nếu không có màu thì hiển thị đen
-       return (
-         <div
-           style={{
-             width: "20px",
-             height: "20px",
-             backgroundColor: colorId,
-             borderRadius: "50%",
-             border: "1px solid #ddd",
-           }}
-           title={colorId}
-         />
-       );
-     },
-   },
+  title: "Giá",
+  dataIndex: "items",
+  render: (items) => {
+    const firstItem = items?.[0];
+    const price = firstItem?.price || 0;
+    return <span>{price.toLocaleString("vi-VN")} ₫</span>;
+  },
+},
+
    
    
     {
@@ -151,28 +141,35 @@ const HistoryDelivery = () => {
      },
    },
     {
-      title: "Order Status",
-      dataIndex: "statusUser",
-      sorter: (a, b) => a.statusUser.localeCompare(b.statusUser),
-      render: (status) => {
-        let color = "";
-        switch (status) {
-          case "ON_DELIVERY":
-            color = "orange";
-            break;
-          case "DELIVERED":
-            color = "blue";
-            break;
-          default:
-            color = "gray";
-        }
-        return (
-          <span style={{ color, fontWeight: "bold" }}>
-            {status}
-          </span>
-        );
-      },
-    },
+  title: "Status",
+  dataIndex: "statusUser",
+  sorter: (a, b) => a.statusUser.localeCompare(b.statusUser),
+  render: (status) => {
+    let color = "";
+    let label = "";
+
+    switch (status) {
+      case "ON_DELIVERY":
+        color = "orange";
+        label = "Đang giao hàng";
+        break;
+      case "DELIVERED":
+        color = "blue";
+        label = "Đã giao hàng";
+        break;
+      default:
+        color = "gray";
+        label = "Không xác định";
+    }
+
+    return (
+      <span style={{ color, fontWeight: "bold" }}>
+        {label}
+      </span>
+    );
+  },
+},
+
     
   ];
 

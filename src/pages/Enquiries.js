@@ -35,7 +35,9 @@ const Enquiries = () => {
 
   return (
     <div>
-      <h3 className="mb-4 title" style={{color: "#fff"}}>Tải lên tài liệu AI</h3>
+      <h3 className="mb-4 title" style={{ color: "#fff" }}>
+        Tải lên tài liệu AI
+      </h3>
       <div className="mb-4 d-flex align-items-center gap-2">
         <Input
           placeholder="Nhập tiêu đề tài liệu"
@@ -46,12 +48,15 @@ const Enquiries = () => {
         <Upload
           beforeUpload={(file) => {
             setSelectedFile(file);
-            return false; // Ngăn auto upload
+            return false;
           }}
           maxCount={1}
           accept=".pdf"
+          showUploadList={false}
         >
-          <Button icon={<UploadOutlined />}>Chọn file PDF</Button>
+          <Button icon={<UploadOutlined />}>
+            {selectedFile ? selectedFile.name : "Chọn file PDF"}
+          </Button>
         </Upload>
         <Button type="primary" onClick={handleFileUpload}>
           Tải lên

@@ -183,6 +183,11 @@ const MainLayout = () => {
               label: "Orders",
             },
             {
+              key: "reviews",
+              icon: <FaClipboardList className="fs-4" />,
+              label: "Reviews",
+            },
+            {
               key: "marketing",
               icon: <RiCouponLine className="fs-4" />,
               label: "Marketing",
@@ -230,7 +235,7 @@ const MainLayout = () => {
             {
               key: "enquiries",
               icon: <FaClipboardList className="fs-4" />,
-              label: "Enquiries",
+              label: "Train AI",
             },
             {
               key: "signout",

@@ -72,6 +72,18 @@ export const fileAI = createAsyncThunk(
   }
 );
 
+export const getUserReviews = createAsyncThunk(
+  "product/getUserReviews",
+  async (data, thunkAPI) => {
+    const re = await productService.getUserReviews(data);
+    if (re && re.data) {
+      return re;
+    } else {
+      return thunkAPI.rejectWithValue(re);
+    }
+  }
+);
+
 export const resetState = createAction("Reset_all");
 
 const initialState = {
@@ -79,6 +91,7 @@ const initialState = {
   isError: false,
   isLoading: false,
   isSuccess: false,
+  userReviews: [],
   message: "",
 };
 export const productSlice = createSlice({
@@ -188,6 +201,21 @@ export const productSlice = createSlice({
         state.updatedProduct = action.payload;
       })
       .addCase(updateAProduct.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.error;
+      })
+      .addCase(getUserReviews.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getUserReviews.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.userReviews = action.payload.data.result; // ✅ Gán danh sách đánh giá
+      })
+      .addCase(getUserReviews.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;

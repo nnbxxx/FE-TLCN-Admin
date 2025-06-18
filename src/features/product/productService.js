@@ -43,6 +43,17 @@ const fileAI = async (formData) => {
   return response;
 };
 
+const getUserReviews = async (params = { current: 1, pageSize: 500 }) => {
+  const token = localStorage.getItem("token");
+  const response = await instance.get("/reviews", {
+    params,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response;
+};
+
 
 
 const productService = {
@@ -52,6 +63,7 @@ const productService = {
   updateProduct,
   getProduct,
   fileAI,
+  getUserReviews,
 };
 
 export default productService;

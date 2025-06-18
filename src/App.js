@@ -32,6 +32,7 @@ import Voucherlist from "./pages/VoucherList";
 import AddVoucher from "./pages/AddVoucher";
 import StockInventory from "./pages/StockInventory";
 import Messages from "./pages/Messages";
+import ReviewList from "./pages/ReviewList";
 function App() {
   return (
     <Router>
@@ -67,6 +68,7 @@ function App() {
           <Route path="blog-category" element={<Addblogcat />} />
           <Route path="blog-category/:id" element={<Addblogcat />} />
           <Route path="orders" element={<Orders />} />
+          <Route path="reviews" element={<ReviewList />} />
           <Route path="order/:id" element={<ViewOrder />} />
           <Route path="customers" element={<Customers />} />
           <Route path="list-color" element={<Colorlist />} />
